@@ -9,6 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from './logger/logger.module';
 import { errorFilterProvider } from './utils/filters/error/error.filter.provider';
 import { FileModule } from './file/file.module';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { FileModule } from './file/file.module';
       isGlobal: true,
     }),
     FileModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],
