@@ -1,0 +1,28 @@
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import { EmailModule } from './email/email.module';
+import { AuthModule } from './auth/auth.module';
+import { DatabaseModule } from './database/database.module';
+import { ConfigModule } from '@nestjs/config';
+import { LoggerModule } from './logger/logger.module';
+import { errorFilterProvider } from './utils/filters/error/error.filter.provider';
+import { FileModule } from './file/file.module';
+
+@Module({
+  imports: [
+    UserModule,
+    EmailModule,
+    AuthModule,
+    DatabaseModule,
+    LoggerModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    FileModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService, errorFilterProvider],
+})
+export class AppModule {}
