@@ -11,6 +11,11 @@ import { CreateAndVerifyUser1740301060631 } from './migrations/1740301060631-cre
 import { CreateFileEntity1740301416004 } from './migrations/1740301416004-create-file-entity';
 import { Log } from './src/logger/entities/log.entity';
 import { CreateLoggerEntity1740301521390 } from './migrations/1740301521390-create-logger-entity';
+import { Task } from "./src/project/entities/task.entity";
+import { Project } from "./src/project/entities/project.entity";
+import { CreateProjectTask1740462061541 } from "./migrations/1740462061541-create-project-task";
+import { Message } from "./src/message/entities/message.entity";
+import { CreateMessage1740487533430 } from "./migrations/1740487533430-create-message";
 
 config();
 const configService = new ConfigService();
@@ -26,12 +31,17 @@ const options: DataSourceOptions & SeederOptions = {
     User,
     UserVerification,
     FileEntity,
-    Log
+    Log,
+    Project,
+    Task,
+    Message,
   ],
   migrations: [
     CreateAndVerifyUser1740301060631,
     CreateFileEntity1740301416004,
-    CreateLoggerEntity1740301521390
+    CreateLoggerEntity1740301521390,
+    CreateProjectTask1740462061541,
+    CreateMessage1740487533430
   ],
   seeds: [MainSeeder],
 };
