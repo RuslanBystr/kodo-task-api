@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,6 +12,8 @@ import {
 import { FileEntity } from '../../file/entities/file.entity';
 import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums/users-role.enum';
+import { Task } from '../../project/entities/task.entity';
+import { Message } from '../../message/entities/message.entity';
 
 @Entity()
 export class User {
@@ -48,6 +51,15 @@ export class User {
     cascade: true,
   })
   public avatar: FileEntity;
+
+  @OneToMany(() => Task, (task) => task.assignedUser)
+  tasks: Task[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  sentMessages: Message[];
+
+  @OneToMany(() => Message, (message) => message.receiver)
+  receivedMessages: Message[];
 
   @Column({
     nullable: true,

@@ -1,26 +1,70 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProjectDto } from '../dto/create-project.dto';
-import { UpdateProjectDto } from '../dto/update-project.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
+import { Project } from '../entities/project.entity';
+import { CreateProjectDto, UpdateProjectDto } from '../dto';
+import { UserSortByEnum } from '../../user/enums/user-sort.enum';
+import { SortOrderEnum } from '../../common/enums/sort-order.enum';
+import { generateSearchConditionsUser } from '../../user/utils/search-condition-users';
+import { GetAllProjectsFilterDto } from '../dto/get-all-projects.dto';
 
 @Injectable()
 export class ProjectService {
+  constructor(
+    @InjectRepository(Project) private projectRepo: Repository<Project>,
+  ) {}
+
   create(createProjectDto: CreateProjectDto) {
-    return 'This action adds a new project';
+    const project = this.projectRepo.create(createProjectDto);
+    return this.projectRepo.save(project);
   }
 
-  findAll() {
-    return `This action returns all project`;
+  public async findAll({
+    page = 1,
+    limit = 10,
+    sortBy = UserSortByEnum.CREATED_AT,
+    order = SortOrderEnum.ASC,
+    ...searchFilterFields
+  }: GetAllProjectsFilterDto): Promise<any> {
+    const skip = (page - 1) * limit;
+
+    const conditions: FindOptionsWhere<Project> =
+      generateSearchConditionsUser<Project>(searchFilterFields);
+
+    const [projectItems, total] = await this.projectRepo.findAndCount({
+      select: ['id', 'name', 'description', 'createdAt'],
+      where: conditions,
+      relations: ['tasks', 'image'],
+      skip,
+      take: limit,
+      order: { [sortBy]: order },
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      items: projectItems,
+      meta: {
+        totalItems: total,
+        itemCount: projectItems.length,
+        itemsPerPage: Number(limit),
+        totalPages,
+        currentPage: Number(page),
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+  findOne(id: string) {
+    return this.projectRepo.findOne({ where: { id }, relations: ['tasks'] });
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(id: string, updateProjectDto: UpdateProjectDto) {
+    await this.projectRepo.update(id, updateProjectDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async remove(id: string) {
+    await this.projectRepo.delete(id);
+    return { message: 'Project deleted successfully' };
   }
 }

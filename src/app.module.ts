@@ -10,6 +10,7 @@ import { LoggerModule } from './logger/logger.module';
 import { errorFilterProvider } from './utils/filters/error/error.filter.provider';
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ProjectModule } from './project/project.module';
     }),
     FileModule,
     ProjectModule,
+    MessageModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],

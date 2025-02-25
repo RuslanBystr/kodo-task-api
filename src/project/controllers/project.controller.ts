@@ -1,34 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
-import { CreateProjectDto } from '../dto/create-project.dto';
-import { UpdateProjectDto } from '../dto/update-project.dto';
+import { CreateProjectDto, UpdateProjectDto } from '../dto';
+import { ApiTags } from '@nestjs/swagger';
+import { GetAllProjectsFilterDto } from '../dto/get-all-projects.dto';
 
+@ApiTags('project')
 @Controller('project')
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectService.create(createProjectDto);
+  @Get()
+  async getProjects(@Query() filterDto: GetAllProjectsFilterDto) {
+    return this.projectService.findAll(filterDto);
   }
 
-  @Get()
-  findAll() {
-    return this.projectService.findAll();
+  @Post()
+  create(@Body() dto: CreateProjectDto) {
+    return this.projectService.create(dto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.projectService.findOne(+id);
+    return this.projectService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectService.update(+id, updateProjectDto);
+  update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
+    return this.projectService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.projectService.remove(+id);
+    return this.projectService.remove(id);
   }
 }
