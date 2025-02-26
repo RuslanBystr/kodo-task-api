@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -14,6 +15,7 @@ import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums/users-role.enum';
 import { Task } from '../../project/entities/task.entity';
 import { Message } from '../../message/entities/message.entity';
+import { Chat } from '../../chat/entities/chat.entity';
 
 @Entity()
 export class User {
@@ -58,8 +60,8 @@ export class User {
   @OneToMany(() => Message, (message) => message.sender)
   sentMessages: Message[];
 
-  @OneToMany(() => Message, (message) => message.receiver)
-  receivedMessages: Message[];
+  @ManyToMany(() => Chat, (chat) => chat.users)
+  chats: Chat[];
 
   @Column({
     nullable: true,
