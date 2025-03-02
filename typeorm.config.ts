@@ -18,6 +18,11 @@ import { Message } from "./src/message/entities/message.entity";
 import { CreateMessage1740487533430 } from "./migrations/1740487533430-create-message";
 import { Chat } from "./src/chat/entities/chat.entity";
 import { CreateChat1740494422110 } from "./migrations/1740494422110-create-chat";
+import { UserChat } from "./src/chat/entities/user.chat.entity";
+import { AddUserChatAndEnum1740827362244 } from "./migrations/1740827362244-add-user-chat-and-enum";
+import { FileEntityUUID1740842180816 } from "./migrations/1740842180816-file-entity-uuid";
+import { ProjectImage1740844355246 } from "./migrations/1740844355246-image-ref-remove";
+import {ChatAvatar1740848332907} from "./migrations/1740848332907-chat-avatar";
 
 config();
 const configService = new ConfigService();
@@ -37,7 +42,8 @@ const options: DataSourceOptions & SeederOptions = {
     Project,
     Task,
     Message,
-    Chat
+    Chat,
+    UserChat
   ],
   migrations: [
     CreateAndVerifyUser1740301060631,
@@ -45,7 +51,11 @@ const options: DataSourceOptions & SeederOptions = {
     CreateLoggerEntity1740301521390,
     CreateProjectTask1740462061541,
     CreateMessage1740487533430,
-    CreateChat1740494422110
+    CreateChat1740494422110,
+    AddUserChatAndEnum1740827362244,
+    FileEntityUUID1740842180816,
+    ProjectImage1740844355246,
+    ChatAvatar1740848332907
   ],
   seeds: [MainSeeder],
 };

@@ -1,5 +1,6 @@
+import { TaskStatusEnum } from '../enums/task-status';
+
 export class UpdateTaskDto {
-  title?: string;
   description?: string;
-  completed?: boolean;
+  status?: TaskStatusEnum;
 }

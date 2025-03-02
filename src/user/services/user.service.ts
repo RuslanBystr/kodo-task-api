@@ -104,7 +104,6 @@ export class UserService {
   async getProfile(id: number): Promise<GetUserResponseDto> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: { avatar: true },
     });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -247,6 +246,7 @@ export class UserService {
         'lastName',
         'email',
         'status',
+        'avatar',
         'isBlocked',
         'createdAt',
         'updatedAt',
@@ -285,7 +285,6 @@ export class UserService {
         'updatedAt',
       ],
       where: conditions,
-      relations: ['avatar'],
       skip,
       take: limit,
       order: { [sortBy]: order },
@@ -314,15 +313,13 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
     if (updateDto.avatarFileUUID) {
-      const file = await this.fileRepository.findOne({
+      const oldFile = await this.fileRepository.findOne({
         where: { uuid: updateDto.avatarFileUUID },
       });
-      if (!file) {
+      if (!oldFile) {
         throw new NotFoundException('File not found');
       }
-      user.avatar = file;
-      //delete old avatar
-      await this.fileService.deleteFile(file.uuid, user.id);
+      await this.fileService.deleteFile(oldFile.uuid, user.id);
     }
     Object.assign<User, Partial<User>>(user, updateDto);
     await this.userRepository.save(user);

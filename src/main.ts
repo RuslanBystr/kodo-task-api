@@ -37,7 +37,7 @@ async function bootstrap() {
     .then(() =>
       console.log('Server started http://localhost:' + process.env.API_PORT),
     )
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err.message));
 }
 bootstrap();
 

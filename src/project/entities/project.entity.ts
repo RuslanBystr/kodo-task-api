@@ -4,24 +4,16 @@ import {
   Column,
   OneToMany,
   CreateDateColumn,
-  JoinColumn,
-  OneToOne,
 } from 'typeorm';
 import { Task } from './task.entity';
-import { FileEntity } from '../../file/entities/file.entity';
 
 @Entity()
 export class Project {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @JoinColumn({ name: 'image', referencedColumnName: 'id' })
-  @OneToOne(() => FileEntity, {
-    orphanedRowAction: 'delete',
-    onDelete: 'CASCADE',
-    cascade: true,
-  })
-  public image: FileEntity;
+  @Column({ type: 'uuid', nullable: true })
+  public image: string;
 
   @Column()
   name: string;

@@ -45,9 +45,6 @@ export class FileService {
       where: {
         uuid,
       },
-      relations: {
-        user: true,
-      },
     });
     if (!file) {
       throw new NotFoundException('File not found');

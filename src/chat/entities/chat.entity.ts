@@ -1,13 +1,6 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
 import { Message } from '../../message/entities/message.entity';
-import { User } from '../../user/entities/user.entity';
+import { UserChat } from './user.chat.entity';
 
 export enum ChatType {
   PRIVATE = 'PRIVATE',
@@ -22,13 +15,12 @@ export class Chat {
   @Column({ type: 'enum', enum: ChatType })
   type: ChatType;
 
-  @ManyToMany(() => User, (user) => user.chats)
-  @JoinTable()
-  users: User[];
+  @OneToMany(() => UserChat, (userChat) => userChat.chat)
+  userChats: UserChat[];
 
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
 
   @Column({ nullable: true })
-  name?: string;
+  groupName?: string;
 }

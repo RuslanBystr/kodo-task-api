@@ -1,9 +1,9 @@
 import {
   Body,
-  Controller,
+  Controller, Delete,
   Get,
   HttpCode,
-  HttpStatus,
+  HttpStatus, Param,
   Patch,
   Post,
   Put,
@@ -40,6 +40,16 @@ export class UserController {
   async getUsers(@Query() filterDto: GetAllUsersFilterDto) {
     return this.userService.findAll(filterDto);
   }
+  @GetProfileApiDocs()
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard, ActiveUserGuard)
+  async getProfile(@GetJwtPayload() user: JwtPayload) {
+    return await this.userService.getProfile(user.id);
+  }
+  @Get(':id')
+  async getUserById(@Param('id') id: number) {
+    return this.userService.findById(id);
+  }
   @Post()
   @UseGuards(JwtAuthGuard)
   public async create(@Body() createAdminDto: any) {
@@ -59,11 +69,18 @@ export class UserController {
   @Put('/profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, ActiveUserGuard)
-  async updateUser(
+  async updateUserProfule(
     @Body() updateDto: UpdateUserDto,
     @GetJwtPayload() { id: userId }: JwtPayload,
   ) {
     return await this.userService.updateUser(updateDto, userId);
+  }
+  @Put(':id')
+  async updateUser(
+      @Param('id') id: number,
+      @Body() updateDto: UpdateUserDto,
+  ) {
+    return await this.userService.updateUser(updateDto, id);
   }
 
   @ChangeDataVerifyCodeApiDocs()
@@ -120,10 +137,8 @@ export class UserController {
     return { message: 'Password was changed successfully' };
   }
 
-  @GetProfileApiDocs()
-  @Get('/profile')
-  @UseGuards(JwtAuthGuard, ActiveUserGuard)
-  async getProfile(@GetJwtPayload() user: JwtPayload) {
-    return await this.userService.getProfile(user.id);
+  @Delete(':id')
+  async deleteUser(id: number) {
+    return this.userService.remove(id)
   }
 }

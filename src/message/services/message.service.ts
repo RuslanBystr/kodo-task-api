@@ -26,17 +26,23 @@ export class MessageService {
 
   public async getMessages({
     page = 1,
-    limit = 50,
+    limit = 100,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
-    const skip = (page - 1) * limit;
-
-    const [messageItems, total] = await this.messageRepo.findAndCount({
-      select: ['id', 'content', 'sender', 'createdAt'],
-      where: { chat: { id: chatId } },
-      skip,
-      take: limit,
-    });
+    const [messageItems, total] = await this.messageRepo
+        .createQueryBuilder('message')
+        .select([
+          'message.id',
+          'message.content',
+          'message.createdAt',
+          'sender.id'
+        ])
+        .leftJoin('message.sender', 'sender')
+        .where('message.chatId = :chatId', { chatId })
+        .orderBy('message.createdAt', 'ASC')
+        .take(limit)
+        .skip((page - 1) * limit)
+        .getManyAndCount();
 
     const totalPages = Math.ceil(total / limit);
 
