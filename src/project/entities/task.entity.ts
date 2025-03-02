@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Project } from './project.entity';
 import { User } from '../../user/entities/user.entity';
+import { TaskStatusEnum } from '../enums/task-status';
 
 @Entity()
 export class Task {
@@ -24,6 +25,9 @@ export class Task {
 
   @ManyToOne(() => User, (user) => user.tasks, { onDelete: 'CASCADE' })
   assignedUser: User;
+
+  @Column({ type: 'enum', enum: TaskStatusEnum, default: TaskStatusEnum.TODO })
+  status: TaskStatusEnum;
 
   @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
   project: Project;

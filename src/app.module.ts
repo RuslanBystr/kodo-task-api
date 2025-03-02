@@ -11,6 +11,7 @@ import { errorFilterProvider } from './utils/filters/error/error.filter.provider
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { MessageModule } from './message/message.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MessageModule } from './message/message.module';
     FileModule,
     ProjectModule,
     MessageModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],

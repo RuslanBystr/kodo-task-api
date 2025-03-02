@@ -48,7 +48,7 @@ export class TaskService {
       generateSearchConditionsUser<Task>(searchFilterFields);
 
     const [taskItems, total] = await this.taskRepo.findAndCount({
-      select: ['id', 'title', 'description', 'createdAt'],
+      select: ['id', 'title', 'description', 'status', 'createdAt'],
       where: conditions,
       relations: ['assignedUser', 'project'],
       skip,

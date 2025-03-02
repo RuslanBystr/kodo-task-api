@@ -3,17 +3,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { FileEntity } from '../../file/entities/file.entity';
 import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums/users-role.enum';
 import { Task } from '../../project/entities/task.entity';
 import { Message } from '../../message/entities/message.entity';
+import {UserChat} from "../../chat/entities/user.chat.entity";
 
 @Entity()
 export class User {
@@ -44,13 +42,8 @@ export class User {
   @Column({ default: false, name: 'is_blocked' })
   public isBlocked: boolean;
 
-  @JoinColumn({ name: 'avatar_file_id', referencedColumnName: 'id' })
-  @OneToOne(() => FileEntity, {
-    orphanedRowAction: 'delete',
-    onDelete: 'CASCADE',
-    cascade: true,
-  })
-  public avatar: FileEntity;
+  @Column({ type: 'uuid', nullable: true })
+  public avatar: string;
 
   @OneToMany(() => Task, (task) => task.assignedUser)
   tasks: Task[];
@@ -58,8 +51,8 @@ export class User {
   @OneToMany(() => Message, (message) => message.sender)
   sentMessages: Message[];
 
-  @OneToMany(() => Message, (message) => message.receiver)
-  receivedMessages: Message[];
+  @OneToMany(() => UserChat, (userChat) => userChat.user)
+  userChats: UserChat[];
 
   @Column({
     nullable: true,

@@ -14,9 +14,13 @@ export class ProjectService {
     @InjectRepository(Project) private projectRepo: Repository<Project>,
   ) {}
 
-  create(createProjectDto: CreateProjectDto) {
-    const project = this.projectRepo.create(createProjectDto);
-    return this.projectRepo.save(project);
+  public async create(createProjectDto: CreateProjectDto) {
+
+    const project = this.projectRepo.create({
+      ...createProjectDto,
+    });
+
+    await this.projectRepo.save(project);
   }
 
   public async findAll({
@@ -32,9 +36,9 @@ export class ProjectService {
       generateSearchConditionsUser<Project>(searchFilterFields);
 
     const [projectItems, total] = await this.projectRepo.findAndCount({
-      select: ['id', 'name', 'description', 'createdAt'],
+      select: ['id', 'name', 'description', 'image', 'createdAt'],
       where: conditions,
-      relations: ['tasks', 'image'],
+      relations: ['tasks'],
       skip,
       take: limit,
       order: { [sortBy]: order },

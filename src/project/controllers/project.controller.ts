@@ -6,7 +6,7 @@ import {
   Param,
   Patch,
   Delete,
-  Query,
+  Query, Put,
 } from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import { CreateProjectDto, UpdateProjectDto } from '../dto';
@@ -33,7 +33,7 @@ export class ProjectController {
     return this.projectService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
     return this.projectService.update(id, dto);
   }

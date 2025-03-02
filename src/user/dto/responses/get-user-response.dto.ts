@@ -24,7 +24,7 @@ export class GetUserResponseDto {
   isBlocked: boolean;
 
   @ApiProperty()
-  avatar: FileEntity;
+  avatar: string;
 
   @ApiProperty()
   createdAt: Date;

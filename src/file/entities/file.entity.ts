@@ -10,11 +10,7 @@ import { User } from '../../user/entities/user.entity';
 
 @Entity()
 export class FileEntity {
-  @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Column()
-  @Generated('uuid')
+  @PrimaryGeneratedColumn('uuid')
   uuid: string;
 
   @Column({ unique: true, name: 'file_name' })
