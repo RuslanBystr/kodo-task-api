@@ -5,12 +5,14 @@ import { Message } from '../entities/message.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
+import { RedisService } from "../../redis/redis.service";
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message) private messageRepo: Repository<Message>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
+    private readonly redisService: RedisService
   ) {}
 
   async sendMessage(messageDto: CreateMessageDto): Promise<any> {
@@ -21,7 +23,10 @@ export class MessageService {
       sender: { id: senderId },
       chat,
     });
-    return this.messageRepo.save(message);
+    const savedMessage = await this.messageRepo.save(message);
+    const cacheKey = `chat:${chatId}:messages`;
+    await this.redisService.deleteCache(cacheKey);
+    return savedMessage;
   }
 
   public async getMessages({
@@ -29,6 +34,15 @@ export class MessageService {
     limit = 100,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
+
+    const cacheKey = `chat:${chatId}:messages`;
+
+    const cachedMessages = await this.redisService.getCache(cacheKey);
+    if (cachedMessages) {
+      console.log("from cache");
+      return cachedMessages;
+    }
+
     const [messageItems, total] = await this.messageRepo
         .createQueryBuilder('message')
         .select([
@@ -46,8 +60,11 @@ export class MessageService {
 
     const totalPages = Math.ceil(total / limit);
 
-    return {
-      items: messageItems,
+    const response = {
+      items: messageItems.map(msg => ({
+        ...msg,
+        sender: msg.sender.id,
+      })),
       meta: {
         totalItems: total,
         itemCount: messageItems.length,
@@ -56,5 +73,10 @@ export class MessageService {
         currentPage: Number(page),
       },
     };
+
+    await this.redisService.setCache(cacheKey, response, 60);
+    console.log("from db");
+    return response;
+
   }
 }

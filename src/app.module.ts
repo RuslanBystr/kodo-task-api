@@ -12,6 +12,7 @@ import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ChatModule } from './chat/chat.module';
     ProjectModule,
     MessageModule,
     ChatModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],
