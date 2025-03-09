@@ -6,7 +6,7 @@ import {
   Param,
   Patch,
   Delete,
-  Query,
+  Query, Put,
 } from '@nestjs/common';
 import { TaskService } from '../services/task.service';
 import { CreateTaskDto, UpdateTaskDto } from '../dto';
@@ -33,7 +33,7 @@ export class TaskController {
     return this.taskService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
     return this.taskService.update(id, dto);
   }
