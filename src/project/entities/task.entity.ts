@@ -9,6 +9,12 @@ import { Project } from './project.entity';
 import { User } from '../../user/entities/user.entity';
 import { TaskStatusEnum } from '../enums/task-status';
 
+export enum TaskPriority {
+  LOW = "Low",
+  MEDIUM = "Medium",
+  HIGH = "High",
+}
+
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn('uuid')
@@ -28,6 +34,24 @@ export class Task {
 
   @Column({ type: 'enum', enum: TaskStatusEnum, default: TaskStatusEnum.TODO })
   status: TaskStatusEnum;
+
+  @Column({ type: "enum", enum: TaskPriority, default: TaskPriority.LOW })
+  priority: TaskPriority;
+
+  @Column({ type: "timestamp", nullable: true })
+  started: Date;
+
+  @Column({ type: "timestamp", nullable: true })
+  deadline: Date;
+
+  @Column({ type: "int", default: 0 })
+  estimate: number;
+
+  @Column({ type: "int", default: 0 })
+  spentTime: number;
+
+  @Column({ type: "int", default: 0 })
+  remaining: number;
 
   @ManyToOne(() => Project, (project) => project.tasks, { onDelete: 'CASCADE' })
   project: Project;

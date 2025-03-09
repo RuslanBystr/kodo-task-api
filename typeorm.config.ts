@@ -23,6 +23,7 @@ import { AddUserChatAndEnum1740827362244 } from "./migrations/1740827362244-add-
 import { FileEntityUUID1740842180816 } from "./migrations/1740842180816-file-entity-uuid";
 import { ProjectImage1740844355246 } from "./migrations/1740844355246-image-ref-remove";
 import {ChatAvatar1740848332907} from "./migrations/1740848332907-chat-avatar";
+import { TaskDetails1741097658314 } from './migrations/1741097658314-task-details';
 
 config();
 const configService = new ConfigService();
@@ -55,7 +56,8 @@ const options: DataSourceOptions & SeederOptions = {
     AddUserChatAndEnum1740827362244,
     FileEntityUUID1740842180816,
     ProjectImage1740844355246,
-    ChatAvatar1740848332907
+    ChatAvatar1740848332907,
+    TaskDetails1741097658314
   ],
   seeds: [MainSeeder],
 };

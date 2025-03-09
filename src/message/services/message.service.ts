@@ -31,17 +31,17 @@ export class MessageService {
 
   public async getMessages({
     page = 1,
-    limit = 100,
+    limit = 20,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
 
-    const cacheKey = `chat:${chatId}:messages`;
-
-    const cachedMessages = await this.redisService.getCache(cacheKey);
-    if (cachedMessages) {
-      console.log("from cache");
-      return cachedMessages;
-    }
+    // const cacheKey = `chat:${chatId}:messages`;
+    //
+    // const cachedMessages = await this.redisService.getCache(cacheKey);
+    // if (cachedMessages) {
+    //   console.log("from cache");
+    //   return cachedMessages;
+    // }
 
     const [messageItems, total] = await this.messageRepo
         .createQueryBuilder('message')
@@ -53,7 +53,7 @@ export class MessageService {
         ])
         .leftJoin('message.sender', 'sender')
         .where('message.chatId = :chatId', { chatId })
-        .orderBy('message.createdAt', 'ASC')
+        .orderBy('message.createdAt', 'DESC')
         .take(limit)
         .skip((page - 1) * limit)
         .getManyAndCount();
@@ -61,10 +61,10 @@ export class MessageService {
     const totalPages = Math.ceil(total / limit);
 
     const response = {
-      items: messageItems.map(msg => ({
+      items: messageItems?.map(msg => ({
         ...msg,
         sender: msg.sender.id,
-      })),
+      })).reverse(),
       meta: {
         totalItems: total,
         itemCount: messageItems.length,
@@ -74,8 +74,8 @@ export class MessageService {
       },
     };
 
-    await this.redisService.setCache(cacheKey, response, 60);
-    console.log("from db");
+    // await this.redisService.setCache(cacheKey, response, 60);
+    // console.log("from db");
     return response;
 
   }

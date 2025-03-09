@@ -23,9 +23,6 @@ export class UpdateUserResponseDto {
   status: boolean;
 
   @ApiProperty()
-  password: string;
-
-  @ApiProperty()
   isBlocked: boolean;
 
   @ApiProperty()

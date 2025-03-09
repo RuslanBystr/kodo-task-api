@@ -69,7 +69,7 @@ export class UserController {
   @Put('/profile')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard, ActiveUserGuard)
-  async updateUserProfule(
+  async updateUserProfile(
     @Body() updateDto: UpdateUserDto,
     @GetJwtPayload() { id: userId }: JwtPayload,
   ) {
