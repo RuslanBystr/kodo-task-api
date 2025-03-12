@@ -5,10 +5,10 @@ import { Task } from '../entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 import { Project } from '../entities/project.entity';
 import { CreateTaskDto, UpdateTaskDto } from '../dto';
-import { UserSortByEnum } from '../../user/enums/user-sort.enum';
 import { SortOrderEnum } from 'src/common/enums/sort-order.enum';
 import { GetAllTasksFilterDto } from '../dto/get-all-tasks.dto';
 import { generateSearchConditionsUser } from '../../user/utils/search-condition-users';
+import { TaskSortByEnum } from '../enums/task-sort-by.enum';
 
 @Injectable()
 export class TaskService {
@@ -38,7 +38,7 @@ export class TaskService {
   public async findAll({
     page = 1,
     limit = 10,
-    sortBy = UserSortByEnum.CREATED_AT,
+    sortBy = TaskSortByEnum.CREATED_AT,
     order = SortOrderEnum.ASC,
     ...searchFilterFields
   }: GetAllTasksFilterDto): Promise<any> {
@@ -48,7 +48,7 @@ export class TaskService {
       generateSearchConditionsUser<Task>(searchFilterFields);
 
     const [taskItems, total] = await this.taskRepo.findAndCount({
-      select: ['id', 'title', 'description', 'status', 'createdAt'],
+      select: ['id', 'title', 'description', 'priority', 'status', 'createdAt'],
       where: conditions,
       relations: ['assignedUser', 'project'],
       skip,
