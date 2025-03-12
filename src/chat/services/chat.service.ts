@@ -9,9 +9,9 @@ import {GetAllChatsFilterDto} from "../dto/get-all-chats-user.dto";
 @Injectable()
 export class ChatService {
   constructor(
-      @InjectRepository(Chat) private chatRepo: Repository<Chat>,
-      @InjectRepository(User) private userRepo: Repository<User>,
-      @InjectRepository(UserChat) private userChatRepo: Repository<UserChat>,
+    @InjectRepository(Chat) private chatRepo: Repository<Chat>,
+    @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(UserChat) private userChatRepo: Repository<UserChat>,
   ) {}
 
   async getUserChats({
@@ -22,19 +22,19 @@ export class ChatService {
 
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
-      .select(['chat.id', 'chat.type', 'chat.groupName'])
-      .leftJoinAndSelect('chat.userChats', 'userChats')
-      .leftJoin('userChats.user', 'users')
-      .addSelect('users.firstName')
-      .addSelect('users.avatar')
-      .addSelect('users.lastName')
-      .where('userChats.userId = :userId', { userId })
+      .innerJoinAndSelect('chat.userChats', 'userChats')
+      .innerJoinAndSelect('userChats.user', 'users')
+      .addSelect(['users.id', 'users.firstName', 'users.lastName'])
       .take(limit)
       .skip((page - 1) * limit)
       .getManyAndCount();
 
+    const filteredChatItems = chatItems.filter((chatItem: Chat) =>
+      chatItem.userChats.some(userChat => userChat.user.id === userId)
+    );
+
     return {
-      items: chatItems,
+      items: filteredChatItems,
       meta: {
         totalItems: total,
         itemCount: chatItems.length,
@@ -55,13 +55,13 @@ export class ChatService {
     }
 
     const existingChat = await this.chatRepo
-        .createQueryBuilder('chat')
-        .innerJoin('chat.userChats', 'userChat')
-        .where('chat.type = :type', { type: ChatType.PRIVATE })
-        .andWhere('userChat.userId IN (:...userIds)', { userIds: [user1Id, user2Id] })
-        .groupBy('chat.id')
-        .having('COUNT(userChat.userId) = 2')
-        .getOne();
+      .createQueryBuilder('chat')
+      .innerJoin('chat.userChats', 'userChat')
+      .where('chat.type = :type', { type: ChatType.PRIVATE })
+      .andWhere('userChat.userId IN (:...userIds)', { userIds: [user1Id, user2Id] })
+      .groupBy('chat.id')
+      .having('COUNT(userChat.userId) = 2')
+      .getOne();
 
     if (existingChat) {
       return existingChat;
@@ -94,4 +94,18 @@ export class ChatService {
 
     return chat;
   }
+  async chatMember(userId: string, chatId: string): Promise<boolean> {
+    console.log(userId);
+    console.log(chatId);
+    const chat = await this.userChatRepo.findOne({
+      where: {
+        user: { id: Number(userId) },
+        chat: { id: Number(chatId) },
+      },
+      relations: ['user', 'chat'],
+    });
+
+    return !!chat;
+  }
+
 }
