@@ -15,7 +15,7 @@ export class UserSeeder implements Seeder {
     const userRepository = dataSource.getRepository(User);
 
     const newUserData: Partial<User> = {
-      firstName: 'Awesome',
+      firstName: 'John',
       lastName: 'Developer',
       email: ADMIN_EMAIL,
       password: await bcrypt.hash(ADMIN_PASSWORD, this.SAULT),
