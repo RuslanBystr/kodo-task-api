@@ -5,14 +5,13 @@ import { Message } from '../entities/message.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
-import { RedisService } from "../../redis/redis.service";
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message) private messageRepo: Repository<Message>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
-    private readonly redisService: RedisService
+    // private readonly redisService: RedisService
   ) {}
 
   async sendMessage(messageDto: CreateMessageDto): Promise<any> {
@@ -24,8 +23,8 @@ export class MessageService {
       chat,
     });
     const savedMessage = await this.messageRepo.save(message);
-    const cacheKey = `chat:${chatId}:messages`;
-    await this.redisService.deleteCache(cacheKey);
+    // const cacheKey = `chat:${chatId}:messages`;
+    // await this.redisService.deleteCache(cacheKey);
     return savedMessage;
   }
 

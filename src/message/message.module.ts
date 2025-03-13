@@ -4,14 +4,14 @@ import { MessageController } from './controllers/message.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './entities/message.entity';
 import { Chat } from '../chat/entities/chat.entity';
-import { RedisModule } from "../redis/redis.module";
+// import { RedisModule } from "../redis/redis.module";
 import { ChatMemberGuard } from './guards/chat-member.guard';
 import { ChatModule } from '../chat/chat.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Message, Chat]),
-    RedisModule,
+    // RedisModule,
     forwardRef(() => ChatModule)
   ],
   controllers: [MessageController],
