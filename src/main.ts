@@ -18,15 +18,17 @@ async function bootstrap() {
     credentials: true,
   });
   app.use(cookieParser());
+
   const config = new DocumentBuilder()
-    .setDescription('Boilerplate API documentation')
     .addBearerAuth(
       { in: 'header', type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
       'Access-token',
     )
-    .setTitle('Boilerplate API')
+    .setTitle('KodoTask API')
+    .setDescription('KodoTask API documentation')
     .setVersion('1.0.0')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document, {
     customCss: 'button { outline: none !important; }',

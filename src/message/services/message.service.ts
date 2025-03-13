@@ -39,7 +39,6 @@ export class MessageService {
     //
     // const cachedMessages = await this.redisService.getCache(cacheKey);
     // if (cachedMessages) {
-    //   console.log("from cache");
     //   return cachedMessages;
     // }
 
@@ -75,7 +74,6 @@ export class MessageService {
     };
 
     // await this.redisService.setCache(cacheKey, response, 60);
-    // console.log("from db");
     return response;
 
   }

@@ -28,7 +28,7 @@ import { RedisModule } from './redis/redis.module';
     ProjectModule,
     MessageModule,
     ChatModule,
-    RedisModule,
+    // RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],
