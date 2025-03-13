@@ -12,7 +12,6 @@ import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
-import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
