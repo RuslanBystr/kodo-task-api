@@ -312,7 +312,6 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    console.log(user);
     if (updateDto.avatarFileUUID) {
       const oldFile = await this.fileRepository.findOne({
         where: { uuid: updateDto.avatarFileUUID },
@@ -323,9 +322,7 @@ export class UserService {
       await this.fileService.deleteFile(oldFile.uuid, user.id);
     }
     if (updateDto.password) {
-      console.log(updateDto.password);
       updateDto.password = await this.bcryptLib.hash(updateDto.password, HASH_ROUNDS);
-      console.log(updateDto.password);
 
     } else {
       updateDto.password = user.password;

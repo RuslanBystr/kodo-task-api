@@ -11,7 +11,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node --max-old-space-size=512 dist/src/main.js",
     "start:dev": "nest start --watch",
     "docker": "docker start c5bfcd3a5e9f || docker run --name redis -d -p 6379:6379 redis",
     "start:debug": "nest start --debug --watch",

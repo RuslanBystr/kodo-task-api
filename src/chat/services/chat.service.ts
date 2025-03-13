@@ -95,8 +95,6 @@ export class ChatService {
     return chat;
   }
   async chatMember(userId: string, chatId: string): Promise<boolean> {
-    console.log(userId);
-    console.log(chatId);
     const chat = await this.userChatRepo.findOne({
       where: {
         user: { id: Number(userId) },
