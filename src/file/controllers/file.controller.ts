@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Controller,
   Delete,
-  Get,
+  Get, InternalServerErrorException, NotFoundException,
   Param,
   Post,
   Res,
@@ -65,18 +65,28 @@ export class FileController {
     return await this.fileLocal.saveFile(file);
   }
 
-  @GetFileApiDocs()
   @Get('/:uuid')
   async getFile(@Param('uuid') uuid: string, @Res() res: Response) {
     if (!isUUID(uuid)) {
-      throw new BadRequestException('Provide a valid uuid');
+      throw new BadRequestException('Provide a valid UUID');
     }
-    const filename = await this.fileLocal.getFile(uuid);
-    return filename
-      ? res.sendFile(filename, { root: UPLOAD_FILE_PATH })
-      : res.end();
-    // get from S3
-    // return await this.fileLocal.getFile(id);
+
+    const file = await this.fileLocal.getFile(uuid);
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    if (!(file instanceof Buffer)) {
+      console.error("Error: File is not a Buffer", typeof file);
+      throw new InternalServerErrorException("File format error");
+    }
+
+    res.setHeader('Content-Type', 'image/jpeg');
+    res.setHeader('Content-Length', file.length);
+
+    console.log("Sending file response...");
+    return res.send(file);
   }
 
   @DeleteFileApiDocs()
