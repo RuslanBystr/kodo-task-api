@@ -1,9 +1,11 @@
 import {
   Body,
-  Controller, Delete,
+  Controller,
+  Delete,
   Get,
   HttpCode,
-  HttpStatus, Param,
+  HttpStatus,
+  Param,
   Patch,
   Post,
   Put,
@@ -76,10 +78,7 @@ export class UserController {
     return await this.userService.updateUser(updateDto, userId);
   }
   @Put(':id')
-  async updateUser(
-      @Param('id') id: number,
-      @Body() updateDto: UpdateUserDto,
-  ) {
+  async updateUser(@Param('id') id: number, @Body() updateDto: UpdateUserDto) {
     return await this.userService.updateUser(updateDto, id);
   }
 
@@ -139,6 +138,6 @@ export class UserController {
 
   @Delete(':id')
   async deleteUser(id: number) {
-    return this.userService.remove(id)
+    return this.userService.remove(id);
   }
 }

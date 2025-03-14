@@ -26,7 +26,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('userConnected')
-  handleUserConnection(@MessageBody() userId: string, client: Socket): void {
+  handleUserConnection(@MessageBody() userId: string): void {
     this.onlineUsers.add(userId);
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
     console.log(`User ${userId} connected`);

@@ -11,7 +11,7 @@ import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums/users-role.enum';
 import { Task } from '../../project/entities/task.entity';
 import { Message } from '../../message/entities/message.entity';
-import {UserChat} from "../../chat/entities/user.chat.entity";
+import { UserChat } from '../../chat/entities/user.chat.entity';
 
 @Entity()
 export class User {

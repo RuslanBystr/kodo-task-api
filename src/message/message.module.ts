@@ -12,7 +12,7 @@ import { ChatModule } from '../chat/chat.module';
   imports: [
     TypeOrmModule.forFeature([Message, Chat]),
     // RedisModule,
-    forwardRef(() => ChatModule)
+    forwardRef(() => ChatModule),
   ],
   controllers: [MessageController],
   providers: [MessageService, ChatMemberGuard],

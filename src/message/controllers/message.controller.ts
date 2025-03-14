@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Param, Get, Query, UseGuards, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  UseGuards,
+  BadRequestException,
+} from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
@@ -13,7 +21,7 @@ export class MessageController {
   @UseGuards(JwtAuthGuard, ChatMemberGuard)
   async getMessages(
     @Query('chatId') chatId: string,
-    @Query() filterDto: GetAllMessageFilterDto
+    @Query() filterDto: GetAllMessageFilterDto,
   ) {
     if (!chatId) {
       throw new BadRequestException('chatId is required');

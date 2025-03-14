@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Controller,
   Delete,
-  Get, InternalServerErrorException, NotFoundException,
+  Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   Res,
@@ -21,9 +23,8 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { GetJwtPayload } from '../../utils/decorators/jwt-payload.decorator';
 import { JwtPayload } from '../../common/types/jwt-payload.type';
 import { UploadFileApiDocs } from '../docs/upload-file.decorator';
-import { GetFileApiDocs } from '../docs/get-file.decorator';
 import { DeleteFileApiDocs } from '../docs/delete-file.decorator';
-import {isUUID} from "class-validator";
+import { isUUID } from 'class-validator';
 
 @ApiTags('file')
 @Controller('file')
@@ -78,14 +79,14 @@ export class FileController {
     }
 
     if (!(file instanceof Buffer)) {
-      console.error("Error: File is not a Buffer", typeof file);
-      throw new InternalServerErrorException("File format error");
+      console.error('Error: File is not a Buffer', typeof file);
+      throw new InternalServerErrorException('File format error');
     }
 
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Content-Length', file.length);
 
-    console.log("Sending file response...");
+    console.log('Sending file response...');
     return res.send(file);
   }
 

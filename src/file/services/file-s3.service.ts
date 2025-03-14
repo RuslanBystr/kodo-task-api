@@ -24,18 +24,24 @@ export class FileS3Service {
       region: this.configService.get<string>(CONFIG.AWS_REGION),
       credentials: {
         accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
-        secretAccessKey: this.configService.get<string>(CONFIG.AWS_SECRET_ACCESS_KEY),
+        secretAccessKey: this.configService.get<string>(
+          CONFIG.AWS_SECRET_ACCESS_KEY,
+        ),
       },
     };
 
-    console.log("AWS Config:", {
+    console.log('AWS Config:', {
       accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
-      secretAccessKey: this.configService.get<string>(CONFIG.AWS_SECRET_ACCESS_KEY),
+      secretAccessKey: this.configService.get<string>(
+        CONFIG.AWS_SECRET_ACCESS_KEY,
+      ),
       region: this.configService.get<string>(CONFIG.AWS_REGION),
       endpoint: this.configService.get<string>(CONFIG.AWS_ENDPOINT_URL_S3),
     });
 
-    const endpointUrl = this.configService.get<string>(CONFIG.AWS_ENDPOINT_URL_S3);
+    const endpointUrl = this.configService.get<string>(
+      CONFIG.AWS_ENDPOINT_URL_S3,
+    );
     if (endpointUrl) {
       options.endpoint = new Endpoint(endpointUrl);
     }
@@ -43,31 +49,36 @@ export class FileS3Service {
     this.s3 = new S3(options);
   }
 
-  async uploadFile(fileName: string, filePath: string): Promise<ManagedUpload.SendData> {
+  async uploadFile(
+    fileName: string,
+    filePath: string,
+  ): Promise<ManagedUpload.SendData> {
     try {
-      console.log("Checking file existence:", filePath);
+      console.log('Checking file existence:', filePath);
 
       if (!fs.existsSync(filePath)) {
         throw new Error(`File not found at path: ${filePath}`);
       }
 
       const fileStream = fs.createReadStream(filePath);
-      console.log("File stream created successfully");
+      console.log('File stream created successfully');
 
-      return await this.s3.upload({
-        Bucket: this.bucketName,
-        Key: this.filterKey(fileName),
-        Body: fileStream,
-      }).promise();
+      return await this.s3
+        .upload({
+          Bucket: this.bucketName,
+          Key: this.filterKey(fileName),
+          Body: fileStream,
+        })
+        .promise();
     } catch (err) {
-      console.error("Upload failed:", err);
+      console.error('Upload failed:', err);
       throw err;
     }
   }
 
   async downloadFile(key: string): Promise<Buffer> {
     const filteredKey = this.filterKey(key);
-    console.log("Attempting to download file with key:", filteredKey);
+    console.log('Attempting to download file with key:', filteredKey);
 
     const params = {
       Bucket: this.bucketName,
@@ -76,15 +87,14 @@ export class FileS3Service {
 
     try {
       const response = await this.s3.getObject(params).promise();
-      console.log("File downloaded successfully:", filteredKey);
+      console.log('File downloaded successfully:', filteredKey);
       return response.Body as Buffer;
     } catch (err) {
-      console.error("S3 Download Error:", err, "Key:", filteredKey);
+      console.error('S3 Download Error:', err, 'Key:', filteredKey);
       await this.loggerService.error(err);
       throw err;
     }
   }
-
 
   async getFileUrl(key: string): Promise<string> {
     const params = {
