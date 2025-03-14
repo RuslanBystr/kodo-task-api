@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ChatService } from '../services/chat.service';
 import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @ApiTags('chat')
 @Controller('chats')

@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Generated,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';

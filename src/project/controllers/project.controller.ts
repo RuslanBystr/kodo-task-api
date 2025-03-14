@@ -4,9 +4,9 @@ import {
   Post,
   Body,
   Param,
-  Patch,
   Delete,
-  Query, Put,
+  Query,
+  Put,
 } from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import { CreateProjectDto, UpdateProjectDto } from '../dto';

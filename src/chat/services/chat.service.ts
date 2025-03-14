@@ -4,7 +4,7 @@ import { Chat, ChatType } from '../entities/chat.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { In, Repository } from 'typeorm';
-import {GetAllChatsFilterDto} from "../dto/get-all-chats-user.dto";
+import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
 
 @Injectable()
 export class ChatService {
@@ -19,7 +19,6 @@ export class ChatService {
     limit = 100,
     userId,
   }: GetAllChatsFilterDto): Promise<any> {
-
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
       .innerJoinAndSelect('chat.userChats', 'userChats')
@@ -30,7 +29,7 @@ export class ChatService {
       .getManyAndCount();
 
     const filteredChatItems = chatItems.filter((chatItem: Chat) =>
-      chatItem.userChats.some(userChat => userChat.user.id === userId)
+      chatItem.userChats.some((userChat) => userChat.user.id === userId),
     );
 
     return {
@@ -58,7 +57,9 @@ export class ChatService {
       .createQueryBuilder('chat')
       .innerJoin('chat.userChats', 'userChat')
       .where('chat.type = :type', { type: ChatType.PRIVATE })
-      .andWhere('userChat.userId IN (:...userIds)', { userIds: [user1Id, user2Id] })
+      .andWhere('userChat.userId IN (:...userIds)', {
+        userIds: [user1Id, user2Id],
+      })
       .groupBy('chat.id')
       .having('COUNT(userChat.userId) = 2')
       .getOne();
@@ -88,7 +89,11 @@ export class ChatService {
     await this.chatRepo.save(chat);
 
     for (const user of users) {
-      const userChat = this.userChatRepo.create({ chat, user, name: groupName });
+      const userChat = this.userChatRepo.create({
+        chat,
+        user,
+        name: groupName,
+      });
       await this.userChatRepo.save(userChat);
     }
 
@@ -105,5 +110,4 @@ export class ChatService {
 
     return !!chat;
   }
-
 }

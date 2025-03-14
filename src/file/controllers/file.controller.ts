@@ -23,7 +23,7 @@ import { JwtPayload } from '../../common/types/jwt-payload.type';
 import { UploadFileApiDocs } from '../docs/upload-file.decorator';
 import { GetFileApiDocs } from '../docs/get-file.decorator';
 import { DeleteFileApiDocs } from '../docs/delete-file.decorator';
-import {isUUID} from "class-validator";
+import { isUUID } from 'class-validator';
 
 @ApiTags('file')
 @Controller('file')

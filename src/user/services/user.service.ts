@@ -322,8 +322,10 @@ export class UserService {
       await this.fileService.deleteFile(oldFile.uuid, user.id);
     }
     if (updateDto.password) {
-      updateDto.password = await this.bcryptLib.hash(updateDto.password, HASH_ROUNDS);
-
+      updateDto.password = await this.bcryptLib.hash(
+        updateDto.password,
+        HASH_ROUNDS,
+      );
     } else {
       updateDto.password = user.password;
     }

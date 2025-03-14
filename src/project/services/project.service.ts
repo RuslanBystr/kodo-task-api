@@ -15,7 +15,6 @@ export class ProjectService {
   ) {}
 
   public async create(createProjectDto: CreateProjectDto) {
-
     const project = this.projectRepo.create({
       ...createProjectDto,
     });

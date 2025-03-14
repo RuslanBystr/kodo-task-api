@@ -33,7 +33,6 @@ export class MessageService {
     limit = 20,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
-
     // const cacheKey = `chat:${chatId}:messages`;
     //
     // const cachedMessages = await this.redisService.getCache(cacheKey);
@@ -42,27 +41,29 @@ export class MessageService {
     // }
 
     const [messageItems, total] = await this.messageRepo
-        .createQueryBuilder('message')
-        .select([
-          'message.id',
-          'message.content',
-          'message.createdAt',
-          'sender.id'
-        ])
-        .leftJoin('message.sender', 'sender')
-        .where('message.chatId = :chatId', { chatId })
-        .orderBy('message.createdAt', 'DESC')
-        .take(limit)
-        .skip((page - 1) * limit)
-        .getManyAndCount();
+      .createQueryBuilder('message')
+      .select([
+        'message.id',
+        'message.content',
+        'message.createdAt',
+        'sender.id',
+      ])
+      .leftJoin('message.sender', 'sender')
+      .where('message.chatId = :chatId', { chatId })
+      .orderBy('message.createdAt', 'DESC')
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
 
     const totalPages = Math.ceil(total / limit);
 
     const response = {
-      items: messageItems?.map(msg => ({
-        ...msg,
-        sender: msg.sender.id,
-      })).reverse(),
+      items: messageItems
+        ?.map((msg) => ({
+          ...msg,
+          sender: msg.sender.id,
+        }))
+        .reverse(),
       meta: {
         totalItems: total,
         itemCount: messageItems.length,
@@ -74,6 +75,5 @@ export class MessageService {
 
     // await this.redisService.setCache(cacheKey, response, 60);
     return response;
-
   }
 }
