@@ -4,10 +4,12 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Project } from './project.entity';
 import { User } from '../../user/entities/user.entity';
 import { TaskStatusEnum } from '../enums/task-status';
+import { TaskLog } from './task-log.entity';
 
 export enum TaskPriority {
   LOW = 'Low',
@@ -49,6 +51,9 @@ export class Task {
 
   @Column({ type: 'int', default: 0 })
   spentTime: number;
+
+  @OneToMany(() => TaskLog, (taskLog) => taskLog.task)
+  timeLogger: TaskLog[];
 
   @Column({ type: 'int', default: 0 })
   remaining: number;

@@ -24,6 +24,8 @@ import { FileEntityUUID1740842180816 } from "./migrations/1740842180816-file-ent
 import { ProjectImage1740844355246 } from "./migrations/1740844355246-image-ref-remove";
 import {ChatAvatar1740848332907} from "./migrations/1740848332907-chat-avatar";
 import { TaskDetails1741097658314 } from './migrations/1741097658314-task-details';
+import { TaskLog } from './src/project/entities/task-log.entity';
+import { AddTaskLog1742030751151 } from './migrations/1742030751151-add-tast-log';
 
 config();
 const configService = new ConfigService();
@@ -44,7 +46,8 @@ const options: DataSourceOptions & SeederOptions = {
     Task,
     Message,
     Chat,
-    UserChat
+    UserChat,
+    TaskLog
   ],
   migrations: [
     CreateAndVerifyUser1740301060631,
@@ -57,7 +60,8 @@ const options: DataSourceOptions & SeederOptions = {
     FileEntityUUID1740842180816,
     ProjectImage1740844355246,
     ChatAvatar1740848332907,
-    TaskDetails1741097658314
+    TaskDetails1741097658314,
+    AddTaskLog1742030751151
   ],
   seeds: [MainSeeder],
 };

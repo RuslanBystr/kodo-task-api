@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Task } from '../entities/task.entity';
@@ -9,11 +9,14 @@ import { SortOrderEnum } from 'src/common/enums/sort-order.enum';
 import { GetAllTasksFilterDto } from '../dto/get-all-tasks.dto';
 import { generateSearchConditionsUser } from '../../user/utils/search-condition-users';
 import { TaskSortByEnum } from '../enums/task-sort-by.enum';
+import { SetTimeDto } from '../dto/set-time.dto';
+import { TaskLog } from '../entities/task-log.entity';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private taskRepo: Repository<Task>,
+    @InjectRepository(TaskLog) private taskLogRepo: Repository<TaskLog>,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Project) private projectRepo: Repository<Project>,
   ) {}
@@ -73,7 +76,7 @@ export class TaskService {
   findOne(id: string) {
     return this.taskRepo.findOne({
       where: { id },
-      relations: ['assignedUser', 'project'],
+      relations: ['assignedUser', 'project', 'timeLogger'],
     });
   }
   async update(id: string, updateTaskDto: UpdateTaskDto) {
@@ -83,5 +86,27 @@ export class TaskService {
   async remove(id: string) {
     await this.taskRepo.delete(id);
     return { message: 'Task deleted successfully' };
+  }
+
+  async updateTaskTime(id: string, setTimeDto: SetTimeDto): Promise<Task> {
+    const task = await this.taskRepo.findOne({ where: { id } });
+
+    if (!task) {
+      throw new NotFoundException(`Task with id ${id} not found`);
+    }
+
+    task.spentTime += setTimeDto.duration;
+    task.remaining = Math.max(task.estimate - task.spentTime, 0);
+
+    await this.taskRepo.save(task);
+
+    const logEntry = this.taskLogRepo.create({
+      duration: setTimeDto.duration,
+      task: task,
+    });
+
+    await this.taskLogRepo.save(logEntry);
+
+    return task;
   }
 }
