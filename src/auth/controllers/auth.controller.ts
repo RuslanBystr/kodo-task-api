@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -25,6 +27,7 @@ import { JwtPayload } from '../../common/types/jwt-payload.type';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { GetRefreshApiDocs } from '../../user/docs/get-refresh.decorator';
 import { GetLogoutApiDocs } from '../../user/docs/logout.decorator';
+import { GoogleAuthGuard } from '../guards/google-auth.guard';
 
 @ApiTags('auth user/customer')
 @Controller('auth')
@@ -42,6 +45,20 @@ export class AuthController {
     res.setHeader('Set-Cookie', [response.refreshTokenCookie.cookie]);
     delete response.refreshTokenCookie;
     res.json(response).end();
+  }
+  @Get('/google/login')
+  @UseGuards(GoogleAuthGuard)
+  googleLogin() {
+    return { message: '' };
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleAuthGuard)
+  async googleRedirect(@Req() req, @Res() res) {
+    const user = req.user;
+    const token = await this.authService.generateToken(user.id);
+    console.log(`http://localhost:3000/auth-success?token=${token}`);
+    return res.redirect(`http://localhost:3000/auth/success?token=${token}`);
   }
 
   @GetRefreshApiDocs()

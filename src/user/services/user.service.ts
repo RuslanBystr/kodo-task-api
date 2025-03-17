@@ -225,11 +225,12 @@ export class UserService {
     };
   }
 
-  // CRUD USER
-
   async createUser(createDto: UserCreateDto): Promise<User> {
     await this.checkEmailAvailability({ email: createDto.email });
-    const password = await this.bcryptLib.hash(createDto.password, HASH_ROUNDS);
+    let password = createDto.password;
+    if (password) {
+      password = await this.bcryptLib.hash(createDto.password, HASH_ROUNDS);
+    }
     const user = this.userRepository.create({
       ...createDto,
       password,
@@ -240,6 +241,24 @@ export class UserService {
   async findById(id: number): Promise<User> {
     return await this.userRepository.findOne({
       where: { id },
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'status',
+        'avatar',
+        'isBlocked',
+        'createdAt',
+        'updatedAt',
+        'phone',
+      ],
+    });
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { email },
       select: [
         'id',
         'firstName',
