@@ -109,4 +109,30 @@ export class TaskService {
 
     return task;
   }
+
+  async removeLog(id: string) {
+    const logEntry = await this.taskLogRepo.findOne({
+      where: { id },
+      relations: ['task'],
+    });
+
+    if (!logEntry) {
+      throw new NotFoundException(`Log with id ${id} not found`);
+    }
+
+    const task = logEntry.task;
+    if (!task) {
+      throw new NotFoundException(
+        `Task associated with log id ${id} not found`,
+      );
+    }
+
+    task.spentTime = Math.max(task.spentTime - logEntry.duration, 0);
+    task.remaining = Math.max(task.estimate - task.spentTime, 0);
+
+    await this.taskRepo.save(task);
+    await this.taskLogRepo.delete(id);
+
+    return { message: 'Task log deleted successfully', updatedTask: task };
+  }
 }

@@ -34,6 +34,11 @@ export class TaskController {
     return await this.taskService.updateTaskTime(id, setTimeDto);
   }
 
+  @Delete('/logs/:id')
+  removeLog(@Param('id') id: string) {
+    return this.taskService.removeLog(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.taskService.findOne(id);

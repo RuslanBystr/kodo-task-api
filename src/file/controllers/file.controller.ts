@@ -40,18 +40,6 @@ export class FileController {
           cb(null, `${randomUUID()}-${file.originalname.replace(/\s/g, '-')}`);
         },
       }),
-      fileFilter: (request, file, callback) => {
-        if (
-          !file.mimetype.includes('image') &&
-          !file.mimetype.includes('pdf')
-        ) {
-          return callback(
-            new BadRequestException('Provide a valid image or pdf document'),
-            false,
-          );
-        }
-        callback(null, true);
-      },
       limits: {
         fileSize: MAX_FILE_SIZE,
       },

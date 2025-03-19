@@ -22,8 +22,14 @@ export class ChatService {
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
       .innerJoinAndSelect('chat.userChats', 'userChats')
-      .innerJoinAndSelect('userChats.user', 'users')
-      .addSelect(['users.id', 'users.firstName', 'users.lastName'])
+      .innerJoin('userChats.user', 'users')
+      .addSelect([
+        'users.id',
+        'users.firstName',
+        'users.lastName',
+        'users.avatar',
+      ])
+      .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
       .take(limit)
       .skip((page - 1) * limit)
       .getManyAndCount();

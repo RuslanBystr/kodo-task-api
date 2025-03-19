@@ -2,29 +2,46 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Chat } from '../../chat/entities/chat.entity';
 import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
+import { FileEntity } from '../../file/entities/file.entity';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message) private messageRepo: Repository<Message>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
+    @InjectRepository(FileEntity) private fileRepo: Repository<FileEntity>,
     // private readonly redisService: RedisService
   ) {}
 
-  async sendMessage(messageDto: CreateMessageDto): Promise<any> {
-    const { chatId, senderId, content } = messageDto;
+  async sendMessage(messageDto: CreateMessageDto): Promise<Message> {
+    console.log(messageDto);
+    const { chatId, senderId, content = null, voiceMessage } = messageDto;
+    let file = null;
+    if (voiceMessage) {
+      file = await this.fileRepo.findOne({ where: { uuid: voiceMessage } });
+    }
+    console.log(file);
     const chat = await this.chatRepo.findOne({ where: { id: chatId } });
+
+    if (!chat) {
+      throw new NotFoundException(`Chat with id ${chatId} not found`);
+    }
+
     const message = this.messageRepo.create({
       content,
+      voiceMessage: file,
       sender: { id: senderId },
       chat,
     });
+
     const savedMessage = await this.messageRepo.save(message);
-    // const cacheKey = `chat:${chatId}:messages`;
-    // await this.redisService.deleteCache(cacheKey);
+
+    chat.lastMessage = savedMessage;
+    await this.chatRepo.save(chat);
+
     return savedMessage;
   }
 
@@ -46,8 +63,10 @@ export class MessageService {
         'message.id',
         'message.content',
         'message.createdAt',
+        'voiceMessage.uuid',
         'sender.id',
       ])
+      .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoin('message.sender', 'sender')
       .where('message.chatId = :chatId', { chatId })
       .orderBy('message.createdAt', 'DESC')

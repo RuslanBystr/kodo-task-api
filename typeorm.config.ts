@@ -26,6 +26,8 @@ import {ChatAvatar1740848332907} from "./migrations/1740848332907-chat-avatar";
 import { TaskDetails1741097658314 } from './migrations/1741097658314-task-details';
 import { TaskLog } from './src/project/entities/task-log.entity';
 import { AddTaskLog1742030751151 } from './migrations/1742030751151-add-tast-log';
+import { AddLastMessage1742228911850 } from './migrations/1742228911850-chat-last-message-column';
+import { AddVoiceMessage1742382401988 } from './migrations/1742382401988-add-voice-message';
 
 config();
 const configService = new ConfigService();
@@ -61,7 +63,9 @@ const options: DataSourceOptions & SeederOptions = {
     ProjectImage1740844355246,
     ChatAvatar1740848332907,
     TaskDetails1741097658314,
-    AddTaskLog1742030751151
+    AddTaskLog1742030751151,
+    AddLastMessage1742228911850,
+    AddVoiceMessage1742382401988
   ],
   seeds: [MainSeeder],
 };
