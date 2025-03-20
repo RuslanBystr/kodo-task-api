@@ -5,7 +5,9 @@ import {
   Get,
   Query,
   UseGuards,
-  BadRequestException, Delete, Param,
+  BadRequestException,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto } from '../dto/create-message.dto';

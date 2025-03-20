@@ -40,7 +40,6 @@ async function bootstrap() {
     .swagger-ui .auth-wrapper>.btn {border: 2px solid #fff; background-color: #dff; }
   `,
     customSiteTitle: 'KodoTask API Docs',
-
   });
 
   await app

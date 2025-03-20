@@ -101,5 +101,6 @@ export class MessageService {
     if (!message) {
       throw new Error(`Message with ID ${id} not found`);
     }
-    return await this.messageRepo.remove(message);  }
+    return await this.messageRepo.remove(message);
+  }
 }

@@ -21,24 +21,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private onlineUsers = new Set<string>();
 
   handleConnection(client: Socket): void {
-    const userId = client.id;
-    this.onlineUsers.add(userId);
+    console.log(`Client connected: ${client.id}`);
   }
 
   @SubscribeMessage('userConnected')
-  handleUserConnection(@MessageBody() userId: string): void {
+  handleUserConnection(
+    @MessageBody() userId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    client.data.userId = userId;
     this.onlineUsers.add(userId);
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
     console.log(`User ${userId} connected`);
   }
 
   handleDisconnect(client: Socket): void {
-    const userId = client.id;
+    const userId = client.data.userId;
+    if (!userId) return;
+
     this.onlineUsers.delete(userId);
     console.log(`User ${userId} disconnected`);
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
   }
-
   @SubscribeMessage('sendMessage')
   async handleMessage(@MessageBody() data: CreateMessageDto) {
     const message = await this.messageService.sendMessage(data);
