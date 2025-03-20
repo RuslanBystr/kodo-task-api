@@ -29,7 +29,7 @@ import { GetRefreshApiDocs } from '../../user/docs/get-refresh.decorator';
 import { GetLogoutApiDocs } from '../../user/docs/logout.decorator';
 import { GoogleAuthGuard } from '../guards/google-auth.guard';
 
-@ApiTags('auth user/customer')
+@ApiTags('auth user')
 @Controller('auth')
 export class AuthController {
   constructor(
