@@ -95,4 +95,11 @@ export class MessageService {
     // await this.redisService.setCache(cacheKey, response, 60);
     return response;
   }
+
+  async removeMessage(id: number): Promise<Message> {
+    const message = await this.messageRepo.findOne({ where: { id } });
+    if (!message) {
+      throw new Error(`Message with ID ${id} not found`);
+    }
+    return await this.messageRepo.remove(message);  }
 }

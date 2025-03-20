@@ -5,7 +5,7 @@ import {
   Get,
   Query,
   UseGuards,
-  BadRequestException,
+  BadRequestException, Delete, Param,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto } from '../dto/create-message.dto';
@@ -34,5 +34,10 @@ export class MessageController {
   @Post('/send')
   async sendMessage(@Body() body: CreateMessageDto) {
     return this.messageService.sendMessage(body);
+  }
+
+  @Delete('/:id')
+  async removeMessage(@Param('id') id: number) {
+    return this.messageService.removeMessage(id);
   }
 }
