@@ -45,6 +45,17 @@ export class MessageService {
     return savedMessage;
   }
 
+  async addReactionOnMessage(id: number, reaction: string): Promise<Message> {
+    const message = await this.messageRepo.findOne({ where: { id } });
+
+    if (!message) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+
+    message.reaction = reaction;
+    return this.messageRepo.save(message);
+  }
+
   public async getMessages({
     page = 1,
     limit = 20,
@@ -62,6 +73,7 @@ export class MessageService {
       .select([
         'message.id',
         'message.content',
+        'message.reaction',
         'message.createdAt',
         'voiceMessage.uuid',
         'sender.id',

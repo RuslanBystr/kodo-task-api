@@ -34,4 +34,10 @@ export class Message {
 
   @Column({ default: false })
   isRead: boolean;
+
+  @Column({ default: null, nullable: true })
+  reaction: string | null;
+
+  @ManyToOne(() => Message, { nullable: true })
+  linkToMessage: Message | null;
 }

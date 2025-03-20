@@ -8,6 +8,7 @@ import {
   BadRequestException,
   Delete,
   Param,
+  Put,
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { CreateMessageDto } from '../dto/create-message.dto';
@@ -36,6 +37,14 @@ export class MessageController {
   @Post('/send')
   async sendMessage(@Body() body: CreateMessageDto) {
     return this.messageService.sendMessage(body);
+  }
+
+  @Put('/:id')
+  async reactionOnMessage(
+    @Param('id') id: number,
+    @Body('reaction') reaction: string,
+  ) {
+    return this.messageService.addReactionOnMessage(id, reaction);
   }
 
   @Delete('/:id')
