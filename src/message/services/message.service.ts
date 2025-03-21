@@ -76,10 +76,15 @@ export class MessageService {
         'message.reaction',
         'message.createdAt',
         'voiceMessage.uuid',
-        'sender.id',
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoin('message.sender', 'sender')
+      .addSelect([
+        'sender.id',
+        'sender.avatar',
+        'sender.firstName',
+        'sender.lastName',
+      ])
       .where('message.chatId = :chatId', { chatId })
       .orderBy('message.createdAt', 'DESC')
       .take(limit)
@@ -92,7 +97,6 @@ export class MessageService {
       items: messageItems
         ?.map((msg) => ({
           ...msg,
-          sender: msg.sender.id,
         }))
         .reverse(),
       meta: {

@@ -50,6 +50,27 @@ export class ChatService {
     };
   }
 
+  async getUserGroupChats({ page = 1, limit = 100 }): Promise<any> {
+    const [chatItems, total] = await this.chatRepo
+      .createQueryBuilder('chat')
+      .where('chat.type = :type', { type: 'GROUP' })
+      .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getManyAndCount();
+
+    return {
+      items: chatItems,
+      meta: {
+        totalItems: total,
+        itemCount: chatItems.length,
+        itemsPerPage: Number(limit),
+        totalPages: Math.ceil(total / limit),
+        currentPage: Number(page),
+      },
+    };
+  }
+
   async createPrivateChat(user1Id: number, user2Id: number): Promise<Chat> {
     const users = await this.userRepo.findBy({
       id: In([user1Id, user2Id]),
@@ -106,7 +127,16 @@ export class ChatService {
     return chat;
   }
   async chatMember(userId: string, chatId: string): Promise<boolean> {
-    const chat = await this.userChatRepo.findOne({
+    const chat = await this.chatRepo.findOne({
+      where: { id: Number(chatId) },
+      select: ['type'],
+    });
+
+    if (!chat) return false;
+
+    if (chat.type === 'GROUP') return true;
+
+    const membership = await this.userChatRepo.findOne({
       where: {
         user: { id: Number(userId) },
         chat: { id: Number(chatId) },
@@ -114,6 +144,6 @@ export class ChatService {
       relations: ['user', 'chat'],
     });
 
-    return !!chat;
+    return !!membership;
   }
 }
