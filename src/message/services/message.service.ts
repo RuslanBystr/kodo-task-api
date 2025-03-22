@@ -17,7 +17,6 @@ export class MessageService {
   ) {}
 
   async sendMessage(messageDto: CreateMessageDto): Promise<Message> {
-    console.log(messageDto);
     const { chatId, senderId, content = null, voiceMessage } = messageDto;
     let file = null;
     if (voiceMessage) {
@@ -56,6 +55,16 @@ export class MessageService {
     return this.messageRepo.save(message);
   }
 
+  async markAsRead(id: number): Promise<Message> {
+    const message = await this.messageRepo.findOne({ where: { id } });
+
+    if (!message) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+
+    message.isRead = true;
+    return this.messageRepo.save(message);
+  }
   public async getMessages({
     page = 1,
     limit = 20,
@@ -74,6 +83,7 @@ export class MessageService {
         'message.id',
         'message.content',
         'message.reaction',
+        'message.isRead',
         'message.createdAt',
         'voiceMessage.uuid',
       ])

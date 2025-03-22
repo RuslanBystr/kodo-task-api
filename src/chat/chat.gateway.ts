@@ -72,6 +72,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`chat-${data.chatId}`).emit('newMessage', message);
   }
 
+  @SubscribeMessage('markMessageAsRead')
+  async handleMarkMessageAsRead(
+    @MessageBody() { chatId, id }: { chatId: string; id: number },
+  ) {
+    console.log('marked');
+    const message = await this.messageService.markAsRead(id);
+    console.log(message);
+    this.server.to(`chat-${chatId}`).emit('messageRead', message);
+  }
+
   @SubscribeMessage('joinChat')
   handleJoinChat(
     @MessageBody() chatId: number,
