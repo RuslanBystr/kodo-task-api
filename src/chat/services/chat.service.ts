@@ -30,6 +30,7 @@ export class ChatService {
         'users.avatar',
       ])
       .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+      .orderBy('chat.lastMessage', 'DESC')
       .take(limit)
       .skip((page - 1) * limit)
       .getManyAndCount();

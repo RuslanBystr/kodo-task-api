@@ -35,6 +35,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`User ${userId} connected`);
   }
 
+  @SubscribeMessage('reaction')
+  async addReactionOnMessage(@MessageBody() message: any): Promise<void> {
+    const response = await this.messageService.addReactionOnMessage(
+      message.id,
+      message.reaction,
+    );
+    this.server.to(`chat-${message.chatId}`).emit('updateMessage', response);
+  }
+
+  @SubscribeMessage('typing')
+  async typingMessage(@MessageBody() message: any): Promise<void> {
+    this.server.to(`chat-${message.chatId}`).emit('typing', message.userId);
+  }
+
+  @SubscribeMessage('removeMessage')
+  async removeMessage(@MessageBody() message: any): Promise<void> {
+    const deletedMessage = await this.messageService.removeMessage(message.id);
+    this.server
+      .to(`chat-${message.chatId}`)
+      .emit('cleanMessage', deletedMessage);
+  }
+
   handleDisconnect(client: Socket): void {
     const userId = client.data.userId;
     if (!userId) return;
@@ -43,6 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`User ${userId} disconnected`);
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
   }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(@MessageBody() data: CreateMessageDto) {
     const message = await this.messageService.sendMessage(data);
