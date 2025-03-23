@@ -30,6 +30,15 @@ export class ChatService {
         'users.avatar',
       ])
       .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+      .leftJoinAndSelect(
+        'chat.messages',
+        'message',
+        'message.isRead = :isRead AND message.sender != :senderId',
+        {
+          isRead: false,
+          senderId: userId,
+        },
+      )
       .orderBy('chat.lastMessage', 'DESC')
       .take(limit)
       .skip((page - 1) * limit)
