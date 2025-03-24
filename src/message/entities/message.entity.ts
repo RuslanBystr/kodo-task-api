@@ -4,17 +4,24 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Chat } from '../../chat/entities/chat.entity';
+import { FileEntity } from '../../file/entities/file.entity';
 
 @Entity('message')
 export class Message {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('text')
-  content: string;
+  @Column({ type: 'text', nullable: true })
+  content: string | null;
+
+  @OneToOne(() => FileEntity, { nullable: true, cascade: true })
+  @JoinColumn({ name: 'voice_message_file_id' })
+  voiceMessage: FileEntity | null;
 
   @ManyToOne(() => User, (user) => user.sentMessages)
   sender: User;
@@ -27,4 +34,10 @@ export class Message {
 
   @Column({ default: false })
   isRead: boolean;
+
+  @Column({ default: null, nullable: true })
+  reaction: string | null;
+
+  @ManyToOne(() => Message, { nullable: true })
+  linkToMessage: Message | null;
 }

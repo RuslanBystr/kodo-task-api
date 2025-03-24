@@ -14,6 +14,11 @@ export class ChatController {
     return this.chatService.getUserChats(filterDto);
   }
 
+  @Get('groups')
+  getUserGroupChats(@Query() filterDto: GetAllChatsFilterDto) {
+    return this.chatService.getUserGroupChats(filterDto);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('private')
   createPrivateChat(@Body() dto: { user1Id: number; user2Id: number }) {

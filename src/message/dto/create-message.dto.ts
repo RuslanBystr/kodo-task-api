@@ -8,5 +8,8 @@ export class CreateMessageDto {
   senderId: number;
 
   @ApiProperty()
-  content: string;
+  content: string | null;
+
+  @ApiProperty()
+  voiceMessage: string | null;
 }

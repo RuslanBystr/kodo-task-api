@@ -13,6 +13,7 @@ import { UserModule } from '../user/user.module';
 import { JwtRefreshTokenStrategy } from './passport-strategies/jwt-refresh-token.strategy';
 import { EmailModule } from 'src/email/email.module';
 import { MailService } from 'src/email/services/mail.service';
+import { GoogleStrategy } from './passport-strategies/google.strategy';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { MailService } from 'src/email/services/mail.service';
     AuthService,
     JwtStrategy,
     JwtRefreshTokenStrategy,
+    GoogleStrategy,
     userEntityProvider,
     MailService,
   ],

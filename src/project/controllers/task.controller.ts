@@ -12,6 +12,7 @@ import { TaskService } from '../services/task.service';
 import { CreateTaskDto, UpdateTaskDto } from '../dto';
 import { ApiTags } from '@nestjs/swagger';
 import { GetAllTasksFilterDto } from '../dto/get-all-tasks.dto';
+import { SetTimeDto } from '../dto/set-time.dto';
 
 @ApiTags('task')
 @Controller('task')
@@ -26,6 +27,16 @@ export class TaskController {
   @Get()
   async getTasks(@Query() filterDto: GetAllTasksFilterDto) {
     return this.taskService.findAll(filterDto);
+  }
+
+  @Put('/spend/:id')
+  async trackTaskTime(@Param('id') id: string, @Body() setTimeDto: SetTimeDto) {
+    return await this.taskService.updateTaskTime(id, setTimeDto);
+  }
+
+  @Delete('/logs/:id')
+  removeLog(@Param('id') id: string) {
+    return this.taskService.removeLog(id);
   }
 
   @Get(':id')

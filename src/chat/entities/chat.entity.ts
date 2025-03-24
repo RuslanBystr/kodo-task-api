@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  Column,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { Message } from '../../message/entities/message.entity';
 import { UserChat } from './user.chat.entity';
 
@@ -17,6 +24,10 @@ export class Chat {
 
   @OneToMany(() => UserChat, (userChat) => userChat.chat)
   userChats: UserChat[];
+
+  @OneToOne(() => Message, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn()
+  lastMessage?: Message;
 
   @OneToMany(() => Message, (message) => message.chat)
   messages: Message[];
