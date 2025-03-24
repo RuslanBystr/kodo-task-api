@@ -74,7 +74,6 @@ export class FileController {
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Content-Length', file.length);
 
-    console.log('Sending file response...');
     return res.send(file);
   }
 
