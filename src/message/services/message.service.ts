@@ -70,6 +70,7 @@ export class MessageService {
     limit = 20,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
+
     // const cacheKey = `chat:${chatId}:messages`;
     //
     // const cachedMessages = await this.redisService.getCache(cacheKey);

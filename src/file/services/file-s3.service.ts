@@ -1,59 +1,98 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggerService } from '../../logger/services/logger.service';
-import fs from 'fs';
+import * as fs from 'node:fs';
 import { Readable } from 'stream';
-import { config, Endpoint, S3 } from 'aws-sdk';
+import { S3, Endpoint } from 'aws-sdk';
 import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload';
-import SendData = ManagedUpload.SendData;
+import { CONFIG } from '../../common/enums/config';
 
 @Injectable()
 export class FileS3Service {
   private s3: S3;
-  public bucketName: string;
+  private bucketName: string;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly loggerService: LoggerService,
   ) {
-    this.bucketName = this.configService.get('AWS_BUCKET_NAME');
+    this.bucketName = this.configService.get<string>(CONFIG.AWS_BUCKET_NAME);
 
-    const options: S3.Types.ClientConfiguration = {};
-    if (this.configService.get('AWS_ENDPOINT_URL_S3')) {
-      options.endpoint = new Endpoint(
-        this.configService.get('AWS_ENDPOINT_URL_S3'),
-      );
-      config.update({ s3ForcePathStyle: true });
+    const options: S3.Types.ClientConfiguration = {
+      s3ForcePathStyle: true,
+      signatureVersion: 'v4',
+      region: this.configService.get<string>(CONFIG.AWS_REGION),
+      credentials: {
+        accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
+        secretAccessKey: this.configService.get<string>(
+          CONFIG.AWS_SECRET_ACCESS_KEY,
+        ),
+      },
+    };
+
+    console.log('AWS Config:', {
+      accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
+      secretAccessKey: this.configService.get<string>(
+        CONFIG.AWS_SECRET_ACCESS_KEY,
+      ),
+      region: this.configService.get<string>(CONFIG.AWS_REGION),
+      endpoint: this.configService.get<string>(CONFIG.AWS_ENDPOINT_URL_S3),
+    });
+
+    const endpointUrl = this.configService.get<string>(
+      CONFIG.AWS_ENDPOINT_URL_S3,
+    );
+    if (endpointUrl) {
+      options.endpoint = new Endpoint(endpointUrl);
     }
+
     this.s3 = new S3(options);
   }
 
-  async uploadFile(fileName: string, filePath: string): Promise<SendData> {
-    const fileStream = fs.createReadStream(filePath);
-    const params = {
-      Bucket: this.bucketName,
-      Key: this.filterKey(fileName),
-      Body: fileStream,
-    };
+  async uploadFile(
+    fileName: string,
+    filePath: string,
+  ): Promise<ManagedUpload.SendData> {
     try {
-      return await this.s3.upload(params).promise();
-    } catch (error) {
-      await this.loggerService.error(error);
-      throw error;
+      console.log('Checking file existence:', filePath);
+
+      if (!fs.existsSync(filePath)) {
+        throw new Error(`File not found at path: ${filePath}`);
+      }
+
+      const fileStream = fs.createReadStream(filePath);
+      console.log('File stream created successfully');
+
+      return await this.s3
+        .upload({
+          Bucket: this.bucketName,
+          Key: this.filterKey(fileName),
+          Body: fileStream,
+        })
+        .promise();
+    } catch (err) {
+      console.error('Upload failed:', err);
+      throw err;
     }
   }
 
   async downloadFile(key: string): Promise<Buffer> {
+    const filteredKey = this.filterKey(key);
+    console.log('Attempting to download file with key:', filteredKey);
+
     const params = {
       Bucket: this.bucketName,
-      Key: this.filterKey(key),
+      Key: filteredKey,
     };
+
     try {
       const response = await this.s3.getObject(params).promise();
+      console.log('File downloaded successfully:', filteredKey);
       return response.Body as Buffer;
-    } catch (error) {
-      await this.loggerService.error(error);
-      throw error;
+    } catch (err) {
+      console.error('S3 Download Error:', err, 'Key:', filteredKey);
+      await this.loggerService.error(err);
+      throw err;
     }
   }
 
@@ -65,13 +104,12 @@ export class FileS3Service {
     return this.s3.getSignedUrlPromise('getObject', params);
   }
 
-  async getFileStream(key: string): Promise<Readable> {
+  getFileStream(key: string): Readable {
     const params = {
       Bucket: this.bucketName,
       Key: this.filterKey(key),
     };
-    const response = await this.s3.getObject(params).createReadStream();
-    return response;
+    return this.s3.getObject(params).createReadStream();
   }
 
   async removeFile(key: string): Promise<void> {
@@ -82,13 +120,13 @@ export class FileS3Service {
 
     try {
       await this.s3.deleteObject(params).promise();
-    } catch (error) {
-      await this.loggerService.error(error);
-      throw error;
+    } catch (err) {
+      await this.loggerService.error(err);
+      throw err;
     }
   }
 
-  filterKey(key: string) {
+  private filterKey(key: string): string {
     return key.replace(/^[./]+|[./]+$/g, '');
   }
 }
