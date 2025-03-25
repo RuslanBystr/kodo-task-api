@@ -13,6 +13,7 @@ import { ProjectModule } from './project/project.module';
 import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { StripeModule } from './stripe/stripe.module';
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { StripeModule } from './stripe/stripe.module';
     MessageModule,
     ChatModule,
     StripeModule,
+    CryptoModule,
     // RedisModule,
   ],
   controllers: [AppController],
