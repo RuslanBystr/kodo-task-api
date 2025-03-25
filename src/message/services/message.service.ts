@@ -122,11 +122,28 @@ export class MessageService {
     return response;
   }
 
-  async removeMessage(id: number): Promise<Message> {
-    const message = await this.messageRepo.findOne({ where: { id } });
+  async removeMessage(id: number): Promise<any> {
+    const message = await this.messageRepo.findOne({
+      where: { id },
+      relations: ['chat'],
+    });
+
     if (!message) {
       throw new Error(`Message with ID ${id} not found`);
     }
-    return await this.messageRepo.remove(message);
+
+    const chat = message.chat;
+    await this.messageRepo.remove(message);
+    console.log(message.chat);
+    if (chat) {
+      const latestMessage = await this.messageRepo.findOne({
+        where: { chat: { id: chat.id } },
+        order: { createdAt: 'DESC' },
+      });
+      console.log(latestMessage);
+      chat.lastMessage = latestMessage || null;
+      await this.chatRepo.save(chat);
+    }
+    return message;
   }
 }
