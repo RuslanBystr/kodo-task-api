@@ -12,4 +12,7 @@ export class CreateMessageDto {
 
   @ApiProperty()
   voiceMessage: string | null;
+
+  @ApiProperty()
+  linkToMessage: string | null;
 }

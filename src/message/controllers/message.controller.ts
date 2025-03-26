@@ -35,11 +35,13 @@ export class MessageController {
   }
 
   @Post('/send')
+  @UseGuards(JwtAuthGuard, ChatMemberGuard)
   async sendMessage(@Body() body: CreateMessageDto) {
     return this.messageService.sendMessage(body);
   }
 
   @Put('/:id')
+  @UseGuards(JwtAuthGuard, ChatMemberGuard)
   async reactionOnMessage(
     @Param('id') id: number,
     @Body('reaction') reaction: string,
@@ -47,8 +49,9 @@ export class MessageController {
     return this.messageService.addReactionOnMessage(id, reaction);
   }
 
-  @Delete('/:id')
-  async removeMessage(@Param('id') id: number) {
+  @Delete('/:chatId')
+  @UseGuards(JwtAuthGuard, ChatMemberGuard)
+  async removeMessage(@Param('chatId') id: number) {
     return this.messageService.removeMessage(id);
   }
 }

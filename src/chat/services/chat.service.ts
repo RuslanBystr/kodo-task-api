@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chat, ChatType } from '../entities/chat.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { In, Repository } from 'typeorm';
 import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
+import { Message } from '../../message/entities/message.entity';
 
 @Injectable()
 export class ChatService {
@@ -136,6 +137,23 @@ export class ChatService {
 
     return chat;
   }
+
+  async deletePrivateChat(chatId: number): Promise<Chat> {
+    const chat = await this.chatRepo.findOne({
+      where: { id: chatId },
+      relations: ['messages'],
+    });
+    if (!chat) throw new NotFoundException('Chat with id {id} not found');
+    await this.chatRepo
+      .createQueryBuilder()
+      .delete()
+      .from(Message)
+      .where('chatId = :chatId', { chatId })
+      .execute();
+
+    return await this.chatRepo.remove(chat);
+  }
+
   async chatMember(userId: string, chatId: string): Promise<boolean> {
     const chat = await this.chatRepo.findOne({
       where: { id: Number(chatId) },
