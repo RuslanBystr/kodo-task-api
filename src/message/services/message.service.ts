@@ -17,12 +17,29 @@ export class MessageService {
   ) {}
 
   async sendMessage(messageDto: CreateMessageDto): Promise<Message> {
-    const { chatId, senderId, content = null, voiceMessage } = messageDto;
-    let file = null;
+    const {
+      chatId,
+      senderId,
+      content = null,
+      voiceMessage,
+      linkToMessage,
+    } = messageDto;
+
+    let file: FileEntity | null = null;
     if (voiceMessage) {
       file = await this.fileRepo.findOne({ where: { uuid: voiceMessage } });
     }
-    console.log(file);
+
+    let replyMessage: Message | null = null;
+    if (linkToMessage) {
+      replyMessage = await this.messageRepo.findOne({
+        where: { id: Number(linkToMessage) },
+      });
+    }
+
+    console.log('Reply Message:', replyMessage);
+    console.log('File:', file);
+
     const chat = await this.chatRepo.findOne({ where: { id: chatId } });
 
     if (!chat) {
@@ -34,6 +51,7 @@ export class MessageService {
       voiceMessage: file,
       sender: { id: senderId },
       chat,
+      linkToMessage: replyMessage,
     });
 
     const savedMessage = await this.messageRepo.save(message);
@@ -88,6 +106,8 @@ export class MessageService {
         'voiceMessage.uuid',
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
+      .leftJoinAndSelect('message.linkToMessage', 'linkToMessage')
+
       .leftJoin('message.sender', 'sender')
       .addSelect([
         'sender.id',
