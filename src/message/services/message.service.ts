@@ -34,6 +34,7 @@ export class MessageService {
     if (linkToMessage) {
       replyMessage = await this.messageRepo.findOne({
         where: { id: Number(linkToMessage) },
+        relations: ['sender'],
       });
     }
 
@@ -107,7 +108,8 @@ export class MessageService {
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoinAndSelect('message.linkToMessage', 'linkToMessage')
-
+      .leftJoinAndSelect('linkToMessage.sender', 'linkedSender')
+      .addSelect(['linkedSender.id', 'linkedSender.firstName'])
       .leftJoin('message.sender', 'sender')
       .addSelect([
         'sender.id',
@@ -123,7 +125,8 @@ export class MessageService {
 
     const totalPages = Math.ceil(total / limit);
 
-    const response = {
+    // await this.redisService.setCache(cacheKey, response, 60);
+    return {
       items: messageItems
         ?.map((msg) => ({
           ...msg,
@@ -137,9 +140,6 @@ export class MessageService {
         currentPage: Number(page),
       },
     };
-
-    // await this.redisService.setCache(cacheKey, response, 60);
-    return response;
   }
 
   async removeMessage(id: number): Promise<any> {
