@@ -38,6 +38,7 @@ export class FileController {
       storage: diskStorage({
         destination: UPLOAD_FILE_PATH || './uploads/public/',
         filename: (_, file, cb) => {
+          console.log(file.originalname);
           cb(null, `${randomUUID()}-${file.originalname.replace(/\s/g, '-')}`);
         },
       }),
@@ -51,6 +52,10 @@ export class FileController {
     @UploadedFile() // FOR ARRAY of files: Array<Express.Multer.File>)
     file: Express.Multer.File,
   ) {
+    console.log('Received file:', file);
+    if (!file) {
+      throw new Error('No file received');
+    }
     return await this.fileLocal.saveFile(file);
   }
 
