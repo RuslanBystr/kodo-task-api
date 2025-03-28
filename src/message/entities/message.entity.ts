@@ -23,6 +23,10 @@ export class Message {
   @JoinColumn({ name: 'voice_message_file_id' })
   voiceMessage: FileEntity | null;
 
+  @OneToOne(() => FileEntity, { nullable: true, cascade: true })
+  @JoinColumn({ name: 'file_id' })
+  file: FileEntity | null;
+
   @ManyToOne(() => User, (user) => user.sentMessages)
   sender: User;
 

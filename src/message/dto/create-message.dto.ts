@@ -14,5 +14,8 @@ export class CreateMessageDto {
   voiceMessage: string | null;
 
   @ApiProperty()
+  file: string | null;
+
+  @ApiProperty()
   linkToMessage: string | null;
 }

@@ -29,6 +29,7 @@ import { AddTaskLog1742030751151 } from './migrations/1742030751151-add-tast-log
 import { AddLastMessage1742228911850 } from './migrations/1742228911850-chat-last-message-column';
 import { AddVoiceMessage1742382401988 } from './migrations/1742382401988-add-voice-message';
 import { AddReactionAndAnswerMessage1742496172431 } from './migrations/1742496172431-add-reaction-and-answer-message';
+import { FileMessage1743163586418 } from './migrations/1743163586418-file-message';
 
 config();
 const configService = new ConfigService();
@@ -67,7 +68,8 @@ const options: DataSourceOptions & SeederOptions = {
     AddTaskLog1742030751151,
     AddLastMessage1742228911850,
     AddVoiceMessage1742382401988,
-    AddReactionAndAnswerMessage1742496172431
+    AddReactionAndAnswerMessage1742496172431,
+    FileMessage1743163586418
   ],
   seeds: [MainSeeder],
 };

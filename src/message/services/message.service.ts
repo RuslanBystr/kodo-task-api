@@ -22,12 +22,22 @@ export class MessageService {
       senderId,
       content = null,
       voiceMessage,
+      file,
       linkToMessage,
     } = messageDto;
+    console.log('UUID: ', file);
+    let voiceFile: FileEntity | null = null;
+    let fileImage: FileEntity | null = null;
 
-    let file: FileEntity | null = null;
     if (voiceMessage) {
-      file = await this.fileRepo.findOne({ where: { uuid: voiceMessage } });
+      voiceFile = await this.fileRepo.findOne({
+        where: { uuid: voiceMessage },
+      });
+    }
+
+    if (file) {
+      fileImage = await this.fileRepo.findOne({ where: { uuid: file } });
+      console.log('file: ', fileImage);
     }
 
     let replyMessage: Message | null = null;
@@ -39,7 +49,8 @@ export class MessageService {
     }
 
     console.log('Reply Message:', replyMessage);
-    console.log('File:', file);
+    console.log('Voice File:', voiceFile);
+    console.log('File:', fileImage);
 
     const chat = await this.chatRepo.findOne({ where: { id: chatId } });
 
@@ -49,10 +60,11 @@ export class MessageService {
 
     const message = this.messageRepo.create({
       content,
-      voiceMessage: file,
+      voiceMessage: voiceFile,
       sender: { id: senderId },
       chat,
       linkToMessage: replyMessage,
+      file: fileImage,
     });
 
     const savedMessage = await this.messageRepo.save(message);
@@ -107,6 +119,7 @@ export class MessageService {
         'voiceMessage.uuid',
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
+      .leftJoinAndSelect('message.file', 'file')
       .leftJoinAndSelect('message.linkToMessage', 'linkToMessage')
       .leftJoinAndSelect('linkToMessage.sender', 'linkedSender')
       .addSelect(['linkedSender.id', 'linkedSender.firstName'])
