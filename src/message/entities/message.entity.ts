@@ -6,6 +6,8 @@ import {
   CreateDateColumn,
   OneToOne,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Chat } from '../../chat/entities/chat.entity';
@@ -38,6 +40,10 @@ export class Message {
 
   @Column({ default: false })
   isRead: boolean;
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  readByUsers: User[];
 
   @Column({ default: null, nullable: true })
   reaction: string | null;

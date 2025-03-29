@@ -30,6 +30,7 @@ import { AddLastMessage1742228911850 } from './migrations/1742228911850-chat-las
 import { AddVoiceMessage1742382401988 } from './migrations/1742382401988-add-voice-message';
 import { AddReactionAndAnswerMessage1742496172431 } from './migrations/1742496172431-add-reaction-and-answer-message';
 import { FileMessage1743163586418 } from './migrations/1743163586418-file-message';
+import { MessageReadByUsers1743260326540 } from './migrations/1743260326540-message-read-by-users';
 
 config();
 const configService = new ConfigService();
@@ -69,7 +70,8 @@ const options: DataSourceOptions & SeederOptions = {
     AddLastMessage1742228911850,
     AddVoiceMessage1742382401988,
     AddReactionAndAnswerMessage1742496172431,
-    FileMessage1743163586418
+    FileMessage1743163586418,
+    MessageReadByUsers1743260326540
   ],
   seeds: [MainSeeder],
 };

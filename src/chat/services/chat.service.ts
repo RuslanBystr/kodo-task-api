@@ -31,6 +31,7 @@ export class ChatService {
         'users.avatar',
       ])
       .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+      .leftJoinAndSelect('lastMessage.file', 'file')
       .leftJoinAndSelect(
         'chat.messages',
         'message',
