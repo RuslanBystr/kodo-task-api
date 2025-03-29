@@ -62,11 +62,25 @@ export class ChatService {
     };
   }
 
-  async getUserGroupChats({ page = 1, limit = 100 }): Promise<any> {
+  async getUserGroupChats({ page = 1, limit = 100, userId }): Promise<any> {
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
-      .where('chat.type = :type', { type: 'GROUP' })
+      .where('chat.type = :type', { type: ChatType.GROUP })
       .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+      .leftJoinAndSelect('lastMessage.file', 'file')
+      .leftJoinAndSelect('chat.messages', 'messages')
+      .leftJoinAndSelect(
+        'chat.messages',
+        'message',
+        'message.isRead = :isRead AND message.sender != :senderId',
+        {
+          isRead: false,
+          senderId: userId,
+        },
+      )
+      .leftJoin('message.readByUsers', 'readUser', 'readUser.id = :userId', { userId })
+      .andWhere('readUser.id IS NULL')
+      .orderBy('chat.lastMessage', 'DESC')
       .take(limit)
       .skip((page - 1) * limit)
       .getManyAndCount();
