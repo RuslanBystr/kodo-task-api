@@ -6,6 +6,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
 import { FileEntity } from '../../file/entities/file.entity';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class MessageService {
@@ -13,6 +14,7 @@ export class MessageService {
     @InjectRepository(Message) private messageRepo: Repository<Message>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(FileEntity) private fileRepo: Repository<FileEntity>,
+    @InjectRepository(User) private userRepo: Repository<User>,
     // private readonly redisService: RedisService
   ) {}
 
@@ -86,16 +88,29 @@ export class MessageService {
     return this.messageRepo.save(message);
   }
 
-  async markAsRead(id: number): Promise<Message> {
-    const message = await this.messageRepo.findOne({ where: { id } });
+  async markAsRead(userId: number, readByUserId: number): Promise<Message> {
+    const message = await this.messageRepo.findOne({
+      where: { id: userId },
+      relations: ['readByUsers'],
+    });
 
     if (!message) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
+      throw new NotFoundException(`Message with ID ${userId} not found`);
+    }
+
+    const user = await this.userRepo.findOne({ where: { id: readByUserId } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${readByUserId} not found`);
+    }
+
+    if (!message.readByUsers.some((u) => u.id === readByUserId)) {
+      message.readByUsers.push(user);
     }
 
     message.isRead = true;
     return this.messageRepo.save(message);
   }
+
   public async getMessages({
     page = 1,
     limit = 20,
@@ -121,6 +136,13 @@ export class MessageService {
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoinAndSelect('message.file', 'file')
       .leftJoinAndSelect('message.linkToMessage', 'linkToMessage')
+      .leftJoin('message.readByUsers', 'readByUsers')
+      .addSelect([
+        'readByUsers.id',
+        'readByUsers.avatar',
+        'readByUsers.firstName',
+        'readByUsers.lastName',
+      ])
       .leftJoinAndSelect('linkToMessage.sender', 'linkedSender')
       .addSelect(['linkedSender.id', 'linkedSender.firstName'])
       .leftJoin('message.sender', 'sender')

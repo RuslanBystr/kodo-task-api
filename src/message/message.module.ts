@@ -8,10 +8,11 @@ import { Chat } from '../chat/entities/chat.entity';
 import { ChatMemberGuard } from './guards/chat-member.guard';
 import { ChatModule } from '../chat/chat.module';
 import { FileEntity } from '../file/entities/file.entity';
+import { User } from '../user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Message, Chat, FileEntity]),
+    TypeOrmModule.forFeature([Message, Chat, FileEntity, User]),
     // RedisModule,
     forwardRef(() => ChatModule),
   ],
