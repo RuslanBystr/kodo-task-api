@@ -78,7 +78,9 @@ export class ChatService {
           senderId: userId,
         },
       )
-      .leftJoin('message.readByUsers', 'readUser', 'readUser.id = :userId', { userId })
+      .leftJoin('message.readByUsers', 'readUser', 'readUser.id = :userId', {
+        userId,
+      })
       .andWhere('readUser.id IS NULL')
       .orderBy('chat.lastMessage', 'DESC')
       .take(limit)
