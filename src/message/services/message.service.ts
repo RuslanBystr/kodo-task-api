@@ -50,10 +50,6 @@ export class MessageService {
       });
     }
 
-    console.log('Reply Message:', replyMessage);
-    console.log('Voice File:', voiceFile);
-    console.log('File:', fileImage);
-
     const chat = await this.chatRepo.findOne({ where: { id: chatId } });
 
     if (!chat) {
@@ -189,7 +185,6 @@ export class MessageService {
 
     const chat = message.chat;
     await this.messageRepo.remove(message);
-    console.log(message.chat);
     if (chat) {
       const latestMessage = await this.messageRepo.findOne({
         where: { chat: { id: chat.id } },

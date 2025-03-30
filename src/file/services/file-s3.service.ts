@@ -10,7 +10,7 @@ import { CONFIG } from '../../common/enums/config';
 @Injectable()
 export class FileS3Service {
   private s3: S3;
-  private bucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -29,15 +29,6 @@ export class FileS3Service {
         ),
       },
     };
-
-    console.log('AWS Config:', {
-      accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
-      secretAccessKey: this.configService.get<string>(
-        CONFIG.AWS_SECRET_ACCESS_KEY,
-      ),
-      region: this.configService.get<string>(CONFIG.AWS_REGION),
-      endpoint: this.configService.get<string>(CONFIG.AWS_ENDPOINT_URL_S3),
-    });
 
     const endpointUrl = this.configService.get<string>(
       CONFIG.AWS_ENDPOINT_URL_S3,
