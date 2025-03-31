@@ -23,8 +23,6 @@ export class StripeService {
       payment_method_types: ['card'],
     });
 
-    console.log('Client Secret:', paymentIntent.client_secret);
-
     return paymentIntent;
   }
 }

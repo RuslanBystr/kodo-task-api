@@ -160,7 +160,7 @@ export class ChatService {
       where: { id: chatId },
       relations: ['messages'],
     });
-    if (!chat) throw new NotFoundException('Chat with id {id} not found');
+    if (!chat) throw new NotFoundException(`Chat with id ${chatId} not found`);
     await this.chatRepo
       .createQueryBuilder()
       .delete()

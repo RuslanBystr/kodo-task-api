@@ -14,6 +14,7 @@ import { MessageModule } from './message/message.module';
 import { ChatModule } from './chat/chat.module';
 import { StripeModule } from './stripe/stripe.module';
 import { CryptoModule } from './crypto/crypto.module';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CryptoModule } from './crypto/crypto.module';
     ChatModule,
     StripeModule,
     CryptoModule,
+    ActivityModule,
     // RedisModule,
   ],
   controllers: [AppController],

@@ -69,7 +69,6 @@ export class FileS3Service {
 
   async downloadFile(key: string): Promise<Buffer> {
     const filteredKey = this.filterKey(key);
-    console.log('Attempting to download file with key:', filteredKey);
 
     const params = {
       Bucket: this.bucketName,
@@ -78,10 +77,8 @@ export class FileS3Service {
 
     try {
       const response = await this.s3.getObject(params).promise();
-      console.log('File downloaded successfully:', filteredKey);
       return response.Body as Buffer;
     } catch (err) {
-      console.error('S3 Download Error:', err, 'Key:', filteredKey);
       await this.loggerService.error(err);
       throw err;
     }

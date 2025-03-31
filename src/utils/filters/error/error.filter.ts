@@ -21,7 +21,6 @@ export class ExceptionsLoggerFilter implements ExceptionFilter {
   }
 
   private configureErrorResponse(error: Error) {
-    console.log('Error', error);
     this.loggerService.error(error);
     return { statusCode: 500, message: 'Internal Server Error' };
   }
