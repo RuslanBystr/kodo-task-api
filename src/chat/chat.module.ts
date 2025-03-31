@@ -7,13 +7,14 @@ import { ChatController } from './controllers/chat.controller';
 import { ChatService } from './services/chat.service';
 import { User } from '../user/entities/user.entity';
 import { UserChat } from './entities/user.chat.entity';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Chat, UserChat, User]),
     forwardRef(() => MessageModule),
   ],
-  providers: [ChatGateway, ChatService],
+  providers: [ChatGateway, ChatService, CryptoService],
   controllers: [ChatController],
   exports: [ChatService],
 })

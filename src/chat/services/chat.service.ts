@@ -6,6 +6,7 @@ import { UserChat } from '../entities/user.chat.entity';
 import { In, Repository } from 'typeorm';
 import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
 import { Message } from '../../message/entities/message.entity';
+import { CryptoService } from '../../crypto/crypto.service';
 
 @Injectable()
 export class ChatService {
@@ -13,6 +14,7 @@ export class ChatService {
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(UserChat) private userChatRepo: Repository<UserChat>,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async getUserChats({
@@ -41,7 +43,6 @@ export class ChatService {
           senderId: userId,
         },
       )
-      .orderBy('chat.lastMessage', 'DESC')
       .take(limit)
       .skip((page - 1) * limit)
       .getManyAndCount();
@@ -50,8 +51,22 @@ export class ChatService {
       chatItem.userChats.some((userChat) => userChat.user.id === userId),
     );
 
+    const decryptLastMessage = Promise.all(
+      filteredChatItems.map(async (chatItem: Chat) => ({
+        ...chatItem,
+        lastMessage: chatItem.lastMessage
+          ? {
+            ...chatItem.lastMessage,
+            content: chatItem.lastMessage.content
+              ? await this.cryptoService.decryptMessage(chatItem.lastMessage.content)
+              : chatItem.lastMessage.content,
+          }
+          : null,
+      }))
+    );
+
     return {
-      items: filteredChatItems,
+      items: await decryptLastMessage,
       meta: {
         totalItems: total,
         itemCount: chatItems.length,
@@ -87,8 +102,22 @@ export class ChatService {
       .skip((page - 1) * limit)
       .getManyAndCount();
 
+    const decryptLastMessage = Promise.all(
+      chatItems.map(async (chatItem: Chat) => ({
+        ...chatItem,
+        lastMessage: chatItem.lastMessage
+          ? {
+            ...chatItem.lastMessage,
+            content: chatItem.lastMessage.content
+              ? await this.cryptoService.decryptMessage(chatItem.lastMessage.content)
+              : chatItem.lastMessage.content,
+          }
+          : null,
+      }))
+    );
+
     return {
-      items: chatItems,
+      items: await decryptLastMessage,
       meta: {
         totalItems: total,
         itemCount: chatItems.length,
