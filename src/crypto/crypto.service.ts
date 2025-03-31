@@ -8,18 +8,18 @@ export class CryptoService {
   private kmsClient: KMSClient;
   private KMS_KEY_ID: string;
 
-  constructor(
-    private readonly configService: ConfigService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.kmsClient = new KMSClient({
       region: this.configService.get<string>(CONFIG.AWS_REGION),
       credentials: {
         accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
-        secretAccessKey: this.configService.get<string>(CONFIG.AWS_SECRET_ACCESS_KEY),
+        secretAccessKey: this.configService.get<string>(
+          CONFIG.AWS_SECRET_ACCESS_KEY,
+        ),
       },
     });
 
-    this.KMS_KEY_ID = this.configService.get<string>(CONFIG.AWS_KMS_KEY_ID)
+    this.KMS_KEY_ID = this.configService.get<string>(CONFIG.AWS_KMS_KEY_ID);
   }
 
   async encryptMessage(message: string): Promise<string> {

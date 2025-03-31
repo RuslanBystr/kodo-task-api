@@ -59,7 +59,9 @@ export class MessageService {
       throw new NotFoundException(`Chat with id ${chatId} not found`);
     }
 
-    const encryptTextMessage = content ? await this.cryptoService.encryptMessage(content): null;
+    const encryptTextMessage = content
+      ? await this.cryptoService.encryptMessage(content)
+      : null;
 
     const message = this.messageRepo.create({
       content: encryptTextMessage,
@@ -77,7 +79,7 @@ export class MessageService {
 
     return {
       ...savedMessage,
-      content
+      content,
     };
   }
 
@@ -171,7 +173,7 @@ export class MessageService {
         content: item.content
           ? await this.cryptoService.decryptMessage(item.content)
           : item.content,
-      }))
+      })),
     );
 
     return {
