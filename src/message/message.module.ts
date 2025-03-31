@@ -9,6 +9,7 @@ import { ChatMemberGuard } from './guards/chat-member.guard';
 import { ChatModule } from '../chat/chat.module';
 import { FileEntity } from '../file/entities/file.entity';
 import { User } from '../user/entities/user.entity';
+import { CryptoService } from '../crypto/crypto.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { User } from '../user/entities/user.entity';
     forwardRef(() => ChatModule),
   ],
   controllers: [MessageController],
-  providers: [MessageService, ChatMemberGuard],
+  providers: [MessageService, CryptoService, ChatMemberGuard],
   exports: [MessageService],
 })
 export class MessageModule {}

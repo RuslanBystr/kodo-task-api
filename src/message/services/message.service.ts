@@ -7,6 +7,7 @@ import { CreateMessageDto } from '../dto/create-message.dto';
 import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
 import { FileEntity } from '../../file/entities/file.entity';
 import { User } from '../../user/entities/user.entity';
+import { CryptoService } from '../../crypto/crypto.service';
 
 @Injectable()
 export class MessageService {
@@ -15,6 +16,8 @@ export class MessageService {
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(FileEntity) private fileRepo: Repository<FileEntity>,
     @InjectRepository(User) private userRepo: Repository<User>,
+
+    private readonly cryptoService: CryptoService,
     // private readonly redisService: RedisService
   ) {}
 
@@ -56,8 +59,10 @@ export class MessageService {
       throw new NotFoundException(`Chat with id ${chatId} not found`);
     }
 
+    const encryptTextMessage = content ? await this.cryptoService.encryptMessage(content): null;
+
     const message = this.messageRepo.create({
-      content,
+      content: encryptTextMessage,
       voiceMessage: voiceFile,
       sender: { id: senderId },
       chat,
@@ -70,7 +75,10 @@ export class MessageService {
     chat.lastMessage = savedMessage;
     await this.chatRepo.save(chat);
 
-    return savedMessage;
+    return {
+      ...savedMessage,
+      content
+    };
   }
 
   async addReactionOnMessage(id: number, reaction: string): Promise<Message> {
@@ -157,12 +165,17 @@ export class MessageService {
     const totalPages = Math.ceil(total / limit);
 
     // await this.redisService.setCache(cacheKey, response, 60);
+    const decryptedMessages = await Promise.all(
+      messageItems.map(async (item) => ({
+        ...item,
+        content: item.content
+          ? await this.cryptoService.decryptMessage(item.content)
+          : item.content,
+      }))
+    );
+
     return {
-      items: messageItems
-        ?.map((msg) => ({
-          ...msg,
-        }))
-        .reverse(),
+      items: decryptedMessages.reverse(),
       meta: {
         totalItems: total,
         itemCount: messageItems.length,
