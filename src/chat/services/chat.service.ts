@@ -56,13 +56,15 @@ export class ChatService {
         ...chatItem,
         lastMessage: chatItem.lastMessage
           ? {
-            ...chatItem.lastMessage,
-            content: chatItem.lastMessage.content
-              ? await this.cryptoService.decryptMessage(chatItem.lastMessage.content)
-              : chatItem.lastMessage.content,
-          }
+              ...chatItem.lastMessage,
+              content: chatItem.lastMessage.content
+                ? await this.cryptoService.decryptMessage(
+                    chatItem.lastMessage.content,
+                  )
+                : chatItem.lastMessage.content,
+            }
           : null,
-      }))
+      })),
     );
 
     return {
@@ -107,13 +109,15 @@ export class ChatService {
         ...chatItem,
         lastMessage: chatItem.lastMessage
           ? {
-            ...chatItem.lastMessage,
-            content: chatItem.lastMessage.content
-              ? await this.cryptoService.decryptMessage(chatItem.lastMessage.content)
-              : chatItem.lastMessage.content,
-          }
+              ...chatItem.lastMessage,
+              content: chatItem.lastMessage.content
+                ? await this.cryptoService.decryptMessage(
+                    chatItem.lastMessage.content,
+                  )
+                : chatItem.lastMessage.content,
+            }
           : null,
-      }))
+      })),
     );
 
     return {

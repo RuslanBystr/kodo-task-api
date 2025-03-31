@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from '../project/entities/task.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
-import { ActivityDto } from './dto/activity.dto';
 
 @Injectable()
 export class ActivityService {
@@ -11,10 +10,9 @@ export class ActivityService {
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Task) private taskRepo: Repository<Task>,
   ) {}
-  async userActivity(activityDto: ActivityDto) {
+  async userActivity(userId: number) {
     try {
-      const userId = activityDto.userId;
-      const user =  await this.userRepo.findOne({where: {id: userId}});
+      const user = await this.userRepo.findOne({ where: { id: userId } });
       if (!user) {
         throw new NotFoundException('User does not exist');
       }
@@ -24,17 +22,18 @@ export class ActivityService {
         .leftJoin('task.assignedUser', 'user')
         .leftJoin('task.timeLogger', 'log')
         .where('user.id = :userId', { userId })
-        .select(['DATE(log.loggedAt) AS date', 'SUM(log.duration) AS totalTime'])
+        .select([
+          'DATE(log.loggedAt) AS date',
+          'SUM(log.duration) AS totalTime',
+        ])
         .groupBy('DATE(log.loggedAt)')
         .orderBy('DATE(log.loggedAt)', 'ASC')
         .getRawMany();
 
       return logs;
-
     } catch (err) {
       console.log(err);
       throw err;
     }
   }
-
 }
