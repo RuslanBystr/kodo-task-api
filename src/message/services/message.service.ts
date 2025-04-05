@@ -79,6 +79,12 @@ export class MessageService {
 
     return {
       ...savedMessage,
+      linkToMessage: replyMessage
+        ? {
+          ...replyMessage,
+          content: replyMessage.content ? await this.cryptoService.decryptMessage(replyMessage.content) : null,
+        }
+        : null,
       content,
     };
   }
@@ -141,7 +147,13 @@ export class MessageService {
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoinAndSelect('message.file', 'file')
-      .leftJoinAndSelect('message.linkToMessage', 'linkToMessage')
+
+      .leftJoin('message.linkToMessage', 'linkToMessage')
+      .addSelect([
+        'linkToMessage.id',
+        'linkToMessage.content',
+      ])
+
       .leftJoin('message.readByUsers', 'readByUsers')
       .addSelect([
         'readByUsers.id',
@@ -149,8 +161,16 @@ export class MessageService {
         'readByUsers.firstName',
         'readByUsers.lastName',
       ])
-      .leftJoinAndSelect('linkToMessage.sender', 'linkedSender')
-      .addSelect(['linkedSender.id', 'linkedSender.firstName'])
+
+      .leftJoin('linkToMessage.file', 'replyMessageFile')
+      .addSelect(['replyMessageFile.uuid'])
+
+      .leftJoin('linkToMessage.voiceMessage', 'replyVoiceMessage')
+      .addSelect(['replyVoiceMessage.uuid'])
+
+      .leftJoin('linkToMessage.sender', 'replyToSender')
+      .addSelect(['replyToSender.id', 'replyToSender.firstName'])
+
       .leftJoin('message.sender', 'sender')
       .addSelect([
         'sender.id',
@@ -158,6 +178,7 @@ export class MessageService {
         'sender.firstName',
         'sender.lastName',
       ])
+
       .where('message.chatId = :chatId', { chatId })
       .orderBy('message.createdAt', 'DESC')
       .take(limit)
@@ -170,6 +191,14 @@ export class MessageService {
     const decryptedMessages = await Promise.all(
       messageItems.map(async (item) => ({
         ...item,
+        linkToMessage: item.linkToMessage
+          ? {
+            ...item.linkToMessage,
+            content: item.linkToMessage.content
+              ? await this.cryptoService.decryptMessage(item.linkToMessage.content)
+              : item.linkToMessage.content,
+          }
+          : null,
         content: item.content
           ? await this.cryptoService.decryptMessage(item.content)
           : item.content,
