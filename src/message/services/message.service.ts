@@ -81,9 +81,11 @@ export class MessageService {
       ...savedMessage,
       linkToMessage: replyMessage
         ? {
-          ...replyMessage,
-          content: replyMessage.content ? await this.cryptoService.decryptMessage(replyMessage.content) : null,
-        }
+            ...replyMessage,
+            content: replyMessage.content
+              ? await this.cryptoService.decryptMessage(replyMessage.content)
+              : null,
+          }
         : null,
       content,
     };
@@ -149,10 +151,7 @@ export class MessageService {
       .leftJoinAndSelect('message.file', 'file')
 
       .leftJoin('message.linkToMessage', 'linkToMessage')
-      .addSelect([
-        'linkToMessage.id',
-        'linkToMessage.content',
-      ])
+      .addSelect(['linkToMessage.id', 'linkToMessage.content'])
 
       .leftJoin('message.readByUsers', 'readByUsers')
       .addSelect([
@@ -193,11 +192,13 @@ export class MessageService {
         ...item,
         linkToMessage: item.linkToMessage
           ? {
-            ...item.linkToMessage,
-            content: item.linkToMessage.content
-              ? await this.cryptoService.decryptMessage(item.linkToMessage.content)
-              : item.linkToMessage.content,
-          }
+              ...item.linkToMessage,
+              content: item.linkToMessage.content
+                ? await this.cryptoService.decryptMessage(
+                    item.linkToMessage.content,
+                  )
+                : item.linkToMessage.content,
+            }
           : null,
         content: item.content
           ? await this.cryptoService.decryptMessage(item.content)

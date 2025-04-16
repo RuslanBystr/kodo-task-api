@@ -45,7 +45,10 @@ async function bootstrap() {
   await app
     .listen(process.env.API_PORT || 3000)
     .then(() =>
-      console.log('Server started http://localhost:' + process.env.API_PORT),
+      console.log(
+        '\x1b[38;2;150;255;150m Server started http://localhost:\x1b[0m' +
+          process.env.API_PORT,
+      ),
     )
     .catch((err) => console.log(err.message));
 }
@@ -62,6 +65,11 @@ function logErrorToFile(error: Error): void {
 
   appendFileSync(filePath, logMessage);
 }
+
+process.on('SIGINT', () => {
+  console.log('\x1b[38;2;255;190;170m - Server stopped\x1b[0m');
+  process.exit(0);
+});
 
 process.on('uncaughtException', (error: Error) => {
   logErrorToFile(error);
