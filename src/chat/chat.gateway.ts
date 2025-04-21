@@ -9,19 +9,37 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { MessageService } from '../message/services/message.service';
+import * as jwt from 'jsonwebtoken';
+
 import { CreateMessageDto } from '../message/dto/create-message.dto';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
-  server: Server;
+  @WebSocketServer() server: Server;
 
-  constructor(private messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) {}
 
   private onlineUsers = new Set<string>();
+  private userSocketMap = new Map<string, string>();
+  private chatUserMap = new Map<string, Set<string>>();
+  private userChatMap = new Map<string, string>();
 
-  handleConnection(client: Socket): void {
-    console.log(`Client connected: ${client.id}`);
+  async handleConnection(client: Socket) {
+    const token = client.handshake.auth?.accessToken;
+
+    if (!token) {
+      console.warn(client.handshake);
+      client.disconnect();
+      return;
+    }
+    try {
+      const decoded: any = jwt.verify(token, '3');
+      client.data.userId = decoded.id || decoded.sub;
+      console.log(`Connected userId : ${client.data.userId}`);
+    } catch (err) {
+      console.log('Invalid token, disconnecting...');
+      client.disconnect();
+    }
   }
 
   @SubscribeMessage('userConnected')
@@ -29,10 +47,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
   ): void {
-    client.data.userId = userId;
-    this.onlineUsers.add(userId);
+    if (!userId) return;
+
+    const stringUserId = userId.toString();
+    client.data.userId = stringUserId;
+
+    this.onlineUsers.add(stringUserId);
+    this.userSocketMap.set(stringUserId, client.id);
+
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-    console.log(`User ${userId} connected`);
+    console.log(`User ${stringUserId} connected with socket ${client.id}`);
+  }
+
+  handleDisconnect(client: Socket): void {
+    const userId = client.data.userId;
+    if (!userId) return;
+
+    this.onlineUsers.delete(userId);
+    this.userSocketMap.delete(userId);
+    this.userChatMap.delete(userId);
+
+    for (const [chatId, users] of this.chatUserMap.entries()) {
+      users.delete(userId);
+      if (users.size === 0) {
+        this.chatUserMap.delete(chatId);
+      }
+    }
+
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
+    console.log(`User ${userId} disconnected`);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async handleMessage(@MessageBody() data: CreateMessageDto) {
+    const message = await this.messageService.sendMessage(data);
+    this.server.to(`chat-${data.chatId}`).emit('newMessage', message);
   }
 
   @SubscribeMessage('reaction')
@@ -57,21 +106,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .emit('cleanMessage', deletedMessage);
   }
 
-  handleDisconnect(client: Socket): void {
-    const userId = client.data.userId;
-    if (!userId) return;
-
-    this.onlineUsers.delete(userId);
-    console.log(`User ${userId} disconnected`);
-    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-  }
-
-  @SubscribeMessage('sendMessage')
-  async handleMessage(@MessageBody() data: CreateMessageDto) {
-    const message = await this.messageService.sendMessage(data);
-    this.server.to(`chat-${data.chatId}`).emit('newMessage', message);
-  }
-
   @SubscribeMessage('markMessageAsRead')
   async handleMarkMessageAsRead(
     @MessageBody()
@@ -90,10 +124,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinChat')
-  handleJoinChat(
-    @MessageBody() chatId: number,
+  handleJoinChat(@MessageBody() data, @ConnectedSocket() client: Socket) {
+    console.log('joinChat', data);
+    const userId = client.data.userId;
+
+    this.userChatMap.set(userId, data);
+
+    this.userSocketMap.set(userId, client.id);
+
+    client.join(data);
+
+    console.log(`User ${userId} joined chat ${data}`);
+  }
+
+  @SubscribeMessage('webrtc_signal')
+  handleWebrtcSignal(
+    @MessageBody() data: { signal: any; toUserId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    client.join(`chat-${chatId}`);
+    console.log('DATA_LOG: ', data);
+    const fromUserId = client.data.userId;
+    const toUserId = data.toUserId?.toString();
+    const fromChatId = this.userChatMap.get(fromUserId);
+    // const toChatId = this.userChatMap.get(toUserId);
+    const toChatId = '1';
+
+    console.log(`WebRTC from: ${fromUserId} to: ${toUserId}`);
+    console.log(data.signal);
+    console.log(`fromChatId: ${fromChatId}, toChatId: ${toChatId}`);
+    console.log(this.userChatMap);
+    if (fromChatId && toChatId && fromChatId === toChatId) {
+      const toSocketId = this.userSocketMap.get(toUserId);
+      if (toSocketId) {
+        console.log('OK');
+        this.server.to(toSocketId).emit('webrtc_signal', {
+          signal: data.signal,
+          fromUserId,
+        });
+      } else {
+        console.log(`User ${toUserId} is not connected (no socket found)`);
+      }
+    } else {
+      console.log(
+        `WebRTC signaling failed: users not in the same chat or chat IDs not found`,
+      );
+    }
   }
 }

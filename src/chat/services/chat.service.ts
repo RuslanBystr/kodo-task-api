@@ -17,6 +17,19 @@ export class ChatService {
     private readonly cryptoService: CryptoService,
   ) {}
 
+  async getChatData(chatId: number): Promise<Chat> {
+    try {
+      const chat = await this.chatRepo.findOne({
+        where: { id: chatId },
+        relations: ['userChats'],
+      });
+      console.log(chat);
+      return chat;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async getUserChats({
     page = 1,
     limit = 100,

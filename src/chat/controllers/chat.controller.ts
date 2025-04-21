@@ -19,6 +19,11 @@ import { ChatMemberGuard } from '../../message/guards/chat-member.guard';
 export class ChatController {
   constructor(private chatService: ChatService) {}
 
+  @Get('/:id')
+  getUserChatData(chatId: number) {
+    return this.chatService.getChatData(chatId);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   getUserChats(@Query() filterDto: GetAllChatsFilterDto) {
