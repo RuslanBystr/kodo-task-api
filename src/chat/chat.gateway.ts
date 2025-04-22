@@ -153,7 +153,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const fromUserId = client.data.userId;
     const toUserId = data.toUserId?.toString();
     const fromChatId = this.userChatMap.get(fromUserId);
-    const toChatId = this.userChatMap.get(toUserId);
+    const toChatId = '14';
 
     console.log(`WebRTC from: ${fromUserId} to: ${toUserId}`);
     console.log(data.signal);
