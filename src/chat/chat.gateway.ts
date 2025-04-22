@@ -12,12 +12,17 @@ import { MessageService } from '../message/services/message.service';
 import * as jwt from 'jsonwebtoken';
 
 import { CreateMessageDto } from '../message/dto/create-message.dto';
+import { ConfigService } from '@nestjs/config';
+import { CONFIG } from '../common/enums/config';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly messageService: MessageService,
+  ) {}
 
   private onlineUsers = new Set<string>();
   private userSocketMap = new Map<string, string>();
@@ -33,7 +38,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     try {
-      const decoded: any = jwt.verify(token, '3');
+      const decoded: any = jwt.verify(
+        token,
+        this.configService.get<string>(CONFIG.JWT_SECRET),
+      );
       client.data.userId = decoded.id || decoded.sub;
       console.log(`Connected userId : ${client.data.userId}`);
     } catch (err) {
@@ -142,12 +150,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { signal: any; toUserId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('DATA_LOG: ', data);
     const fromUserId = client.data.userId;
     const toUserId = data.toUserId?.toString();
     const fromChatId = this.userChatMap.get(fromUserId);
-    // const toChatId = this.userChatMap.get(toUserId);
-    const toChatId = '1';
+    const toChatId = this.userChatMap.get(toUserId);
 
     console.log(`WebRTC from: ${fromUserId} to: ${toUserId}`);
     console.log(data.signal);
