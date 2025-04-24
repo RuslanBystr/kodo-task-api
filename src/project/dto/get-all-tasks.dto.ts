@@ -22,6 +22,16 @@ export class GetAllTasksFilterDto extends PaginationFilterDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  assignedUserId?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  projectId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsDateString()
   createdAt: string;
 

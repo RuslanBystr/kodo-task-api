@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Task } from '../entities/task.entity';
@@ -43,34 +47,58 @@ export class TaskService {
     limit = 10,
     sortBy = TaskSortByEnum.CREATED_AT,
     order = SortOrderEnum.ASC,
+    assignedUserId,
+    projectId = undefined,
     ...searchFilterFields
   }: GetAllTasksFilterDto): Promise<any> {
     const skip = (page - 1) * limit;
 
-    const conditions: FindOptionsWhere<Task> =
+    const baseConditions: FindOptionsWhere<Task> =
       generateSearchConditionsUser<Task>(searchFilterFields);
 
-    const [taskItems, total] = await this.taskRepo.findAndCount({
-      select: ['id', 'title', 'description', 'priority', 'status', 'createdAt'],
-      where: conditions,
-      relations: ['assignedUser', 'project'],
-      skip,
-      take: limit,
-      order: { [sortBy]: order },
-    });
-
-    const totalPages = Math.ceil(total / limit);
-
-    return {
-      items: taskItems,
-      meta: {
-        totalItems: total,
-        itemCount: taskItems.length,
-        itemsPerPage: Number(limit),
-        totalPages,
-        currentPage: Number(page),
-      },
+    const conditions: FindOptionsWhere<Task> = {
+      ...baseConditions,
     };
+
+    try {
+      const [taskItems, total] = await this.taskRepo.findAndCount({
+        select: [
+          'id',
+          'title',
+          'description',
+          'priority',
+          'status',
+          'createdAt',
+        ],
+        where: {
+          ...conditions,
+          project: projectId ? { id: projectId } : undefined,
+          assignedUser: assignedUserId ? { id: assignedUserId } : undefined,
+        },
+        relations: ['assignedUser', 'project'],
+        skip,
+        take: limit,
+        order: { [sortBy]: order },
+      });
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        items: taskItems,
+        meta: {
+          totalItems: total,
+          itemCount: taskItems.length,
+          itemsPerPage: Number(limit),
+          totalPages,
+          currentPage: Number(page),
+        },
+      };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException(
+        'Something went wrong while fetching tasks',
+      );
+    }
   }
 
   findOne(id: string) {
