@@ -9,45 +9,24 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { MessageService } from '../message/services/message.service';
-import * as jwt from 'jsonwebtoken';
 
 import { CreateMessageDto } from '../message/dto/create-message.dto';
-import { ConfigService } from '@nestjs/config';
-import { CONFIG } from '../common/enums/config';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly messageService: MessageService,
-  ) {}
+  constructor(private readonly messageService: MessageService) {}
 
   private onlineUsers = new Set<string>();
   private userSocketMap = new Map<string, string>();
+  private socketUserMap = new Map<string, string>();
+
   private chatUserMap = new Map<string, Set<string>>();
-  private userChatMap = new Map<string, string>();
+  private userChatMap = new Map<string, Set<string>>();
 
-  async handleConnection(client: Socket) {
-    const token = client.handshake.auth?.accessToken;
-
-    if (!token) {
-      console.warn(client.handshake);
-      client.disconnect();
-      return;
-    }
-    try {
-      const decoded: any = jwt.verify(
-        token,
-        this.configService.get<string>(CONFIG.JWT_SECRET),
-      );
-      client.data.userId = decoded.id || decoded.sub;
-      console.log(`Connected userId : ${client.data.userId}`);
-    } catch (err) {
-      console.log('Invalid token, disconnecting...');
-      client.disconnect();
-    }
+  async handleConnection() {
+    console.log('Connected');
   }
 
   @SubscribeMessage('userConnected')
@@ -57,22 +36,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): void {
     if (!userId) return;
 
-    const stringUserId = userId.toString();
-    client.data.userId = stringUserId;
+    client.data.userId = userId;
+    this.onlineUsers.add(userId);
 
-    this.onlineUsers.add(stringUserId);
-    this.userSocketMap.set(stringUserId, client.id);
+    this.userSocketMap.set(userId, client.id);
+    this.socketUserMap.set(client.id, userId);
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-    console.log(`User ${stringUserId} connected with socket ${client.id}`);
+    console.log(`User ${userId} connected with socket ${client.id}`);
   }
 
   handleDisconnect(client: Socket): void {
-    const userId = client.data.userId;
+    const userId = client.data.userId || this.socketUserMap.get(client.id);
     if (!userId) return;
 
     this.onlineUsers.delete(userId);
     this.userSocketMap.delete(userId);
+    this.socketUserMap.delete(client.id);
     this.userChatMap.delete(userId);
 
     for (const [chatId, users] of this.chatUserMap.entries()) {
@@ -132,48 +112,53 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinChat')
-  handleJoinChat(@MessageBody() data, @ConnectedSocket() client: Socket) {
-    console.log('joinChat', data);
+  handleJoinChat(
+    @MessageBody() chatId: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('JOIN_CHAT DATA: ', chatId);
     const userId = client.data.userId;
 
-    this.userChatMap.set(userId, data);
+    if (!userId) {
+      console.warn('Attempted to join chat without userId set on socket');
+      return;
+    }
 
     this.userSocketMap.set(userId, client.id);
 
-    client.join(data);
+    let chatSet = this.userChatMap.get(userId);
+    if (!chatSet) {
+      chatSet = new Set<string>();
+      this.userChatMap.set(userId, chatSet);
+    }
 
-    console.log(`User ${userId} joined chat ${data}`);
+    chatSet.add(chatId);
+
+    client.join(`chat-${chatId}`);
+
+    console.log(`User ${userId} joined chat ${chatId}`);
   }
 
   @SubscribeMessage('webrtc_signal')
   handleWebrtcSignal(
-    @MessageBody() data: { signal: any; toUserId: string },
+    @MessageBody() data: { signal: any; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
     const fromUserId = client.data.userId;
-    const toUserId = data.toUserId?.toString();
-    const fromChatId = this.userChatMap.get(fromUserId);
-    const toChatId = '14';
 
-    console.log(`WebRTC from: ${fromUserId} to: ${toUserId}`);
-    console.log(data.signal);
-    console.log(`fromChatId: ${fromChatId}, toChatId: ${toChatId}`);
-    console.log(this.userChatMap);
-    if (fromChatId && toChatId && fromChatId === toChatId) {
-      const toSocketId = this.userSocketMap.get(toUserId);
+    const fromChats = this.userChatMap.get(fromUserId);
+    const toChats = this.userChatMap.get(data.toUserId);
+
+    if (fromChats?.has(data.chatId) && toChats?.has(data.chatId)) {
+      const toSocketId = this.userSocketMap.get(data.toUserId);
       if (toSocketId) {
-        console.log('OK');
         this.server.to(toSocketId).emit('webrtc_signal', {
           signal: data.signal,
           fromUserId,
         });
-      } else {
-        console.log(`User ${toUserId} is not connected (no socket found)`);
       }
     } else {
-      console.log(
-        `WebRTC signaling failed: users not in the same chat or chat IDs not found`,
-      );
+      console.log('Users are not in the same chat');
     }
   }
 }

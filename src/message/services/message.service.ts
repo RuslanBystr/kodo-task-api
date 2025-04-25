@@ -30,7 +30,7 @@ export class MessageService {
       file,
       linkToMessage,
     } = messageDto;
-    console.log('UUID: ', file);
+
     let voiceFile: FileEntity | null = null;
     let fileImage: FileEntity | null = null;
 
