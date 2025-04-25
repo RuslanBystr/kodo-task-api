@@ -116,20 +116,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() chatId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('JOIN_CHAT DATA: ', chatId);
+    console.log('JOIN_CHAT_ID: ', chatId);
     const userId = client.data.userId;
+
+    console.log('USER_ID: ', userId);
 
     if (!userId) {
       console.warn('Attempted to join chat without userId set on socket');
       return;
     }
-
+    console.log('CLIENT ID: ', client.id);
     this.userSocketMap.set(userId, client.id);
 
     let chatSet = this.userChatMap.get(userId);
+    console.log('CHAT SET: ', chatSet);
+
     if (!chatSet) {
       chatSet = new Set<string>();
       this.userChatMap.set(userId, chatSet);
+      console.log('CHAT SET OK');
     }
 
     chatSet.add(chatId);
@@ -140,17 +145,46 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('webrtc_signal')
-  handleWebrtcSignal(
+  async handleWebrtcSignal(
     @MessageBody() data: { signal: any; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
     const fromUserId = client.data.userId;
 
-    const fromChats = this.userChatMap.get(fromUserId);
-    const toChats = this.userChatMap.get(data.toUserId);
+    const fromChats = this.userChatMap.get(fromUserId) || new Set<string>();
+    let toChats = this.userChatMap.get(data.toUserId);
 
-    if (fromChats?.has(data.chatId) && toChats?.has(data.chatId)) {
+    if (!toChats) {
       const toSocketId = this.userSocketMap.get(data.toUserId);
+
+      if (toSocketId) {
+        const toSocket = this.server.sockets.sockets.get(toSocketId);
+
+        if (toSocket) {
+          toSocket.join(`chat-${data.chatId}`);
+          toChats = new Set<string>([data.chatId]);
+          this.userChatMap.set(data.toUserId, toChats);
+
+          console.log(`Auto-joined ${data.toUserId} to chat ${data.chatId}`);
+        } else {
+          console.warn(`Socket not found for user ${data.toUserId}`);
+          return;
+        }
+      } else {
+        console.warn(`User ${data.toUserId} is not connected`);
+        return;
+      }
+    }
+
+    console.log('-------------DEBUG--------------');
+    console.log('DATA CHAT ID: ', data.chatId);
+    console.log('FROM CHATS: ', fromChats);
+    console.log('TO CHATS: ', toChats);
+    console.log('--------------------------------');
+
+    if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
+      const toSocketId = this.userSocketMap.get(data.toUserId);
+
       if (toSocketId) {
         this.server.to(toSocketId).emit('webrtc_signal', {
           signal: data.signal,

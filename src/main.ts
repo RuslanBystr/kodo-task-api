@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { join } from 'path';
 import { appendFileSync } from 'fs';
 import * as cookieParser from 'cookie-parser';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,7 +18,9 @@ async function bootstrap() {
         },
     credentials: true,
   });
+
   app.use(cookieParser());
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   const config = new DocumentBuilder()
     .addBearerAuth(
@@ -46,7 +49,7 @@ async function bootstrap() {
     .listen(process.env.API_PORT || 3000)
     .then(() =>
       console.log(
-        '\x1b[38;2;150;255;150m Server started http://localhost:\x1b[0m' +
+        '\x1b[38;2;150;255;150m Server started\x1b[0m http://localhost:' +
           process.env.API_PORT,
       ),
     )
