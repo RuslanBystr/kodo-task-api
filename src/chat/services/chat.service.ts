@@ -217,6 +217,19 @@ export class ChatService {
     return await this.chatRepo.remove(chat);
   }
 
+  async getChatMembers(chatId: number): Promise<User[]> {
+    const chat = await this.chatRepo.findOne({
+      where: { id: chatId },
+      relations: ['userChats', 'userChats.user'],
+    });
+
+    if (!chat) {
+      throw new NotFoundException(`Chat with id ${chatId} not found`);
+    }
+
+    return chat.userChats.map((userChat) => userChat.user);
+  }
+
   async chatMember(userId: string, chatId: string): Promise<boolean> {
     const chat = await this.chatRepo.findOne({
       where: { id: Number(chatId) },

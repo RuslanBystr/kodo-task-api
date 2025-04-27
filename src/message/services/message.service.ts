@@ -74,11 +74,20 @@ export class MessageService {
 
     const savedMessage = await this.messageRepo.save(message);
 
+    const fullMessage = await this.messageRepo.findOne({
+      where: { id: savedMessage.id },
+      relations: ['sender'],
+    });
+
     chat.lastMessage = savedMessage;
     await this.chatRepo.save(chat);
 
+    if (!fullMessage) {
+      throw new Error('Failed to load saved message');
+    }
+
     return {
-      ...savedMessage,
+      ...fullMessage,
       linkToMessage: replyMessage
         ? {
             ...replyMessage,

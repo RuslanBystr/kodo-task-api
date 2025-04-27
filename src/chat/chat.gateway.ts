@@ -11,15 +11,19 @@ import { Socket, Server } from 'socket.io';
 import { MessageService } from '../message/services/message.service';
 
 import { CreateMessageDto } from '../message/dto/create-message.dto';
+import { ChatService } from './services/chat.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly chatService: ChatService
+  ) {}
 
   private onlineUsers = new Set<string>();
-  private userSocketMap = new Map<string, string>();
+  private userSocketMap = new Map<number, string>();
   private socketUserMap = new Map<string, string>();
 
   private chatUserMap = new Map<string, Set<string>>();
@@ -39,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.data.userId = userId;
     this.onlineUsers.add(userId);
 
-    this.userSocketMap.set(userId, client.id);
+    this.userSocketMap.set(Number(userId), client.id);
     this.socketUserMap.set(client.id, userId);
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
@@ -70,6 +74,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleMessage(@MessageBody() data: CreateMessageDto) {
     const message = await this.messageService.sendMessage(data);
     this.server.to(`chat-${data.chatId}`).emit('newMessage', message);
+
+    const chatMembers = await this.chatService.getChatMembers(data.chatId);
+
+    const filterMembers = chatMembers.filter(
+      (member) => data.senderId !== member.id,
+    );
+
+    for (const member of filterMembers) {
+      const socketId = this.userSocketMap.get(member.id);
+
+      if (socketId) {
+        this.server.to(socketId).emit('notifyNewMessage', message);
+      }
+    }
   }
 
   @SubscribeMessage('reaction')
@@ -155,7 +173,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let toChats = this.userChatMap.get(data.toUserId);
 
     if (!toChats) {
-      const toSocketId = this.userSocketMap.get(data.toUserId);
+      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
 
       if (toSocketId) {
         const toSocket = this.server.sockets.sockets.get(toSocketId);
@@ -183,7 +201,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('--------------------------------');
 
     if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
-      const toSocketId = this.userSocketMap.get(data.toUserId);
+      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
 
       if (toSocketId) {
         this.server.to(toSocketId).emit('webrtc_signal', {
