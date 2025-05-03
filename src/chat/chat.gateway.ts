@@ -19,7 +19,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
     private readonly messageService: MessageService,
-    private readonly chatService: ChatService
+    private readonly chatService: ChatService,
   ) {}
 
   private onlineUsers = new Set<string>();
@@ -73,7 +73,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendMessage')
   async handleMessage(@MessageBody() data: CreateMessageDto) {
     const message = await this.messageService.sendMessage(data);
-    this.server.to(`chat-${data.chatId}`).emit('newMessage', message);
+    this.server
+      .to(`chat-${data.chatId}`)
+      .emit('newMessage', { ...message, chat: { id: data.chatId } });
 
     const chatMembers = await this.chatService.getChatMembers(data.chatId);
 
@@ -137,13 +139,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log('JOIN_CHAT_ID: ', chatId);
     const userId = client.data.userId;
 
-    console.log('USER_ID: ', userId);
-
     if (!userId) {
       console.warn('Attempted to join chat without userId set on socket');
       return;
     }
-    console.log('CLIENT ID: ', client.id);
     this.userSocketMap.set(userId, client.id);
 
     let chatSet = this.userChatMap.get(userId);
@@ -152,7 +151,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!chatSet) {
       chatSet = new Set<string>();
       this.userChatMap.set(userId, chatSet);
-      console.log('CHAT SET OK');
     }
 
     chatSet.add(chatId);

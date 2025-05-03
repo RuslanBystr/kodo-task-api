@@ -86,18 +86,9 @@ export class MessageService {
       throw new Error('Failed to load saved message');
     }
 
-    return {
-      ...fullMessage,
-      linkToMessage: replyMessage
-        ? {
-            ...replyMessage,
-            content: replyMessage.content
-              ? await this.cryptoService.decryptMessage(replyMessage.content)
-              : null,
-          }
-        : null,
-      content,
-    };
+    const fullMessageData = await this.getMessageById(savedMessage.id);
+
+    return fullMessageData;
   }
 
   async addReactionOnMessage(id: number, reaction: string): Promise<Message> {
@@ -132,6 +123,62 @@ export class MessageService {
 
     message.isRead = true;
     return this.messageRepo.save(message);
+  }
+
+  async getMessageById(id: number): Promise<Message> {
+    const message = await this.messageRepo
+      .createQueryBuilder('message')
+      .select([
+        'message.id',
+        'message.content',
+        'message.reaction',
+        'message.isRead',
+        'message.createdAt',
+        'voiceMessage.uuid',
+        'file.uuid',
+      ])
+      .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
+      .leftJoinAndSelect('message.file', 'file')
+      .leftJoin('message.linkToMessage', 'linkToMessage')
+      .addSelect(['linkToMessage.id', 'linkToMessage.content'])
+      .leftJoin('linkToMessage.file', 'replyMessageFile')
+      .addSelect(['replyMessageFile.uuid'])
+      .leftJoin('linkToMessage.voiceMessage', 'replyVoiceMessage')
+      .addSelect(['replyVoiceMessage.uuid'])
+      .leftJoin('linkToMessage.sender', 'replyToSender')
+      .addSelect(['replyToSender.id', 'replyToSender.firstName'])
+      .leftJoin('message.sender', 'sender')
+      .addSelect([
+        'sender.id',
+        'sender.avatar',
+        'sender.firstName',
+        'sender.lastName',
+      ])
+      .where('message.id = :id', { id })
+      .getOne();
+
+    if (!message) {
+      throw new NotFoundException(`Message with ID ${id} not found`);
+    }
+
+    const decryptedMessage = {
+      ...message,
+      content: message.content
+        ? await this.cryptoService.decryptMessage(message.content)
+        : null,
+      linkToMessage: message.linkToMessage
+        ? {
+            ...message.linkToMessage,
+            content: message.linkToMessage.content
+              ? await this.cryptoService.decryptMessage(
+                  message.linkToMessage.content,
+                )
+              : null,
+          }
+        : null,
+    };
+
+    return decryptedMessage;
   }
 
   public async getMessages({
