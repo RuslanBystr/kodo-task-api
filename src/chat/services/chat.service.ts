@@ -7,6 +7,7 @@ import { In, Repository } from 'typeorm';
 import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
 import { Message } from '../../message/entities/message.entity';
 import { CryptoService } from '../../crypto/crypto.service';
+import { FileEntity } from '../../file/entities/file.entity';
 
 @Injectable()
 export class ChatService {
@@ -30,6 +31,45 @@ export class ChatService {
     }
   }
 
+  async lastMessageDescription(chatItems: Chat[]): Promise<
+    {
+      id: number;
+      type: ChatType;
+      userChats: UserChat[];
+      lastMessage: {
+        id: number;
+        content: string;
+        voiceMessage: FileEntity | null;
+        file: FileEntity | null;
+        sender: User;
+        chat: Chat;
+        createdAt: Date;
+        isRead: boolean;
+        readByUsers: User[];
+        reaction: string | null;
+        linkToMessage: Message | null;
+      } | null;
+      messages: Message[];
+      groupName?: string;
+    }[]
+  > {
+    return Promise.all(
+      chatItems.map(async (chatItem: Chat) => ({
+        ...chatItem,
+        lastMessage: chatItem.lastMessage
+          ? {
+              ...chatItem.lastMessage,
+              content: chatItem.lastMessage.content
+                ? await this.cryptoService.decryptMessage(
+                    chatItem.lastMessage.content,
+                  )
+                : chatItem.lastMessage.content,
+            }
+          : null,
+      })),
+    );
+  }
+
   async getUserChats({
     page = 1,
     limit = 100,
@@ -37,6 +77,7 @@ export class ChatService {
   }: GetAllChatsFilterDto): Promise<any> {
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
+      .where('chat.type = :type', { type: ChatType.PRIVATE })
       .innerJoinAndSelect('chat.userChats', 'userChats')
       .innerJoin('userChats.user', 'users')
       .addSelect([
@@ -64,24 +105,10 @@ export class ChatService {
       chatItem.userChats.some((userChat) => userChat.user.id === userId),
     );
 
-    const decryptLastMessage = Promise.all(
-      filteredChatItems.map(async (chatItem: Chat) => ({
-        ...chatItem,
-        lastMessage: chatItem.lastMessage
-          ? {
-              ...chatItem.lastMessage,
-              content: chatItem.lastMessage.content
-                ? await this.cryptoService.decryptMessage(
-                    chatItem.lastMessage.content,
-                  )
-                : chatItem.lastMessage.content,
-            }
-          : null,
-      })),
-    );
-
+    const chats = await this.lastMessageDescription(filteredChatItems);
+    console.log(chats);
     return {
-      items: await decryptLastMessage,
+      items: chats,
       meta: {
         totalItems: total,
         itemCount: chatItems.length,
@@ -93,56 +120,46 @@ export class ChatService {
   }
 
   async getUserGroupChats({ page = 1, limit = 100, userId }): Promise<any> {
-    const [chatItems, total] = await this.chatRepo
-      .createQueryBuilder('chat')
-      .where('chat.type = :type', { type: ChatType.GROUP })
-      .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
-      .leftJoinAndSelect('lastMessage.file', 'file')
-      .leftJoinAndSelect('chat.messages', 'messages')
-      .leftJoinAndSelect(
-        'chat.messages',
-        'message',
-        'message.isRead = :isRead AND message.sender != :senderId',
-        {
-          isRead: false,
-          senderId: userId,
+    try {
+      const [chatItems, total] = await this.chatRepo
+        .createQueryBuilder('chat')
+        .where('chat.type = :type', { type: ChatType.GROUP })
+        .leftJoinAndSelect('chat.lastMessage', 'lastMessage')
+        .leftJoinAndSelect('lastMessage.file', 'file')
+        .leftJoinAndSelect('chat.messages', 'messages')
+        .leftJoinAndSelect(
+          'chat.messages',
+          'message',
+          'message.isRead = :isRead AND message.sender != :senderId',
+          {
+            isRead: false,
+            senderId: userId,
+          },
+        )
+        .leftJoin('message.readByUsers', 'readUser', 'readUser.id = :userId', {
+          userId,
+        })
+        .andWhere('readUser.id IS NULL')
+        .orderBy('chat.lastMessage', 'DESC')
+        .take(limit)
+        .skip((page - 1) * limit)
+        .getManyAndCount();
+
+      const chats = await this.lastMessageDescription(chatItems);
+
+      return {
+        items: chats,
+        meta: {
+          totalItems: total,
+          itemCount: chatItems.length,
+          itemsPerPage: Number(limit),
+          totalPages: Math.ceil(total / limit),
+          currentPage: Number(page),
         },
-      )
-      .leftJoin('message.readByUsers', 'readUser', 'readUser.id = :userId', {
-        userId,
-      })
-      .andWhere('readUser.id IS NULL')
-      .orderBy('chat.lastMessage', 'DESC')
-      .take(limit)
-      .skip((page - 1) * limit)
-      .getManyAndCount();
-
-    const decryptLastMessage = Promise.all(
-      chatItems.map(async (chatItem: Chat) => ({
-        ...chatItem,
-        lastMessage: chatItem.lastMessage
-          ? {
-              ...chatItem.lastMessage,
-              content: chatItem.lastMessage.content
-                ? await this.cryptoService.decryptMessage(
-                    chatItem.lastMessage.content,
-                  )
-                : chatItem.lastMessage.content,
-            }
-          : null,
-      })),
-    );
-
-    return {
-      items: await decryptLastMessage,
-      meta: {
-        totalItems: total,
-        itemCount: chatItems.length,
-        itemsPerPage: Number(limit),
-        totalPages: Math.ceil(total / limit),
-        currentPage: Number(page),
-      },
-    };
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   async createPrivateChat(user1Id: number, user2Id: number): Promise<Chat> {
