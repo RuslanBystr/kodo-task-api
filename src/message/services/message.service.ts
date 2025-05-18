@@ -291,7 +291,6 @@ export class MessageService {
         where: { chat: { id: chat.id } },
         order: { createdAt: 'DESC' },
       });
-      console.log(latestMessage);
       chat.lastMessage = latestMessage || null;
       await this.chatRepo.save(chat);
     }

@@ -38,7 +38,6 @@ export class FileController {
       storage: diskStorage({
         destination: UPLOAD_FILE_PATH || './uploads/public/',
         filename: (_, file, cb) => {
-          console.log(file.originalname);
           cb(null, `${randomUUID()}-${file.originalname.replace(/\s/g, '-')}`);
         },
       }),

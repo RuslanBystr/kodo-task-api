@@ -44,7 +44,7 @@ export class TaskService {
   }
   public async findAll({
     page = 1,
-    limit = 10,
+    limit = 20,
     sortBy = TaskSortByEnum.CREATED_AT,
     order = SortOrderEnum.ASC,
     assignedUserId,

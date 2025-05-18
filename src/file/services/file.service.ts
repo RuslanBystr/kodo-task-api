@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileEntity } from '../entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import fs from 'fs';
+import * as fs from 'node:fs';
 import { UPLOAD_FILE_PATH } from '../../common/constants/file';
 import { RemoveFileResponseDto } from '../dto/responses/remove-file-response.dto';
 import { FileS3Service } from './file-s3.service';
@@ -38,7 +38,7 @@ export class FileService {
 
       return { uuid: newFile.uuid };
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   }
 

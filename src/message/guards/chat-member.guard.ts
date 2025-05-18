@@ -14,7 +14,6 @@ export class ChatMemberGuard implements CanActivate {
     const { user, query, params } = context.switchToHttp().getRequest();
     const userId = user?.id;
     const chatId = query.chatId || params.chatId;
-    console.log(query);
     if (!userId || !chatId) {
       throw new ForbiddenException('Missing userId or chatId');
     }
