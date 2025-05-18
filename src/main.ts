@@ -46,7 +46,7 @@ async function bootstrap() {
   });
 
   await app
-    .listen(process.env.API_PORT || 3000)
+    .listen(process.env.API_PORT, '0.0.0.0')
     .then(() =>
       console.log(
         '\x1b[38;2;150;255;150m Server started\x1b[0m http://localhost:' +
