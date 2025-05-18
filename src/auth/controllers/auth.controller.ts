@@ -57,7 +57,6 @@ export class AuthController {
   async googleRedirect(@Req() req, @Res() res) {
     const user = req.user;
     const token = await this.authService.generateToken(user.id);
-    console.log(user.id);
     return res.redirect(`http://localhost:3000/auth/success?token=${token}`);
   }
 

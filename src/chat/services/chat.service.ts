@@ -24,7 +24,6 @@ export class ChatService {
         where: { id: chatId },
         relations: ['userChats'],
       });
-      console.log(chat);
       return chat;
     } catch (error) {
       console.error(error);
@@ -106,7 +105,6 @@ export class ChatService {
     );
 
     const chats = await this.lastMessageDescription(filteredChatItems);
-    console.log(chats);
     return {
       items: chats,
       meta: {

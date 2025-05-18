@@ -9,7 +9,6 @@ export class ActivityController {
 
   @Get(':userId')
   userActivity(@Param('userId', ParseIntPipe) userId: number) {
-    console.log(userId);
     return this.activityService.userActivity(userId);
   }
 }
