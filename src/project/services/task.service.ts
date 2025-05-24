@@ -42,12 +42,13 @@ export class TaskService {
     });
     return this.taskRepo.save(task);
   }
+
   public async findAll({
     page = 1,
     limit = 20,
     sortBy = TaskSortByEnum.CREATED_AT,
-    order = SortOrderEnum.ASC,
-    assignedUserId,
+    order = SortOrderEnum.DESC,
+    assignedTo,
     projectId = undefined,
     ...searchFilterFields
   }: GetAllTasksFilterDto): Promise<any> {
@@ -62,23 +63,18 @@ export class TaskService {
 
     try {
       const [taskItems, total] = await this.taskRepo.findAndCount({
-        select: [
-          'id',
-          'title',
-          'description',
-          'priority',
-          'status',
-          'createdAt',
-        ],
         where: {
           ...conditions,
           project: projectId ? { id: projectId } : undefined,
-          assignedUser: assignedUserId ? { id: assignedUserId } : undefined,
+          assignedUser: assignedTo ? { id: assignedTo } : undefined,
         },
         relations: ['assignedUser', 'project'],
         skip,
         take: limit,
-        order: { [sortBy]: order },
+        order: {
+          status: SortOrderEnum.ASC,
+          [sortBy]: order,
+        },
       });
 
       const totalPages = Math.ceil(total / limit);

@@ -29,11 +29,15 @@ export class FileS3Service {
       region: this.configService.get<string>(CONFIG.AWS_REGION),
       credentials: {
         accessKeyId: this.configService.get<string>(CONFIG.AWS_ACCESS_KEY_ID),
-        secretAccessKey: this.configService.get<string>(CONFIG.AWS_SECRET_ACCESS_KEY),
+        secretAccessKey: this.configService.get<string>(
+          CONFIG.AWS_SECRET_ACCESS_KEY,
+        ),
       },
     };
 
-    const endpointUrl = this.configService.get<string>(CONFIG.AWS_ENDPOINT_URL_S3);
+    const endpointUrl = this.configService.get<string>(
+      CONFIG.AWS_ENDPOINT_URL_S3,
+    );
     if (endpointUrl) {
       options.endpoint = endpointUrl;
     }

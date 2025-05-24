@@ -2,12 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FileEntity } from '../entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as fs from 'node:fs';
+import fs from 'fs';
 import { UPLOAD_FILE_PATH } from '../../common/constants/file';
 import { RemoveFileResponseDto } from '../dto/responses/remove-file-response.dto';
 import { FileS3Service } from './file-s3.service';
 import * as path from 'node:path';
-import * as sharp from 'sharp';
 
 @Injectable()
 export class FileService {
@@ -18,60 +17,30 @@ export class FileService {
   ) {}
 
   async saveFile(file: Express.Multer.File) {
-    const originalPath = path.join(UPLOAD_FILE_PATH, file.filename);
-    const avatarFileName = `avatar-${file.filename}.webp`;
-    const avatarPath = path.join(UPLOAD_FILE_PATH, avatarFileName);
+    const filePath = path.join(UPLOAD_FILE_PATH, file.filename);
+    console.log(filePath);
 
-    try {
-      await sharp(originalPath)
-        .resize(48, 48)
-        .toFormat('webp')
-        .toFile(avatarPath);
+    await this.fileS3.uploadFile(file.filename, filePath);
 
-      await this.fileS3.uploadFile(file.filename, originalPath);
-      await this.fileS3.uploadFile(avatarFileName, avatarPath);
+    const newFile = await this.fileRepository.save({ fileName: file.filename });
 
-      const newFile = await this.fileRepository.save({
-        fileName: file.filename,
-      });
-      await this.cleanupFiles(originalPath, avatarPath);
-
-      return { uuid: newFile.uuid };
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async cleanupFiles(originalPath: string, avatarPath: string) {
-    try {
-      if (fs.existsSync(originalPath)) {
-        await fs.promises.unlink(originalPath);
-      }
-      if (fs.existsSync(avatarPath)) {
-        await fs.promises.unlink(avatarPath);
-      }
-    } catch (err) {
-      console.error('Error during file cleanup:', err);
-    }
+    return { uuid: newFile.uuid };
   }
 
   async getFile(uuid: string) {
-    const file = await this.fileRepository.findOne({ where: { uuid } });
-
+    const file = await this.fileRepository.findOne({
+      where: {
+        uuid,
+      },
+    });
     if (!file) {
       throw new NotFoundException('File not found');
     }
-
-    const avatarFileName = `avatar-${file.fileName}.webp`;
-
-    let existFile = await this.fileS3.downloadFile(avatarFileName);
-
-    if (!existFile) {
-      existFile = await this.fileS3.downloadFile(file.fileName);
-    }
-
-    return existFile;
+    // return file.fileName;
+    // get from S3
+    return await this.fileS3.downloadFile(file.fileName);
   }
+
   async deleteFile(
     uuid: string,
     userId: number,
