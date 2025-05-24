@@ -23,7 +23,7 @@ export class GetAllTasksFilterDto extends PaginationFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  assignedUserId?: number;
+  assignedTo?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
