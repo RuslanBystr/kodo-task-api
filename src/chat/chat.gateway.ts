@@ -136,7 +136,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() chatId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    console.log('JOIN_CHAT_ID: ', chatId);
     const userId = client.data.userId;
 
     if (!userId) {
@@ -146,7 +145,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.userSocketMap.set(userId, client.id);
 
     let chatSet = this.userChatMap.get(userId);
-    console.log('CHAT SET: ', chatSet);
 
     if (!chatSet) {
       chatSet = new Set<string>();
@@ -191,12 +189,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
     }
-
-    console.log('-------------DEBUG--------------');
-    console.log('DATA CHAT ID: ', data.chatId);
-    console.log('FROM CHATS: ', fromChats);
-    console.log('TO CHATS: ', toChats);
-    console.log('--------------------------------');
 
     if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
       const toSocketId = this.userSocketMap.get(Number(data.toUserId));
