@@ -9,12 +9,15 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { TaskService } from '../services/task.service';
-import { CreateTaskDto, UpdateTaskDto } from '../dto';
 import { ApiTags } from '@nestjs/swagger';
-import { GetAllTasksFilterDto } from '../dto/get-all-tasks.dto';
-import { SetTimeDto } from '../dto/set-time.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../../auth/guards';
+import { TaskService } from '../services/task.service';
+import {
+  CreateTaskDto,
+  UpdateTaskDto,
+  GetAllTasksFilterDto,
+  SetTimeDto,
+} from '../dto';
 
 @ApiTags('task')
 @Controller('task')

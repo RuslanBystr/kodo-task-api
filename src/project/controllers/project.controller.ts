@@ -10,15 +10,18 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { ProjectService } from '../services/project.service';
-import { CreateProjectDto, UpdateProjectDto } from '../dto';
 import { ApiTags } from '@nestjs/swagger';
-import { GetAllProjectsFilterDto } from '../dto/get-all-projects.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { AddProjectMemberDto } from '../dto/add-project-member.dto';
-import { RemoveProjectMemberDto } from '../dto/remove-project-member.dto';
-import { AuthRequest } from '../../common/types/auth-request.type';
-import { ProjectMemberGuard } from '../guards/project-member.guard';
+import { ProjectService } from '../services/project.service';
+import { ProjectMemberGuard } from '../guards';
+import { JwtAuthGuard } from '../../auth/guards';
+import { AuthRequest } from '../../common/types';
+import {
+  AddProjectMemberDto,
+  CreateProjectDto,
+  GetAllProjectsFilterDto,
+  RemoveProjectMemberDto,
+  UpdateProjectDto,
+} from '../dto';
 
 @ApiTags('project')
 @Controller('project')

@@ -8,7 +8,7 @@ import { TaskService } from './services/task.service';
 import { TaskController } from './controllers/task.controller';
 import { User } from '../user/entities/user.entity';
 import { TaskLog } from './entities/task-log.entity';
-import { ProjectMemberGuard } from './guards/project-member.guard';
+import { ProjectMemberGuard } from './guards';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Project, Task, TaskLog])],

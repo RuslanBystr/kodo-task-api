@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './entities/message.entity';
 import { Chat } from '../chat/entities/chat.entity';
 // import { RedisModule } from "../redis/redis.module";
-import { ChatMemberGuard } from './guards/chat-member.guard';
+import { ChatMemberGuard } from './guards';
 import { ChatModule } from '../chat/chat.module';
 import { FileEntity } from '../file/entities/file.entity';
 import { User } from '../user/entities/user.entity';

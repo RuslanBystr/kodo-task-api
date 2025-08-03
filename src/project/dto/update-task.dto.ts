@@ -1,4 +1,4 @@
-import { TaskStatusEnum } from '../enums/task-status';
+import { TaskStatusEnum } from '../enums';
 
 export class UpdateTaskDto {
   description?: string;

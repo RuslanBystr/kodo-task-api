@@ -1,12 +1,11 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { randomBytes, randomUUID } from 'crypto';
-import { UserVerifyCodeType } from '../types/user-verify-code.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserVerification } from '../entities/user-verification.entity';
-import { ENTITIES } from '../../common/enums/entities';
-import { UserVerificationType } from '../types/user-verification.type';
+import { ENTITIES } from '../../common/enums';
+import { UserVerificationType, UserVerifyCodeType } from '../types';
 
 @Injectable()
 export class UserVerificationService {

@@ -12,19 +12,18 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { FileService } from '../services/file.service';
-import { randomUUID } from 'crypto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MAX_FILE_SIZE, UPLOAD_FILE_PATH } from '../../common/constants/file';
-import { diskStorage } from 'multer';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { GetJwtPayload } from '../../utils/decorators/jwt-payload.decorator';
-import { JwtPayload } from '../../common/types/jwt-payload.type';
-import { UploadFileApiDocs } from '../docs/upload-file.decorator';
-import { DeleteFileApiDocs } from '../docs/delete-file.decorator';
+import { randomUUID } from 'crypto';
 import { isUUID } from 'class-validator';
+import { diskStorage } from 'multer';
+import { FileService } from '../services/file.service';
+import { DeleteFileApiDocs, UploadFileApiDocs } from '../docs';
+import { MAX_FILE_SIZE, UPLOAD_FILE_PATH } from '../../common/constants';
+import { GetJwtPayload } from '../../common/utils/decorators';
+import { JwtPayload } from '../../common/types';
+import { JwtAuthGuard } from '../../auth/guards';
 
 @ApiTags('file')
 @Controller('file')

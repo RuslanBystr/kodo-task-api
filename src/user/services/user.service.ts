@@ -5,30 +5,33 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { LIBS } from '../../common/enums/libs';
-import { bcrypt } from '../../utils/libs/bcrypt/bcrypt.type';
-import { HASH_ROUNDS } from '../../common/constants/auth';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LIBS, SortOrderEnum } from '../../common/enums';
+import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
+import { HASH_ROUNDS } from '../../common/constants';
 import { User } from '../entities/user.entity';
 import { FindOptionsWhere, Not, Repository } from 'typeorm';
 import { UserVerificationService } from './user-verification.service';
 import { MailService } from '../../email/services/mail.service';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { FileEntity } from '../../file/entities/file.entity';
-import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { UpdateUserResponseDto } from '../dto/responses/update-user-response.dto';
-import { GetUserResponseDto } from '../dto/responses/get-user-response.dto';
 import { FileService } from '../../file/services/file.service';
-import { UpdatePhoneDto } from '../dto/update-phone.dto';
-import { UpdateEmailDto } from '../dto/update-email.dto';
-import { ChangePhoneResponseDto } from '../dto/responses/change-phone-response.dto';
-import { ChangeEmailResponseDto } from '../dto/responses/change-email-response.dto';
-import { UserCreateDto } from '../dto/user-create-dto';
-import { UserSortByEnum } from '../enums/user-sort.enum';
-import { SortOrderEnum } from 'src/common/enums/sort-order.enum';
-import { GetAllUsersFilterDto } from '../dto/get-all-users-filters.dto';
-import { generateSearchConditionsUser } from '../utils/search-condition-users';
-import { UserGetAllResponseDto } from '../dto/responses/user-get-all-response.dto';
+import { UserSortByEnum } from '../enums';
+import { generateSearchConditions } from '../../common/utils';
+import {
+  ChangeEmailResponseDto,
+  ChangePhoneResponseDto,
+  GetUserResponseDto,
+  UpdateUserResponseDto,
+  UserGetAllResponseDto,
+} from '../dto/responses';
+import {
+  GetAllUsersFilterDto,
+  UpdateEmailDto,
+  UpdatePasswordDto,
+  UpdatePhoneDto,
+  UpdateUserDto,
+  UserCreateDto,
+} from '../dto';
 
 @Injectable()
 export class UserService {
@@ -284,7 +287,7 @@ export class UserService {
     const skip = (page - 1) * limit;
 
     const conditions: FindOptionsWhere<User> =
-      generateSearchConditionsUser<User>(searchFilterFields);
+      generateSearchConditions<User>(searchFilterFields);
 
     if (searchFilterFields.id && !Number.isNaN(Number(searchFilterFields.id))) {
       conditions.id = Number(searchFilterFields.id);

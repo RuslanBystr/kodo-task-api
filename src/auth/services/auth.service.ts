@@ -6,25 +6,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
-import { LoginDto } from '../../common/dto/login.dto';
-import { RegisterDto } from '../dto/register.dto';
-import { LIBS } from '../../common/enums/libs';
-import { bcrypt } from '../../utils/libs/bcrypt/bcrypt.type';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { JwtPayload } from '../../common/types/jwt-payload.type';
-import { ENTITIES } from '../../common/enums/entities';
-import { UserType } from '../../user/types/user.type';
-import { LoginResponseDto } from '../dto/responses/login-response.dto';
-import { RegisterResponseDto } from '../dto/responses/register-response.dto';
-import { ResetPasswordDto } from '../dto/reset-password.dto';
-import { UserService } from '../../user/services/user.service';
-import { UserVerificationService } from '../../user/services/user-verification.service';
-import { HASH_ROUNDS } from '../../common/constants/auth';
 import { ConfigService } from '@nestjs/config';
-import { CONFIG } from '../../common/enums/config';
-import { RefreshTokenCookieDto } from '../dto/refresh-token-cookie.dto';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
+import { RefreshTokenCookieDto, RegisterDto, ResetPasswordDto } from '../dto';
+import { LoginResponseDto, RegisterResponseDto } from '../dto/responses';
+import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
+import { CONFIG, ENTITIES, LIBS } from '../../common/enums';
+import { UserType } from 'src/user/types';
+import { LoginDto } from '../../common/dto';
+import { JwtPayload } from '../../common/types';
+import { HASH_ROUNDS } from '../../common/constants';
+import { User } from '../../user/entities/user.entity';
+import { UserService, UserVerificationService } from '../../user/services';
 
 @Injectable()
 export class AuthService {
