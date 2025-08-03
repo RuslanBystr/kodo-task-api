@@ -3,11 +3,10 @@ import { Chat } from '../../chat/entities/chat.entity';
 import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateMessageDto } from '../dto/create-message.dto';
-import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
 import { FileEntity } from '../../file/entities/file.entity';
 import { User } from '../../user/entities/user.entity';
 import { CryptoService } from '../../crypto/crypto.service';
+import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
 
 @Injectable()
 export class MessageService {

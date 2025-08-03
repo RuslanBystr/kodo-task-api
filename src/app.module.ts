@@ -7,7 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { LoggerModule } from './logger/logger.module';
-import { errorFilterProvider } from './utils/filters/error/error.filter.provider';
+import { errorFilterProvider } from './common/utils/filters/error/error.filter.provider';
 import { FileModule } from './file/file.module';
 import { ProjectModule } from './project/project.module';
 import { MessageModule } from './message/message.module';
@@ -33,7 +33,6 @@ import { ActivityModule } from './activity/activity.module';
     StripeModule,
     CryptoModule,
     ActivityModule,
-    // RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, errorFilterProvider],

@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { join } from 'path';
 import { appendFileSync } from 'fs';
 import * as cookieParser from 'cookie-parser';
-import { IoAdapter } from '@nestjs/platform-socket.io';
+import { AppModule } from './app.module';
+import { setupSwagger } from './swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,28 +22,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useWebSocketAdapter(new IoAdapter(app));
 
-  const config = new DocumentBuilder()
-    .addBearerAuth(
-      { in: 'header', type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'Access-token',
-    )
-    .setTitle('KodoTask API')
-    .setDescription('KodoTask API documentation')
-    .setVersion('1.0.0')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-
-  SwaggerModule.setup('api', app, document, {
-    customCss: `
-    button { outline: none !important; }
-    #swagger-ui { background: linear-gradient(45deg, #eafffa, #cceeff); }
-    .swagger-ui>.topbar { background-color: #66aabb; }
-    #swagger-ui .scheme-container { background-color: #77d9d9; }
-    .swagger-ui .auth-wrapper>.btn {border: 2px solid #fff; background-color: #dff; }
-  `,
-    customSiteTitle: 'KodoTask API Docs',
-  });
+  setupSwagger(app);
 
   await app
     .listen(process.env.API_PORT, '0.0.0.0')

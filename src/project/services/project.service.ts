@@ -6,14 +6,17 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Project } from '../entities/project.entity';
-import { CreateProjectDto, UpdateProjectDto } from '../dto';
-import { UserSortByEnum } from '../../user/enums/user-sort.enum';
-import { SortOrderEnum } from '../../common/enums/sort-order.enum';
-import { generateSearchConditionsUser } from '../../user/utils/search-condition-users';
-import { GetAllProjectsFilterDto } from '../dto/get-all-projects.dto';
 import { User } from '../../user/entities/user.entity';
-import { AddProjectMemberDto } from '../dto/add-project-member.dto';
-import { RemoveProjectMemberDto } from '../dto/remove-project-member.dto';
+import {
+  AddProjectMemberDto,
+  CreateProjectDto,
+  GetAllProjectsFilterDto,
+  RemoveProjectMemberDto,
+  UpdateProjectDto,
+} from '../dto';
+import { UserSortByEnum } from '../../user/enums';
+import { SortOrderEnum } from '../../common/enums';
+import { generateSearchConditions } from '../../common/utils';
 
 @Injectable()
 export class ProjectService {
@@ -50,7 +53,7 @@ export class ProjectService {
     const skip = (page - 1) * limit;
 
     const conditions: FindOptionsWhere<Project> =
-      generateSearchConditionsUser<Project>(searchFilterFields);
+      generateSearchConditions<Project>(searchFilterFields);
 
     const [projectItems] = await this.projectRepo.findAndCount({
       select: ['id', 'name', 'description', 'image', 'createdAt'],

@@ -8,7 +8,7 @@ import { JwtStrategy } from './passport-strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { userEntityProvider } from '../user/providers/user-entity.provider';
-import { BcryptModule } from '../utils/libs/bcrypt/bcrypt.module';
+import { BcryptModule } from '../common/utils/libs/bcrypt/bcrypt.module';
 import { UserModule } from '../user/user.module';
 import { JwtRefreshTokenStrategy } from './passport-strategies/jwt-refresh-token.strategy';
 import { EmailModule } from 'src/email/email.module';

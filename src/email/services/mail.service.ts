@@ -3,14 +3,13 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { TemplatesService } from './templates.service';
 import { ConfigService } from '@nestjs/config';
-import { CONFIG } from '../../common/enums/config';
-import { ADDITIONAL_PROVIDERS } from '../../common/enums/additional-providers';
 import { MailDataRequired } from '@sendgrid/mail';
-import { LoggerService } from '../../logger/services/logger.service';
+import { TemplatesService } from './templates.service';
 import { SendgridType } from '../types/sendgrid.type';
 import { templates } from '../templates';
+import { CONFIG, ADDITIONAL_PROVIDERS } from '../../common/enums';
+import { LoggerService } from '../../logger/services/logger.service';
 
 @Injectable()
 export class MailService {

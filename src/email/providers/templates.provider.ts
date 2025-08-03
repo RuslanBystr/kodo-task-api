@@ -1,6 +1,6 @@
 import { Provider } from '@nestjs/common';
 import { templates } from '../templates';
-import { ADDITIONAL_PROVIDERS } from '../../common/enums/additional-providers';
+import { ADDITIONAL_PROVIDERS } from '../../common/enums';
 
 export const templatesProvider: Provider = {
   provide: ADDITIONAL_PROVIDERS.TEMPLATES,

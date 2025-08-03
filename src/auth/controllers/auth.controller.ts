@@ -10,24 +10,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthService } from '../services/auth.service';
-import { LoginDto } from '../../common/dto/login.dto';
-import { RegisterDto } from '../dto/register.dto';
 import { Response } from 'express';
-import { ResetPasswordDto } from '../dto/reset-password.dto';
-import { ForgotPasswordEmailDto } from '../dto/forgot-password-email.dto';
+import { AuthService } from '../services/auth.service';
+import { LoginDto } from '../../common/dto';
 import { UserService } from '../../user/services/user.service';
-import { ResetPasswordApiDocs } from '../docs/reset-password.decorator';
-import { ForgotPasswordApiDocs } from '../docs/forgot-password.decorator';
-import { RegisterApiDocs } from '../docs/register.decorator';
-import { LoginApiDocs } from '../docs/login.decorator';
-import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
-import { GetJwtPayload } from '../../utils/decorators/jwt-payload.decorator';
-import { JwtPayload } from '../../common/types/jwt-payload.type';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { GetRefreshApiDocs } from '../../user/docs/get-refresh.decorator';
-import { GetLogoutApiDocs } from '../../user/docs/logout.decorator';
-import { GoogleAuthGuard } from '../guards/google-auth.guard';
+import { GetJwtPayload } from '../../common/utils/decorators';
+import { JwtPayload } from '../../common/types';
+import { GoogleAuthGuard, JwtAuthGuard, JwtRefreshGuard } from '../guards';
+import {
+  ForgotPasswordApiDocs,
+  LoginApiDocs,
+  RegisterApiDocs,
+  ResetPasswordApiDocs,
+} from '../docs';
+import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
+import { ForgotPasswordEmailDto, RegisterDto, ResetPasswordDto } from '../dto';
 
 @ApiTags('auth user')
 @Controller('auth')

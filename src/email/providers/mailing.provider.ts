@@ -1,9 +1,7 @@
 import { ConfigService } from '@nestjs/config';
-import { CONFIG } from '../../common/enums/config';
 import { Provider } from '@nestjs/common';
-
-import { ADDITIONAL_PROVIDERS } from '../../common/enums/additional-providers';
 import * as SendGrid from '@sendgrid/mail';
+import { CONFIG, ADDITIONAL_PROVIDERS } from '../../common/enums';
 
 export const MailingProvider: Provider = {
   provide: ADDITIONAL_PROVIDERS.SENDGRID,

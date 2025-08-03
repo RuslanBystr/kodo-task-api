@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-import { StripeService } from './stripe.service';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { StripeService } from './stripe.service';
+import { JwtAuthGuard } from '../auth/guards';
 
 @ApiTags('payments')
 @Controller('payments')

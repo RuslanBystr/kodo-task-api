@@ -8,11 +8,11 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ChatService } from '../services/chat.service';
-import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ChatMemberGuard } from '../../message/guards/chat-member.guard';
+import { ChatService } from '../services/chat.service';
+import { GetAllChatsFilterDto } from '../dto';
+import { JwtAuthGuard } from '../../auth/guards';
+import { ChatMemberGuard } from '../../message/guards';
 
 @ApiTags('chat')
 @Controller('chats')

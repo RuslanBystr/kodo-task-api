@@ -8,13 +8,16 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { Task } from '../entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 import { Project } from '../entities/project.entity';
-import { CreateTaskDto, UpdateTaskDto } from '../dto';
-import { SortOrderEnum } from 'src/common/enums/sort-order.enum';
-import { GetAllTasksFilterDto } from '../dto/get-all-tasks.dto';
-import { generateSearchConditionsUser } from '../../user/utils/search-condition-users';
-import { TaskSortByEnum } from '../enums/task-sort-by.enum';
-import { SetTimeDto } from '../dto/set-time.dto';
 import { TaskLog } from '../entities/task-log.entity';
+import { generateSearchConditions } from '../../common/utils';
+import { TaskSortByEnum } from '../enums';
+import { SortOrderEnum } from 'src/common/enums';
+import {
+  CreateTaskDto,
+  GetAllTasksFilterDto,
+  SetTimeDto,
+  UpdateTaskDto,
+} from '../dto';
 
 @Injectable()
 export class TaskService {
@@ -55,7 +58,7 @@ export class TaskService {
     const skip = (page - 1) * limit;
 
     const baseConditions: FindOptionsWhere<Task> =
-      generateSearchConditionsUser<Task>(searchFilterFields);
+      generateSearchConditions<Task>(searchFilterFields);
 
     const conditions: FindOptionsWhere<Task> = {
       ...baseConditions,

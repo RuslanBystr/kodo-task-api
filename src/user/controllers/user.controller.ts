@@ -13,25 +13,28 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserService } from '../services/user.service';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ActiveUserGuard } from '../../auth/guards/active-user.guard';
-import { JwtPayload } from '../../common/types/jwt-payload.type';
-import { GetJwtPayload } from '../../utils/decorators/jwt-payload.decorator';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { UpdatePasswordDto } from '../dto/update-password.dto';
-import { UpdateProfileApiDocs } from '../docs/update-profile.decorator';
-import { UpdatePasswordApiDocs } from '../docs/update-password.decorator';
-import { GetProfileApiDocs } from '../docs/get-profile.decorator';
-import { UpdateEmailDto } from '../dto/update-email.dto';
-import { UpdatePhoneDto } from '../dto/update-phone.dto';
-import { ChangeEmailApiDocs } from '../docs/change-email.decorator';
-import { ChangePhoneApiDocs } from '../docs/change-phone.decorator';
-import { ChangeDataVerifyCodeApiDocs } from '../docs/change-data-verify-code.decorator';
-import { ChangeEmailDto } from '../dto/change-email.dto';
-import { CheckEmailDto } from '../dto/check-email.dto';
-import { CheckEmailApiDocs } from '../docs/check-email.api.docs';
-import { GetAllUsersFilterDto } from '../dto/get-all-users-filters.dto';
+import { UserService } from '../services';
+import { ActiveUserGuard, JwtAuthGuard } from '../../auth/guards';
+import { JwtPayload } from '../../common/types';
+import { GetJwtPayload } from '../../common/utils/decorators';
+import {
+  ChangeDataVerifyCodeApiDocs,
+  ChangeEmailApiDocs,
+  ChangePhoneApiDocs,
+  CheckEmailApiDocs,
+  GetProfileApiDocs,
+  UpdatePasswordApiDocs,
+  UpdateProfileApiDocs,
+} from '../docs';
+import {
+  ChangeEmailDto,
+  CheckEmailDto,
+  GetAllUsersFilterDto,
+  UpdateEmailDto,
+  UpdatePasswordDto,
+  UpdatePhoneDto,
+  UpdateUserDto,
+} from '../dto';
 
 @ApiTags('user')
 @Controller('user')
