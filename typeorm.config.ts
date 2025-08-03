@@ -31,6 +31,7 @@ import { AddVoiceMessage1742382401988 } from './migrations/1742382401988-add-voi
 import { AddReactionAndAnswerMessage1742496172431 } from './migrations/1742496172431-add-reaction-and-answer-message';
 import { FileMessage1743163586418 } from './migrations/1743163586418-file-message';
 import { MessageReadByUsers1743260326540 } from './migrations/1743260326540-message-read-by-users';
+import { ProjectMembers1748633190456 } from './migrations/1748633190456-project-members';
 
 config();
 const configService = new ConfigService();
@@ -71,7 +72,8 @@ const options: DataSourceOptions & SeederOptions = {
     AddVoiceMessage1742382401988,
     AddReactionAndAnswerMessage1742496172431,
     FileMessage1743163586418,
-    MessageReadByUsers1743260326540
+    MessageReadByUsers1743260326540,
+    ProjectMembers1748633190456
   ],
   seeds: [MainSeeder],
 };

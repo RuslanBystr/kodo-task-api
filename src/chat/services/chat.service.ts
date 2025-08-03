@@ -199,21 +199,26 @@ export class ChatService {
     return chat;
   }
   async createGroupChat(userIds: number[], groupName: string): Promise<Chat> {
-    const users = await this.userRepo.findBy({ id: In(userIds) });
+    try {
+      const users = await this.userRepo.findBy({ id: In(userIds) });
 
-    const chat = this.chatRepo.create({ type: ChatType.GROUP, groupName });
-    await this.chatRepo.save(chat);
+      const chat = this.chatRepo.create({ type: ChatType.GROUP, groupName });
+      await this.chatRepo.save(chat);
 
-    for (const user of users) {
-      const userChat = this.userChatRepo.create({
-        chat,
-        user,
-        name: groupName,
-      });
-      await this.userChatRepo.save(userChat);
+      for (const user of users) {
+        const userChat = this.userChatRepo.create({
+          chat,
+          user,
+          name: groupName,
+        });
+        await this.userChatRepo.save(userChat);
+      }
+
+      return chat;
+    } catch (err) {
+      throw err;
     }
 
-    return chat;
   }
 
   async deletePrivateChat(chatId: number): Promise<Chat> {

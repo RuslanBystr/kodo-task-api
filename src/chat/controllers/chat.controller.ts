@@ -39,8 +39,9 @@ export class ChatController {
 
   @Post('group')
   @UseGuards(JwtAuthGuard)
-  createGroupChat(@Body() dto: { userIds: number[]; name: string }) {
-    return this.chatService.createGroupChat(dto.userIds, dto.name);
+  createGroupChat(@Body() dto: { groupName: string, userIds: number[]; }) {
+    console.log(dto);
+    return this.chatService.createGroupChat(dto.userIds, dto.groupName);
   }
   @Delete('/:chatId')
   @UseGuards(JwtAuthGuard, ChatMemberGuard)
