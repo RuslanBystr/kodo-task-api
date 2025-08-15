@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { FileEntity } from '../entities/file.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import fs from 'fs';
-import { UPLOAD_FILE_PATH } from '../../common/constants/file';
-import { RemoveFileResponseDto } from '../dto/responses/remove-file-response.dto';
-import { FileS3Service } from './file-s3.service';
 import * as path from 'node:path';
+import { Repository } from 'typeorm';
+import { FileS3Service } from './file-s3.service';
+import { FileEntity } from '../entities/file.entity';
+import { RemoveFileResponseDto } from '../dto/responses';
+import { UPLOAD_FILE_PATH } from '../../common/constants';
 
 @Injectable()
 export class FileService {
@@ -20,7 +20,11 @@ export class FileService {
     const filePath = path.join(UPLOAD_FILE_PATH, file.filename);
     console.log(filePath);
 
-    await this.fileS3.uploadFile(file.filename, filePath);
+    try {
+      await this.fileS3.uploadFile(file.filename, filePath);
+    } catch (error) {
+      console.warn(error);
+    }
 
     const newFile = await this.fileRepository.save({ fileName: file.filename });
 
@@ -36,9 +40,9 @@ export class FileService {
     if (!file) {
       throw new NotFoundException('File not found');
     }
-    // return file.fileName;
+    return file.fileName;
     // get from S3
-    return await this.fileS3.downloadFile(file.fileName);
+    // return await this.fileS3.downloadFile(file.fileName);
   }
 
   async deleteFile(

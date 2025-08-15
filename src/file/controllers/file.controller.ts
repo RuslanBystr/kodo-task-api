@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -50,7 +49,6 @@ export class FileController {
     @UploadedFile() // FOR ARRAY of files: Array<Express.Multer.File>)
     file: Express.Multer.File,
   ) {
-    console.log('Received file:', file);
     if (!file) {
       throw new Error('No file received');
     }
@@ -69,15 +67,14 @@ export class FileController {
       throw new NotFoundException('File not found');
     }
 
-    if (!(file instanceof Buffer)) {
-      console.error('Error: File is not a Buffer', typeof file);
-      throw new InternalServerErrorException('File format error');
+    if (Buffer.isBuffer(file)) {
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.setHeader('Content-Length', file.length);
+
+      return res.send(file);
     }
-
-    res.setHeader('Content-Type', 'image/jpeg');
-    res.setHeader('Content-Length', file.length);
-
-    return res.send(file);
+    console.warn('Error: File is not a Buffer', typeof file);
+    return file ? res.sendFile(file, { root: UPLOAD_FILE_PATH }) : res.end();
   }
 
   @DeleteFileApiDocs()
