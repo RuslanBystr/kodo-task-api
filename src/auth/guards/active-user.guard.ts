@@ -4,7 +4,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { AuthRequest } from '../../common/types/auth-request.type';
+import { AuthRequest } from '../../common/types';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Repository } from 'typeorm';

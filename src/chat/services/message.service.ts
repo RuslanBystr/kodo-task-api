@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Chat } from '../../chat/entities/chat.entity';
+import { Chat } from '../entities/chat.entity';
 import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -85,9 +85,7 @@ export class MessageService {
       throw new Error('Failed to load saved message');
     }
 
-    const fullMessageData = await this.getMessageById(savedMessage.id);
-
-    return fullMessageData;
+    return await this.getMessageById(savedMessage.id);
   }
 
   async addReactionOnMessage(id: number, reaction: string): Promise<Message> {
@@ -185,13 +183,6 @@ export class MessageService {
     limit = 20,
     chatId,
   }: GetAllMessageFilterDto): Promise<any> {
-    // const cacheKey = `chat:${chatId}:messages`;
-    //
-    // const cachedMessages = await this.redisService.getCache(cacheKey);
-    // if (cachedMessages) {
-    //   return cachedMessages;
-    // }
-
     const [messageItems, total] = await this.messageRepo
       .createQueryBuilder('message')
       .select([
@@ -241,7 +232,6 @@ export class MessageService {
 
     const totalPages = Math.ceil(total / limit);
 
-    // await this.redisService.setCache(cacheKey, response, 60);
     const decryptedMessages = await Promise.all(
       messageItems.map(async (item) => ({
         ...item,

@@ -10,7 +10,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums';
 import { Task } from '../../project/entities/task.entity';
-import { Message } from '../../message/entities/message.entity';
+import { Message } from '../../chat/entities/message.entity';
 import { UserChat } from '../../chat/entities/user.chat.entity';
 
 @Entity()

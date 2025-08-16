@@ -12,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ChatService } from '../services/chat.service';
 import { GetAllChatsFilterDto } from '../dto';
 import { JwtAuthGuard } from '../../auth/guards';
-import { ChatMemberGuard } from '../../message/guards';
+import { ChatMemberGuard } from '../guards';
 
 @ApiTags('chat')
 @Controller('chats')
@@ -39,7 +39,7 @@ export class ChatController {
 
   @Post('group')
   @UseGuards(JwtAuthGuard)
-  createGroupChat(@Body() dto: { groupName: string, userIds: number[]; }) {
+  createGroupChat(@Body() dto: { groupName: string; userIds: number[] }) {
     console.log(dto);
     return this.chatService.createGroupChat(dto.userIds, dto.groupName);
   }

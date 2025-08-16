@@ -10,12 +10,11 @@ import {
   Param,
   Put,
 } from '@nestjs/common';
-import { MessageService } from '../services/message.service';
-import { CreateMessageDto } from '../dto/create-message.dto';
-import { GetAllMessageFilterDto } from '../dto/get-all-message-filters.dto';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { ChatMemberGuard } from '../guards/chat-member.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { MessageService } from '../services/message.service';
+import { ChatMemberGuard } from '../guards';
+import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
+import { JwtAuthGuard } from '../../auth/guards';
 
 @ApiTags('message')
 @Controller('messages')

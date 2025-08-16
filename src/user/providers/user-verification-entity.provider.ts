@@ -1,5 +1,5 @@
 import { Provider } from '@nestjs/common';
-import { ENTITIES } from '../../common/enums/entities';
+import { ENTITIES } from '../../common/enums';
 import { UserVerification } from '../entities/user-verification.entity';
 
 export const userVerificationEntityProvider: Provider = {

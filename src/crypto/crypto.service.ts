@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CONFIG } from '../common/enums/config';
+import { CONFIG } from '../common/enums';
 import { ConfigService } from '@nestjs/config';
 import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
 
@@ -23,16 +23,21 @@ export class CryptoService {
   }
 
   async encryptMessage(message: string): Promise<string> {
-    const command = new EncryptCommand({
-      KeyId: this.KMS_KEY_ID,
-      Plaintext: Buffer.from(message),
-    });
+    try {
+      const command = new EncryptCommand({
+        KeyId: this.KMS_KEY_ID,
+        Plaintext: Buffer.from(message),
+      });
 
-    const response = await this.kmsClient.send(command);
-    if (!response.CiphertextBlob) {
-      throw new Error('Encryption failed: No CiphertextBlob returned');
+      const response = await this.kmsClient.send(command);
+      if (!response.CiphertextBlob) {
+        throw new Error('Encryption failed: No CiphertextBlob returned');
+      }
+      return Buffer.from(response.CiphertextBlob).toString('base64');
+    } catch (error) {
+      console.error(error);
+      return message;
     }
-    return Buffer.from(response.CiphertextBlob).toString('base64');
   }
 
   async decryptMessage(encryptedMessage: string): Promise<string> {

@@ -2,18 +2,18 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CONFIG } from '../common/enums/config';
+import { CONFIG } from '../common/enums';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './passport-strategies/jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { userEntityProvider } from '../user/providers/user-entity.provider';
 import { BcryptModule } from '../common/utils/libs/bcrypt/bcrypt.module';
 import { UserModule } from '../user/user.module';
-import { JwtRefreshTokenStrategy } from './passport-strategies/jwt-refresh-token.strategy';
+import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
 import { EmailModule } from 'src/email/email.module';
 import { MailService } from 'src/email/services/mail.service';
-import { GoogleStrategy } from './passport-strategies/google.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [

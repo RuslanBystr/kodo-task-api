@@ -6,7 +6,7 @@ import {
 } from 'passport-google-oauth20';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UserService } from '../../user/services/user.service';
+import { UserService } from '../../user/services';
 import { CONFIG } from 'src/common/enums/config';
 
 @Injectable()

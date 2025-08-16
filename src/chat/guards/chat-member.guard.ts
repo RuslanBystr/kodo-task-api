@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { ChatService } from '../../chat/services/chat.service';
+import { ChatService } from '../services/chat.service';
 
 @Injectable()
 export class ChatMemberGuard implements CanActivate {

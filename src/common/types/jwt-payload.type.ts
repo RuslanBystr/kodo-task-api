@@ -1,3 +1,3 @@
-import { JwtPayloadDto } from '../dto/jwt-payload.dto';
+import { JwtPayloadDto } from '../dto';
 
 export type JwtPayload = InstanceType<typeof JwtPayloadDto>;

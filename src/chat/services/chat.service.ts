@@ -4,8 +4,8 @@ import { Chat, ChatType } from '../entities/chat.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { In, Repository } from 'typeorm';
-import { GetAllChatsFilterDto } from '../dto/get-all-chats-user.dto';
-import { Message } from '../../message/entities/message.entity';
+import { GetAllChatsFilterDto } from '../dto';
+import { Message } from '../entities/message.entity';
 import { CryptoService } from '../../crypto/crypto.service';
 import { FileEntity } from '../../file/entities/file.entity';
 
@@ -218,7 +218,6 @@ export class ChatService {
     } catch (err) {
       throw err;
     }
-
   }
 
   async deletePrivateChat(chatId: number): Promise<Chat> {

@@ -10,10 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { LoginDto } from '../../common/dto';
-import { UserService } from '../../user/services/user.service';
+import { UserService } from '../../user/services';
 import { GetJwtPayload } from '../../common/utils/decorators';
 import { JwtPayload } from '../../common/types';
 import { GoogleAuthGuard, JwtAuthGuard, JwtRefreshGuard } from '../guards';
@@ -51,9 +51,8 @@ export class AuthController {
 
   @Get('/google/redirect')
   @UseGuards(GoogleAuthGuard)
-  async googleRedirect(@Req() req, @Res() res) {
-    const user = req.user;
-    const token = await this.authService.generateToken(user.id);
+  async googleRedirect(@Req() req: Request, @Res() res: Response) {
+    const token = await this.authService.generateToken({ id: req.user.id });
     return res.redirect(`http://localhost:3000/auth/success?token=${token}`);
   }
 
