@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { Message } from '../../message/entities/message.entity';
+import { Message } from './message.entity';
 import { UserChat } from './user.chat.entity';
 
 export enum ChatType {

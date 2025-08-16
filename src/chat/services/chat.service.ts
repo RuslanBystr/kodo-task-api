@@ -5,7 +5,7 @@ import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { In, Repository } from 'typeorm';
 import { GetAllChatsFilterDto } from '../dto';
-import { Message } from '../../message/entities/message.entity';
+import { Message } from '../entities/message.entity';
 import { CryptoService } from '../../crypto/crypto.service';
 import { FileEntity } from '../../file/entities/file.entity';
 

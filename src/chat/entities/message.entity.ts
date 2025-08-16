@@ -10,7 +10,7 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { Chat } from '../../chat/entities/chat.entity';
+import { Chat } from './chat.entity';
 import { FileEntity } from '../../file/entities/file.entity';
 
 @Entity('message')

@@ -12,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ChatService } from '../services/chat.service';
 import { GetAllChatsFilterDto } from '../dto';
 import { JwtAuthGuard } from '../../auth/guards';
-import { ChatMemberGuard } from '../../message/guards';
+import { ChatMemberGuard } from '../guards';
 
 @ApiTags('chat')
 @Controller('chats')

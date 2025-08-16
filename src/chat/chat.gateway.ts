@@ -8,9 +8,9 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { MessageService } from '../message/services/message.service';
+import { MessageService } from './services/message.service';
 
-import { CreateMessageDto } from '../message/dto/create-message.dto';
+import { CreateMessageDto } from './dto/create-message.dto';
 import { ChatService } from './services/chat.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })

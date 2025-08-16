@@ -14,7 +14,7 @@ import { CreateLoggerEntity1740301521390 } from './migrations/1740301521390-crea
 import { Task } from "./src/project/entities/task.entity";
 import { Project } from "./src/project/entities/project.entity";
 import { CreateProjectTask1740462061541 } from "./migrations/1740462061541-create-project-task";
-import { Message } from "./src/message/entities/message.entity";
+import { Message } from "./src/chat/entities/message.entity";
 import { CreateMessage1740487533430 } from "./migrations/1740487533430-create-message";
 import { Chat } from "./src/chat/entities/chat.entity";
 import { CreateChat1740494422110 } from "./migrations/1740494422110-create-chat";
