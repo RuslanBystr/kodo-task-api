@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chat, ChatType } from '../entities/chat.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { GetAllChatsFilterDto } from '../dto';
 import { Message } from '../entities/message.entity';
 import { CryptoService } from '../../crypto/crypto.service';
@@ -15,6 +15,7 @@ export class ChatService {
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(UserChat) private userChatRepo: Repository<UserChat>,
+    private readonly dataSource: DataSource,
     private readonly cryptoService: CryptoService,
   ) {}
 
@@ -198,6 +199,7 @@ export class ChatService {
 
     return chat;
   }
+
   async createGroupChat(userIds: number[], groupName: string): Promise<Chat> {
     try {
       const users = await this.userRepo.findBy({ id: In(userIds) });
@@ -217,6 +219,60 @@ export class ChatService {
       return chat;
     } catch (err) {
       throw err;
+    }
+  }
+  async addChatMembers(
+    chatId: number,
+    userIds: number[],
+  ): Promise<{ added: number[]; skipped: number[] }> {
+    return this.dataSource.transaction(async (manager) => {
+      const chat = await manager.getRepository(Chat).findOne({
+        where: { id: chatId },
+        relations: { userChats: { user: true } },
+      });
+      if (!chat) throw new NotFoundException('Chat not found');
+      if (chat.type !== ChatType.GROUP) {
+        throw new BadRequestException(
+          'Members can be added only to group chats',
+        );
+      }
+
+      const users = await manager
+        .getRepository(User)
+        .findBy({ id: In(userIds) });
+      const foundIds = new Set(users.map((u) => u.id));
+
+      const existingIds = new Set(chat.userChats.map((uc) => uc.user.id));
+
+      const toAddIds = [...foundIds].filter((id) => !existingIds.has(id));
+      const skipped = userIds.filter((id) => !toAddIds.includes(id));
+
+      if (toAddIds.length === 0) {
+        return { added: [], skipped };
+      }
+
+      const userChatRepo = manager.getRepository(UserChat);
+      const toAddEntities = toAddIds.map((id) =>
+        userChatRepo.create({
+          chat: { id: chatId } as Chat,
+          user: { id } as User,
+          name: chat.groupName,
+        }),
+      );
+
+      await userChatRepo.save(toAddEntities);
+
+      return { added: toAddIds, skipped };
+    });
+  }
+
+  async removeChatMember(chatId: number, userId: number): Promise<void> {
+    const res = await this.userChatRepo.delete({
+      chat: { id: chatId },
+      user: { id: userId },
+    });
+    if (!res.affected) {
+      throw new NotFoundException('Member not found in chat');
     }
   }
 

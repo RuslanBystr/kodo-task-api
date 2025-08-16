@@ -13,6 +13,8 @@ import { ChatService } from '../services/chat.service';
 import { GetAllChatsFilterDto } from '../dto';
 import { JwtAuthGuard } from '../../auth/guards';
 import { ChatMemberGuard } from '../guards';
+import { CreateGroupDto } from '../dto/create-group.dto';
+import { AddGroupMemberDto } from '../dto/add-group-member.dto';
 
 @ApiTags('chat')
 @Controller('chats')
@@ -39,10 +41,17 @@ export class ChatController {
 
   @Post('group')
   @UseGuards(JwtAuthGuard)
-  createGroupChat(@Body() dto: { groupName: string; userIds: number[] }) {
+  createGroupChat(@Body() dto: CreateGroupDto) {
     console.log(dto);
     return this.chatService.createGroupChat(dto.userIds, dto.groupName);
   }
+
+  @Post('group/member')
+  @UseGuards(JwtAuthGuard)
+  addGroupMember(@Body() dto: AddGroupMemberDto) {
+    return this.chatService.addChatMembers(dto.chatId, dto.userId);
+  }
+
   @Delete('/:chatId')
   @UseGuards(JwtAuthGuard, ChatMemberGuard)
   async deletePrivateChat(@Param('chatId') id: number) {
