@@ -39,6 +39,7 @@ export class AuthService {
     const token = await this.generateToken(user);
     const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
       id: user.id,
+      role: user.role,
     });
     await this.userService.setCurrentRefreshToken(
       refreshTokenCookie.token,
@@ -64,6 +65,7 @@ export class AuthService {
     const token = await this.generateToken(user);
     const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
       id: user.id,
+      role: user.role,
     });
     await this.userService.setCurrentRefreshToken(
       refreshTokenCookie.token,
@@ -75,10 +77,11 @@ export class AuthService {
     };
   }
 
-  async generateToken({ id }: JwtPayload, signOptions?: JwtSignOptions) {
+  async generateToken({ id, role }: JwtPayload, signOptions?: JwtSignOptions) {
     const token = await this.jwtService.signAsync(
       {
         id,
+        role,
       },
       signOptions,
     );
@@ -126,6 +129,7 @@ export class AuthService {
     const token: string = await this.generateToken(user);
     const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
       id: user.id,
+      role: user.role,
     });
     user.currentHashedRefreshToken = refreshTokenCookie.token;
     await this.userRepository.save(user);
@@ -183,6 +187,7 @@ export class AuthService {
     const token: string = await this.generateToken(user);
     const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
       id: user.id,
+      role: user.role,
     });
     await this.userService.setCurrentRefreshToken(
       refreshTokenCookie.token,

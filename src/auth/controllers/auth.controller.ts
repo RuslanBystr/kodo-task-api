@@ -27,8 +27,9 @@ import {
 import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
 import { ForgotPasswordEmailDto, RegisterDto, ResetPasswordDto } from '../dto';
 import { CONFIG } from '../../common/enums';
+import { UsersRoleEnum } from '../../user/enums';
 
-@ApiTags('auth user')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   private baseFrontendUrl: string;
@@ -37,7 +38,7 @@ export class AuthController {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {
-    this.baseFrontendUrl = configService.get(CONFIG.FRONTEND_URL);
+    this.baseFrontendUrl = this.configService.get(CONFIG.FRONTEND_URL);
   }
 
   @LoginApiDocs()
@@ -58,7 +59,10 @@ export class AuthController {
   @Get('/google/redirect')
   @UseGuards(GoogleAuthGuard)
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
-    const token = await this.authService.generateToken({ id: req.user.id });
+    const token = await this.authService.generateToken({
+      id: req.user.id,
+      role: req.user.role as UsersRoleEnum,
+    });
     return res.redirect(`${this.baseFrontendUrl}/auth/success?token=${token}`);
   }
 

@@ -12,10 +12,12 @@ export function setupSwagger(app: INestApplication) {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'Authorization',
+        description: 'Paste your access token here',
         in: 'header',
       },
-      'Access-token',
+      'access_token',
     )
+    .addTag('Auth')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

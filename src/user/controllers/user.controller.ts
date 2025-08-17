@@ -6,15 +6,16 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from '../services';
-import { ActiveUserGuard, JwtAuthGuard } from '../../auth/guards';
+import { ActiveUserGuard, JwtAuthGuard, RolesGuard } from '../../auth/guards';
 import { JwtPayload } from '../../common/types';
 import { GetJwtPayload } from '../../common/utils/decorators';
 import {
@@ -35,7 +36,11 @@ import {
   UpdatePhoneDto,
   UpdateUserDto,
 } from '../dto';
+import { UsersRoleEnum } from '../enums';
+import { Role } from '../../common/role.decorator';
+import { DeleteUserDocs } from '../docs/delete-user.decorator';
 
+@ApiBearerAuth('access_token')
 @ApiTags('user')
 @Controller('user')
 export class UserController {
@@ -139,8 +144,12 @@ export class UserController {
     return { message: 'Password was changed successfully' };
   }
 
+  @DeleteUserDocs()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Role(UsersRoleEnum.ADMIN)
   @Delete(':id')
-  async deleteUser(id: number) {
-    return this.userService.remove(id);
+  @HttpCode(204)
+  async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.userService.remove(id);
   }
 }
