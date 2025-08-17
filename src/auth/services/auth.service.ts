@@ -19,6 +19,7 @@ import { JwtPayload } from '../../common/types';
 import { HASH_ROUNDS } from '../../common/constants';
 import { User } from '../../user/entities/user.entity';
 import { UserService, UserVerificationService } from '../../user/services';
+import { UsersRoleEnum } from '../../user/enums';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,13 @@ export class AuthService {
 
   async login({ email, password }: LoginDto): Promise<LoginResponseDto> {
     const user = await this.checkLoginCredentialsUser({ email, password });
-    const token = await this.generateToken(user);
+    const token = await this.generateToken(
+      { id: user.id, role: user.role },
+      {
+        secret: this.configService.get(CONFIG.JWT_SECRET),
+        expiresIn: this.configService.get(CONFIG.JWT_EXPIRATION_TIME) + 'd',
+      },
+    );
     const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
       id: user.id,
       role: user.role,
@@ -106,44 +113,49 @@ export class AuthService {
   }
 
   async register(
-    registerDto: RegisterDto,
+    dto: RegisterDto,
   ): Promise<RegisterResponseDto & { refreshTokenCookie: string }> {
-    const existedUser = await this.userRepository.findOne({
-      where: {
-        email: registerDto.email,
-      },
+    const exists = await this.userRepository.findOne({
+      where: { email: dto.email },
     });
-    if (existedUser) {
-      throw new ConflictException('This email is already taken');
-    }
+    if (exists) throw new ConflictException('This email is already taken');
 
-    const user = new this.user();
-    user.firstName = registerDto.firstName;
-    user.lastName = registerDto.lastName;
-    user.email = registerDto.email;
-    user.phone = registerDto.phone;
-    user.password = await this.bcryptLib.hash(
-      registerDto.password,
-      HASH_ROUNDS,
-    );
-    const token: string = await this.generateToken(user);
-    const refreshTokenCookie = await this.getCookieWithJwtRefreshToken({
-      id: user.id,
-      role: user.role,
+    const user = this.userRepository.create({
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      phone: dto.phone,
+      role: UsersRoleEnum.USER,
+      password: await this.bcryptLib.hash(dto.password, HASH_ROUNDS),
     });
-    user.currentHashedRefreshToken = refreshTokenCookie.token;
-    await this.userRepository.save(user);
+
+    const saved = await this.userRepository.save(user);
+
+    const token = await this.generateToken(
+      { id: saved.id, role: saved.role },
+      {
+        secret: this.configService.get(CONFIG.JWT_SECRET),
+        expiresIn: this.configService.get(CONFIG.JWT_EXPIRATION_TIME) + 'd',
+      },
+    );
+
+    const refresh = await this.getCookieWithJwtRefreshToken({
+      id: saved.id,
+      role: saved.role,
+    });
+    await this.userService.setCurrentRefreshToken(refresh.token, saved.id);
 
     return {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phone: user.phone,
-      id: user.id,
+      id: saved.id,
+      email: saved.email,
+      firstName: saved.firstName,
+      lastName: saved.lastName,
+      phone: saved.phone,
       token,
-      refreshTokenCookie: refreshTokenCookie.cookie,
+      refreshTokenCookie: refresh.cookie,
     };
   }
+
   async checkLoginCredentialsUser({
     email,
     password,
