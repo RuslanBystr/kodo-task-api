@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { LoginDto } from '../../common/dto';
@@ -25,14 +26,19 @@ import {
 } from '../docs';
 import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
 import { ForgotPasswordEmailDto, RegisterDto, ResetPasswordDto } from '../dto';
+import { CONFIG } from '../../common/enums';
 
 @ApiTags('auth user')
 @Controller('auth')
 export class AuthController {
+  private baseFrontendUrl: string;
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.baseFrontendUrl = configService.get(CONFIG.FRONTEND_URL);
+  }
 
   @LoginApiDocs()
   @Post('/login')
@@ -53,7 +59,7 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleRedirect(@Req() req: Request, @Res() res: Response) {
     const token = await this.authService.generateToken({ id: req.user.id });
-    return res.redirect(`http://localhost:3000/auth/success?token=${token}`);
+    return res.redirect(`${this.baseFrontendUrl}/auth/success?token=${token}`);
   }
 
   @GetRefreshApiDocs()
