@@ -3,6 +3,7 @@ import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SortOrderEnum } from '../../common/enums';
 import { PaginationFilterDto } from '../../common/dto/pagination';
+import { TaskSortByEnum } from '../enums';
 
 export class GetAllTasksFilterDto extends PaginationFilterDto {
   @ApiPropertyOptional()
@@ -42,5 +43,5 @@ export class GetAllTasksFilterDto extends PaginationFilterDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  sortBy: string;
+  sortBy: TaskSortByEnum;
 }

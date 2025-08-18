@@ -52,9 +52,7 @@ export class AuthController {
   }
   @Get('/google/login')
   @UseGuards(GoogleAuthGuard)
-  googleLogin() {
-    return { message: '' };
-  }
+  googleLogin() {}
 
   @Get('/google/redirect')
   @UseGuards(GoogleAuthGuard)

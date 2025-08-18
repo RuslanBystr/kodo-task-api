@@ -50,12 +50,14 @@ export class UserController {
   async getUsers(@Query() filterDto: GetAllUsersFilterDto) {
     return this.userService.findAll(filterDto);
   }
+
   @GetProfileApiDocs()
   @Get('/profile')
   @UseGuards(JwtAuthGuard, ActiveUserGuard)
   async getProfile(@GetJwtPayload() user: JwtPayload) {
     return await this.userService.getProfile(user.id);
   }
+
   @Get(':id')
   async getUserById(@Param('id') id: number) {
     return this.userService.findById(id);
