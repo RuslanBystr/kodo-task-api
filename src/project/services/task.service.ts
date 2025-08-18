@@ -46,50 +46,66 @@ export class TaskService {
     return this.taskRepo.save(task);
   }
 
-  public async findAll({
-    page = 1,
-    limit = 20,
-    sortBy = TaskSortByEnum.CREATED_AT,
-    order = SortOrderEnum.DESC,
-    assignedTo,
-    projectId = undefined,
-    ...searchFilterFields
-  }: GetAllTasksFilterDto): Promise<any> {
-    const skip = (page - 1) * limit;
+  public async findAll(
+    userId: number,
+    {
+      page = 1,
+      limit = 20,
+      sortBy = TaskSortByEnum.CREATED_AT,
+      order = SortOrderEnum.DESC,
+      projectId,
+      ...searchFilterFields
+    }: GetAllTasksFilterDto,
+  ): Promise<{
+    items: Task[];
+    meta: {
+      totalItems: number;
+      itemCount: number;
+      itemsPerPage: number;
+      totalPages: number;
+      currentPage: number;
+    };
+  }> {
+    const pageNum = Number(page) || 1;
+    const limitNum = Math.max(1, Number(limit) || 20);
+    const skip = (pageNum - 1) * limitNum;
+
+    const sortKey = Object.values(TaskSortByEnum).includes(sortBy)
+      ? sortBy
+      : TaskSortByEnum.CREATED_AT;
+    const sortDirection = Object.values(SortOrderEnum).includes(order)
+      ? order
+      : SortOrderEnum.DESC;
 
     const baseConditions: FindOptionsWhere<Task> =
       generateSearchConditions<Task>(searchFilterFields);
 
-    const conditions: FindOptionsWhere<Task> = {
-      ...baseConditions,
-    };
-
     try {
       const [taskItems, total] = await this.taskRepo.findAndCount({
         where: {
-          ...conditions,
-          project: projectId ? { id: projectId } : undefined,
-          assignedUser: assignedTo ? { id: assignedTo } : undefined,
+          ...baseConditions,
+          ...(projectId ? { project: { id: projectId } } : {}),
+          assignedUser: { id: Number(userId) },
         },
         relations: ['assignedUser', 'project'],
         skip,
-        take: limit,
+        take: limitNum,
         order: {
           status: SortOrderEnum.ASC,
-          [sortBy]: order,
+          [sortKey]: sortDirection,
         },
       });
 
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / limitNum) || 1;
 
       return {
         items: taskItems,
         meta: {
           totalItems: total,
           itemCount: taskItems.length,
-          itemsPerPage: Number(limit),
+          itemsPerPage: limitNum,
           totalPages,
-          currentPage: Number(page),
+          currentPage: pageNum,
         },
       };
     } catch (error) {
@@ -115,11 +131,18 @@ export class TaskService {
     return { message: 'Task deleted successfully' };
   }
 
-  async updateTaskTime(id: string, setTimeDto: SetTimeDto): Promise<Task> {
-    const task = await this.taskRepo.findOne({ where: { id } });
+  async updateTaskTime(
+    userId: number,
+    taskId: string,
+    setTimeDto: SetTimeDto,
+  ): Promise<Task> {
+    const task = await this.taskRepo.findOne({
+      where: { id: taskId, assignedUser: { id: userId } },
+      relations: ['assignedUser'],
+    });
 
     if (!task) {
-      throw new NotFoundException(`Task with id ${id} not found`);
+      throw new NotFoundException(`Task with id ${taskId} not found`);
     }
 
     task.spentTime += setTimeDto.duration;

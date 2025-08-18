@@ -8,8 +8,9 @@ import {
   Query,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards';
 import { TaskService } from '../services/task.service';
 import {
@@ -18,7 +19,9 @@ import {
   GetAllTasksFilterDto,
   SetTimeDto,
 } from '../dto';
+import { AuthRequest } from '../../common/types';
 
+@ApiBearerAuth('access_token')
 @ApiTags('task')
 @Controller('task')
 export class TaskController {
@@ -32,14 +35,25 @@ export class TaskController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getTasks(@Query() filterDto: GetAllTasksFilterDto) {
-    return this.taskService.findAll(filterDto);
+  async getTasks(
+    @Query() filterDto: GetAllTasksFilterDto,
+    @Req() req: AuthRequest,
+  ) {
+    return this.taskService.findAll(req.user.id, filterDto);
   }
 
   @Put('/spend/:id')
   @UseGuards(JwtAuthGuard)
-  async trackTaskTime(@Param('id') id: string, @Body() setTimeDto: SetTimeDto) {
-    return await this.taskService.updateTaskTime(id, setTimeDto);
+  async trackTaskTime(
+    @Param('id') taskId: string,
+    @Body() setTimeDto: SetTimeDto,
+    @Req() req: AuthRequest,
+  ) {
+    return await this.taskService.updateTaskTime(
+      req.user.id,
+      taskId,
+      setTimeDto,
+    );
   }
 
   @Delete('/logs/:id')
