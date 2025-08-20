@@ -120,13 +120,13 @@ export class ProjectService {
       );
     }
 
-    const user = await this.userRepo.findOne({ where: { id: dto.userId } });
+    const user = await this.userRepo.findOne({ where: { email: dto.email } });
     if (!user) {
-      throw new NotFoundException(`User with ID ${dto.userId} not found`);
+      throw new NotFoundException(`User with ID ${dto.email} not found`);
     }
 
     // Check if user is already a member
-    if (project.members.some((member) => member.id === dto.userId)) {
+    if (project.members.some((member) => member.email === dto.email)) {
       return { message: 'User is already a member of this project' };
     }
 
@@ -187,7 +187,9 @@ export class ProjectService {
       );
     }
 
-    return project.members;
+    return {
+      items: project.members,
+    };
   }
 
   async isUserMember(projectId: string, userId: number): Promise<boolean> {
