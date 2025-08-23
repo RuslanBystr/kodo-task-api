@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { SeederOptions } from 'typeorm-extension';
-import { CONFIG } from './src/common/enums/config';
+import { CONFIG } from './src/common/enums';
 import { MainSeeder } from './src/seeds/main-seeder';
 import { User } from './src/user/entities/user.entity';
 import { config } from 'dotenv';
@@ -11,18 +11,18 @@ import { CreateAndVerifyUser1740301060631 } from './migrations/1740301060631-cre
 import { CreateFileEntity1740301416004 } from './migrations/1740301416004-create-file-entity';
 import { Log } from './src/logger/entities/log.entity';
 import { CreateLoggerEntity1740301521390 } from './migrations/1740301521390-create-logger-entity';
-import { Task } from "./src/project/entities/task.entity";
-import { Project } from "./src/project/entities/project.entity";
-import { CreateProjectTask1740462061541 } from "./migrations/1740462061541-create-project-task";
-import { Message } from "./src/chat/entities/message.entity";
-import { CreateMessage1740487533430 } from "./migrations/1740487533430-create-message";
-import { Chat } from "./src/chat/entities/chat.entity";
-import { CreateChat1740494422110 } from "./migrations/1740494422110-create-chat";
-import { UserChat } from "./src/chat/entities/user.chat.entity";
-import { AddUserChatAndEnum1740827362244 } from "./migrations/1740827362244-add-user-chat-and-enum";
-import { FileEntityUUID1740842180816 } from "./migrations/1740842180816-file-entity-uuid";
-import { ProjectImage1740844355246 } from "./migrations/1740844355246-image-ref-remove";
-import {ChatAvatar1740848332907} from "./migrations/1740848332907-chat-avatar";
+import { Task } from './src/project/entities/task.entity';
+import { Project } from './src/project/entities/project.entity';
+import { CreateProjectTask1740462061541 } from './migrations/1740462061541-create-project-task';
+import { Message } from './src/chat/entities/message.entity';
+import { CreateMessage1740487533430 } from './migrations/1740487533430-create-message';
+import { Chat } from './src/chat/entities/chat.entity';
+import { CreateChat1740494422110 } from './migrations/1740494422110-create-chat';
+import { UserChat } from './src/chat/entities/user.chat.entity';
+import { AddUserChatAndEnum1740827362244 } from './migrations/1740827362244-add-user-chat-and-enum';
+import { FileEntityUUID1740842180816 } from './migrations/1740842180816-file-entity-uuid';
+import { ProjectImage1740844355246 } from './migrations/1740844355246-image-ref-remove';
+import { ChatAvatar1740848332907 } from './migrations/1740848332907-chat-avatar';
 import { TaskDetails1741097658314 } from './migrations/1741097658314-task-details';
 import { TaskLog } from './src/project/entities/task-log.entity';
 import { AddTaskLog1742030751151 } from './migrations/1742030751151-add-tast-log';
@@ -32,6 +32,10 @@ import { AddReactionAndAnswerMessage1742496172431 } from './migrations/174249617
 import { FileMessage1743163586418 } from './migrations/1743163586418-file-message';
 import { MessageReadByUsers1743260326540 } from './migrations/1743260326540-message-read-by-users';
 import { ProjectMembers1748633190456 } from './migrations/1748633190456-project-members';
+import { Threads } from './src/llm/entities/threads.entity';
+import { ThreadMessages } from './src/llm/entities/thread-messages.entity';
+import { Threads1755943711841 } from './migrations/1755943711841-threads';
+import { ThreadMessageRole1755945896932 } from './migrations/1755945896932-thread-message-role';
 
 config();
 const configService = new ConfigService();
@@ -53,7 +57,9 @@ const options: DataSourceOptions & SeederOptions = {
     Message,
     Chat,
     UserChat,
-    TaskLog
+    TaskLog,
+    Threads,
+    ThreadMessages,
   ],
   migrations: [
     CreateAndVerifyUser1740301060631,
@@ -73,7 +79,9 @@ const options: DataSourceOptions & SeederOptions = {
     AddReactionAndAnswerMessage1742496172431,
     FileMessage1743163586418,
     MessageReadByUsers1743260326540,
-    ProjectMembers1748633190456
+    ProjectMembers1748633190456,
+    Threads1755943711841,
+    ThreadMessageRole1755945896932,
   ],
   seeds: [MainSeeder],
 };
