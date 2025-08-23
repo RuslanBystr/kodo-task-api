@@ -6,9 +6,7 @@ import { Threads } from './entities/threads.entity';
 import { ThreadMessages } from './entities/thread-messages.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Threads, ThreadMessages]),
-  ],
+  imports: [TypeOrmModule.forFeature([Threads, ThreadMessages])],
   providers: [LLMService],
   controllers: [LLMController],
 })

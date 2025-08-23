@@ -51,8 +51,18 @@ export function ChatHistoryApiDocs() {
         example: {
           threadId: '874213981245',
           items: [
-            { id: 'uuid-1', role: 'user', content: 'Hi!', created_at: '2025-08-23T18:19:10.000Z' },
-            { id: 'uuid-2', role: 'model', content: 'Hello 👋', created_at: '2025-08-23T18:19:11.200Z' },
+            {
+              id: 'uuid-1',
+              role: 'user',
+              content: 'Hi!',
+              created_at: '2025-08-23T18:19:10.000Z',
+            },
+            {
+              id: 'uuid-2',
+              role: 'model',
+              content: 'Hello 👋',
+              created_at: '2025-08-23T18:19:11.200Z',
+            },
           ],
           nextCursor: '2025-08-23T18:19:10.000Z',
         },

@@ -61,12 +61,14 @@ export function ChatWithThreadApiDocs() {
           threadId: {
             type: 'string',
             nullable: true,
-            description: 'Existing thread ID. If omitted, a new thread is created.',
+            description:
+              'Existing thread ID. If omitted, a new thread is created.',
           },
           systemPrompt: {
             type: 'string',
             nullable: true,
-            description: 'Optional system instruction applied when creating a new thread.',
+            description:
+              'Optional system instruction applied when creating a new thread.',
           },
         },
         required: ['prompt'],

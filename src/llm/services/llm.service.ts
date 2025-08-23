@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Repository } from 'typeorm';
@@ -43,6 +47,21 @@ export class LLMService {
       console.error('Error while generating text:', error);
       throw new Error('Failed to generate text using Gemini API.');
     }
+  }
+
+  async createThread(params: {
+    userId: string;
+    title?: string | null;
+    systemPrompt?: string | null;
+  }) {
+    let thread = this.threadsRepo.create({
+      user_id: params.userId as any,
+      title: params.title ?? null,
+      system_prompt: params.systemPrompt ?? null,
+      summary: null,
+    });
+    thread = await this.threadsRepo.save(thread);
+    return thread;
   }
 
   async getChatHistory(params: {
@@ -184,5 +203,79 @@ export class LLMService {
     await this.threadsRepo.update(thread.id as any, { updated_at: new Date() });
 
     return { reply, threadId: String(thread.id) };
+  }
+
+  async findAllThreads(params: {
+    userId: string;
+    offset?: number;
+    limit?: number;
+    q?: string;
+  }): Promise<{
+    total: number;
+    items: Array<{
+      id: string;
+      title: string | null;
+      system_prompt: string | null;
+      summary: string | null;
+      created_at: Date;
+      updated_at: Date;
+    }>;
+    nextOffset?: number;
+    hasMore: boolean;
+  }> {
+    const { userId } = params;
+    const offset = params.offset ?? 0;
+    const limit = params.limit ?? 20;
+
+    const qb = this.threadsRepo
+      .createQueryBuilder('t')
+      .where('t.user_id = :uid', { uid: userId })
+      .orderBy('t.updated_at', 'DESC')
+      .offset(offset)
+      .limit(limit);
+
+    if (params.q) {
+      qb.andWhere('(t.title ILIKE :q OR t.summary ILIKE :q)', {
+        q: `%${params.q}%`,
+      });
+    }
+
+    const [rows, total] = await qb.getManyAndCount();
+
+    const items = rows.map((t) => ({
+      id: String(t.id),
+      title: t.title ?? null,
+      system_prompt: t.system_prompt ?? null,
+      summary: t.summary ?? null,
+      created_at: t.created_at,
+      updated_at: t.updated_at,
+    }));
+
+    const nextOffset = offset + items.length;
+    const hasMore = nextOffset < total;
+
+    return {
+      total,
+      items,
+      nextOffset: hasMore ? nextOffset : undefined,
+      hasMore,
+    };
+  }
+
+  async deleteThread(params: {
+    userId: string;
+    threadId: string;
+  }): Promise<void> {
+    const { userId, threadId } = params;
+
+    const thread = await this.threadsRepo.findOne({
+      where: { id: threadId } as any,
+    });
+    if (!thread) throw new NotFoundException('Thread not found');
+    if (String(thread.user_id) !== String(userId)) {
+      throw new ForbiddenException('Thread belongs to another user');
+    }
+
+    await this.threadsRepo.delete(threadId as any);
   }
 }
