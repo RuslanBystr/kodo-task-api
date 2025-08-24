@@ -1,9 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TaskStatusEnum } from '../enums';
-import { SortOrderEnum } from '../../common/enums';
-import { PaginationFilterDto } from '../../common/dto/pagination';
+import { TaskStatusEnum } from '../../domain';
+import { SortOrderEnum } from '../../../common/enums';
+import { PaginationFilterDto } from '../../../common/dto/pagination';
 
 export class GetAllProjectsFilterDto extends PaginationFilterDto {
   @ApiPropertyOptional()

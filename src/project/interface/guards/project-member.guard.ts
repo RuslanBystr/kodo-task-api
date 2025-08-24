@@ -4,11 +4,12 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { ProjectService } from '../services/project.service';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetProjectMembersQuery } from '../../application/queries/get-project-members.query';
 
 @Injectable()
 export class ProjectMemberGuard implements CanActivate {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly query: QueryBus) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const { user, params } = context.switchToHttp().getRequest();
@@ -19,7 +20,9 @@ export class ProjectMemberGuard implements CanActivate {
       throw new ForbiddenException('Missing userId or projectId');
     }
 
-    const isMember = await this.projectService.isUserMember(projectId, userId);
+    const isMember = await this.query.execute(
+      new GetProjectMembersQuery(projectId, userId),
+    );
 
     if (!isMember) {
       throw new ForbiddenException('You do not have access to this project');

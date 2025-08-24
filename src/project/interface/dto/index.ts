@@ -1,4 +1,3 @@
-export * from './create-task.dto';
 export * from './add-project-member.dto';
 export * from './create-project.dto';
 export * from './get-all-projects.dto';

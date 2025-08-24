@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UsersRoleEnum } from '../enums';
-import { Task } from '../../project/entities/task.entity';
+import { Task } from '../../project/infrastructure/entities/task.entity';
 import { Message } from '../../chat/entities/message.entity';
 import { UserChat } from '../../chat/entities/user.chat.entity';
 

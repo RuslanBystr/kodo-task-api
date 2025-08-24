@@ -7,8 +7,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Project } from './project.entity';
-import { User } from '../../user/entities/user.entity';
-import { TaskStatusEnum } from '../enums/task-status';
+import { User } from '../../../user/entities/user.entity';
+import { TaskStatusEnum } from '../../domain/task-status';
 import { TaskLog } from './task-log.entity';
 
 export enum TaskPriority {
