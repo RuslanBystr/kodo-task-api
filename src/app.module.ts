@@ -15,6 +15,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { CryptoModule } from './crypto/crypto.module';
 import { ActivityModule } from './activity/activity.module';
 import { LlmModule } from './llm/llm.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LlmModule } from './llm/llm.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    CqrsModule,
     FileModule,
     ProjectModule,
     ChatModule,

@@ -11,8 +11,8 @@ import { CreateAndVerifyUser1740301060631 } from './migrations/1740301060631-cre
 import { CreateFileEntity1740301416004 } from './migrations/1740301416004-create-file-entity';
 import { Log } from './src/logger/entities/log.entity';
 import { CreateLoggerEntity1740301521390 } from './migrations/1740301521390-create-logger-entity';
-import { Task } from './src/project/entities/task.entity';
-import { Project } from './src/project/entities/project.entity';
+import { Task } from './src/project/infrastructure/entities/task.entity';
+import { Project } from './src/project/infrastructure/entities/project.entity';
 import { CreateProjectTask1740462061541 } from './migrations/1740462061541-create-project-task';
 import { Message } from './src/chat/entities/message.entity';
 import { CreateMessage1740487533430 } from './migrations/1740487533430-create-message';
@@ -24,7 +24,7 @@ import { FileEntityUUID1740842180816 } from './migrations/1740842180816-file-ent
 import { ProjectImage1740844355246 } from './migrations/1740844355246-image-ref-remove';
 import { ChatAvatar1740848332907 } from './migrations/1740848332907-chat-avatar';
 import { TaskDetails1741097658314 } from './migrations/1741097658314-task-details';
-import { TaskLog } from './src/project/entities/task-log.entity';
+import { TaskLog } from './src/project/infrastructure/entities/task-log.entity';
 import { AddTaskLog1742030751151 } from './migrations/1742030751151-add-tast-log';
 import { AddLastMessage1742228911850 } from './migrations/1742228911850-chat-last-message-column';
 import { AddVoiceMessage1742382401988 } from './migrations/1742382401988-add-voice-message';
