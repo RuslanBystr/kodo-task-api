@@ -1,10 +1,11 @@
 import {
+  ArgumentsHost,
   Catch,
   ExceptionFilter,
-  ArgumentsHost,
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
+
 import { LoggerService } from '../../../../logger/services/logger.service';
 
 @Catch()

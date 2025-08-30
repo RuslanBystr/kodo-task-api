@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString } from 'class-validator';
-import { PaginationFilterDto } from '../../common/dto/pagination/pagination-filters.dto';
 import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString } from 'class-validator';
+
+import { PaginationFilterDto } from '../../common/dto/pagination/pagination-filters.dto';
 
 export class GetAllMessageFilterDto extends PaginationFilterDto {
   @ApiPropertyOptional()

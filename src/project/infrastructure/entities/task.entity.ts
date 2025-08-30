@@ -1,14 +1,15 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Project } from './project.entity';
+
 import { User } from '../../../user/entities/user.entity';
 import { TaskStatusEnum } from '../../domain';
+import { Project } from './project.entity';
 import { TaskLog } from './task-log.entity';
 
 export enum TaskPriority {

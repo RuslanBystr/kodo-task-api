@@ -1,11 +1,12 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { ThreadMessages } from './thread-messages.entity';
 
 @Entity({ name: 'threads' })

@@ -1,18 +1,19 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import {
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { Repository } from 'typeorm';
-import { CONFIG } from '../../common/enums';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Threads } from '../entities/threads.entity';
+import { Repository } from 'typeorm';
+
+import { CONFIG } from '../../common/enums';
 import {
   MessageRole,
   ThreadMessages,
 } from '../entities/thread-messages.entity';
+import { Threads } from '../entities/threads.entity';
 
 @Injectable()
 export class LLMService {
@@ -55,7 +56,7 @@ export class LLMService {
     systemPrompt?: string | null;
   }) {
     let thread = this.threadsRepo.create({
-      user_id: params.userId as any,
+      user_id: params.userId,
       title: params.title ?? null,
       system_prompt: params.systemPrompt ?? null,
       summary: null,
@@ -84,7 +85,7 @@ export class LLMService {
       params.limit && params.limit > 0 ? Math.min(params.limit, 100) : 30;
 
     const thread = await this.threadsRepo.findOne({
-      where: { id: threadId } as any,
+      where: { id: threadId },
     });
     if (!thread) throw new NotFoundException('Thread not found');
     if (String(thread.user_id) !== String(userId))
@@ -114,7 +115,7 @@ export class LLMService {
       threadId: String(thread.id),
       items: itemsAsc.map((m) => ({
         id: m.id,
-        role: (m as any).role,
+        role: m.role,
         content: m.content,
         created_at: m.created_at,
       })),
@@ -123,11 +124,11 @@ export class LLMService {
   }
 
   async chatWithThread(params: {
-    userId: string;
+    userId: number;
     prompt: string;
     threadId: string;
     systemPrompt: string;
-  }): Promise<any> {
+  }) {
     let thread: Threads | null;
     if (params.threadId) {
       thread = await this.threadsRepo.findOne({
@@ -138,7 +139,7 @@ export class LLMService {
       }
     } else {
       thread = this.threadsRepo.create({
-        user_id: params.userId,
+        user_id: params.userId.toString(),
         title: null,
         system_prompt: params.systemPrompt,
         summary: null,
@@ -165,7 +166,7 @@ export class LLMService {
     }
 
     for (const m of lastMessages) {
-      const r = (m as any).role as 'user' | 'model' | 'system' | undefined;
+      const r = m.role as 'user' | 'model' | 'system' | undefined;
       if (r === 'system') continue;
       const role = r === 'user' ? 'user' : 'model';
       history.push({ role, parts: [{ text: m.content }] });
@@ -180,12 +181,12 @@ export class LLMService {
 
     await this.threadMessagesRepo.save(
       this.threadMessagesRepo.create({
-        thread_id: thread.id as any,
+        thread_id: thread.id,
         content: params.prompt,
         parts: null,
         token_count: null,
         role: MessageRole.user,
-      }) as any,
+      }),
     );
 
     const result = await chat.sendMessage(params.prompt);
@@ -193,14 +194,14 @@ export class LLMService {
 
     await this.threadMessagesRepo.save(
       this.threadMessagesRepo.create({
-        thread_id: thread.id as any,
+        thread_id: thread.id,
         content: reply,
         parts: null,
         token_count: null,
         role: MessageRole.model,
-      }) as any,
+      }),
     );
-    await this.threadsRepo.update(thread.id as any, { updated_at: new Date() });
+    await this.threadsRepo.update(thread.id, { updated_at: new Date() });
 
     return { reply, threadId: String(thread.id) };
   }
@@ -263,19 +264,19 @@ export class LLMService {
   }
 
   async deleteThread(params: {
-    userId: string;
+    userId: number;
     threadId: string;
   }): Promise<void> {
     const { userId, threadId } = params;
 
     const thread = await this.threadsRepo.findOne({
-      where: { id: threadId } as any,
+      where: { id: threadId },
     });
     if (!thread) throw new NotFoundException('Thread not found');
     if (String(thread.user_id) !== String(userId)) {
       throw new ForbiddenException('Thread belongs to another user');
     }
 
-    await this.threadsRepo.delete(threadId as any);
+    await this.threadsRepo.delete(threadId);
   }
 }

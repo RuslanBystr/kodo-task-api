@@ -1,10 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiOkResponse,
-  ApiUnauthorizedResponse,
-  ApiQuery,
   ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 export function FindThreadsApiDocs() {

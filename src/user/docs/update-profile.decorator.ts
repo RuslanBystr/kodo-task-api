@@ -9,6 +9,7 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { UpdateUserResponseDto } from '../dto/responses/update-user-response.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 

@@ -1,28 +1,29 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Query,
+  Get,
+  Param,
+  Post,
   Put,
-  UseGuards,
+  Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '../../../auth/guards';
-import { UpdateTaskDto, GetAllTasksFilterDto, SetTimeDto } from '../dto';
 import { AuthRequest } from '../../../common/types';
-import { CreateTaskDto } from '../dto/create-task.dto';
 import { CreateTaskCommand } from '../../application/commands/create-task.command';
-import { GetAssignedTasksQuery } from '../../application/queries/get-assigned-tasks.query';
-import { GetTaskByIdQuery } from '../../application/queries/get-task-by-id.query';
-import { UpdateTaskCommand } from '../../application/commands/update-task.command';
 import { DeleteTaskCommand } from '../../application/commands/delete-task.command';
 import { RemoveTaskLogCommand } from '../../application/commands/remove-task-log.command';
+import { UpdateTaskCommand } from '../../application/commands/update-task.command';
 import { UpdateTaskTimeCommand } from '../../application/commands/update-task-time.command';
+import { GetAssignedTasksQuery } from '../../application/queries/get-assigned-tasks.query';
+import { GetTaskByIdQuery } from '../../application/queries/get-task-by-id.query';
+import { GetAllTasksFilterDto, SetTimeDto, UpdateTaskDto } from '../dto';
+import { CreateTaskDto } from '../dto/create-task.dto';
 
 @ApiBearerAuth('access_token')
 @ApiTags('task')

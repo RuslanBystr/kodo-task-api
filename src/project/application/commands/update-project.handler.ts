@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateProjectCommand } from './update-project.command';
+
 import { Project } from '../../infrastructure/entities/project.entity';
+import { UpdateProjectCommand } from './update-project.command';
 
 @CommandHandler(UpdateProjectCommand)
 export class UpdateProjectHandler

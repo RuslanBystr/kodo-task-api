@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { STRATEGIES } from '../../common/enums';
 import { ConfigService } from '@nestjs/config';
-import { UserService } from '../../user/services';
+import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
-import { CONFIG } from '../../common/enums';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+import { CONFIG, STRATEGIES } from '../../common/enums';
 import { JwtPayload } from '../../common/types';
+import { UserService } from '../../user/services';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(

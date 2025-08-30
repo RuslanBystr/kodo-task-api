@@ -1,9 +1,10 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RemoveProjectMemberCommand } from './remove-project-member.command';
+
 import { Project } from '../../infrastructure/entities/project.entity';
+import { RemoveProjectMemberCommand } from './remove-project-member.command';
 
 @CommandHandler(RemoveProjectMemberCommand)
 export class RemoveProjectMemberHandler

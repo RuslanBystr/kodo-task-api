@@ -1,10 +1,11 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+
 import { GetProjectMembersQuery } from '../../application/queries/get-project-members.query';
 
 @Injectable()

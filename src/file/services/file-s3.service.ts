@@ -1,17 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { LoggerService } from '../../logger/services/logger.service';
 import * as fs from 'node:fs';
-import { Readable } from 'stream';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Upload } from '@aws-sdk/lib-storage';
+
 import {
   CompleteMultipartUploadCommandOutput,
   GetObjectCommand,
   S3,
   S3ClientConfig,
 } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Readable } from 'stream';
+
 import { CONFIG } from '../../common/enums/config';
+import { LoggerService } from '../../logger/services/logger.service';
 
 @Injectable()
 export class FileS3Service {

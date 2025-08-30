@@ -1,5 +1,5 @@
-import * as crypto from 'crypto';
 import axios from 'axios';
+import * as crypto from 'crypto';
 
 export class LiqPayClient {
   constructor(

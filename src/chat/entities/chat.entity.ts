@@ -1,14 +1,15 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  OneToMany,
   Column,
+  Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { ChatType } from '../enums/chat-type.enum';
 import { Message } from './message.entity';
 import { UserChat } from './user.chat.entity';
-import { ChatType } from '../enums/chat-type.enum';
 
 @Entity()
 export class Chat {

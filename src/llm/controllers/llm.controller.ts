@@ -10,18 +10,20 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { LLMService } from '../services/llm.service';
-import { GenerateTextApiDocs } from '../docs/api-generate.decorator';
-import { JwtAuthGuard } from '../../auth/guards';
-import { ChatWithThreadDto } from '../dto/chat-with-thread.dto';
-import { ChatWithThreadApiDocs } from '../docs/api-chat-with-thread.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { ChatHistoryQueryDto } from '../dto/chat-history-query.dto';
+import { Request } from 'express';
+
+import { JwtAuthGuard } from '../../auth/guards';
 import { ChatHistoryApiDocs } from '../docs/api-chat-history.decorator';
-import { FindThreadsQueryDto } from '../dto/find-all-threads.dto';
-import { FindThreadsApiDocs } from '../docs/api-find-threads.decorator';
+import { ChatWithThreadApiDocs } from '../docs/api-chat-with-thread.decorator';
 import { DeleteThreadApiDocs } from '../docs/api-delete-thread.decorator';
+import { FindThreadsApiDocs } from '../docs/api-find-threads.decorator';
+import { GenerateTextApiDocs } from '../docs/api-generate.decorator';
+import { ChatHistoryQueryDto } from '../dto/chat-history-query.dto';
+import { ChatWithThreadDto } from '../dto/chat-with-thread.dto';
 import { CreateThreadDto } from '../dto/create-thread.dto';
+import { FindThreadsQueryDto } from '../dto/find-all-threads.dto';
+import { LLMService } from '../services/llm.service';
 
 @Controller('llm')
 @ApiBearerAuth('access_token')
@@ -30,7 +32,7 @@ export class LLMController {
 
   @Post('generate')
   @GenerateTextApiDocs()
-  async generate(@Body('prompt') prompt: string): Promise<any> {
+  async generate(@Body('prompt') prompt: string) {
     if (!prompt) {
       return { error: 'Prompt is required.' };
     }
@@ -41,10 +43,9 @@ export class LLMController {
   @Get('chat')
   @UseGuards(JwtAuthGuard)
   @ChatHistoryApiDocs()
-  async getChat(@Query() q: ChatHistoryQueryDto, @Req() req: any) {
-    const userId: string = req.user?.id ?? req.user?.userId;
+  async getChat(@Query() q: ChatHistoryQueryDto, @Req() req: Request) {
     return this.llmService.getChatHistory({
-      userId,
+      userId: req.user.id.toString(),
       threadId: q.threadId,
       limit: q.limit,
       before: q.before,
@@ -54,10 +55,9 @@ export class LLMController {
   @Get('threads')
   @UseGuards(JwtAuthGuard)
   @FindThreadsApiDocs()
-  async findAllThreads(@Query() q: FindThreadsQueryDto, @Req() req: any) {
-    const userId: string = req.user?.id ?? req.user?.userId;
+  async findAllThreads(@Query() q: FindThreadsQueryDto, @Req() req: Request) {
     return this.llmService.findAllThreads({
-      userId,
+      userId: req.user?.id.toString(),
       offset: q.offset,
       limit: q.limit,
       q: q.q,
@@ -66,10 +66,9 @@ export class LLMController {
 
   @Post('threads')
   @UseGuards(JwtAuthGuard)
-  async createThread(@Body() dto: CreateThreadDto, @Req() req: any) {
-    const userId: string = req.user?.id ?? req.user?.userId;
+  async createThread(@Body() dto: CreateThreadDto, @Req() req: Request) {
     const t = await this.llmService.createThread({
-      userId,
+      userId: req.user?.id.toString(),
       title: dto.title,
       systemPrompt: dto.systemPrompt,
     });
@@ -79,10 +78,9 @@ export class LLMController {
   @Post('chat')
   @UseGuards(JwtAuthGuard)
   @ChatWithThreadApiDocs()
-  async chat(@Body() dto: ChatWithThreadDto, @Req() req: any) {
-    const userId: string = req.user?.id ?? req.user?.userId;
+  async chat(@Body() dto: ChatWithThreadDto, @Req() req: Request) {
     const { reply, threadId } = await this.llmService.chatWithThread({
-      userId,
+      userId: req.user.id,
       prompt: dto.prompt,
       threadId: dto.threadId,
       systemPrompt: dto.systemPrompt,
@@ -94,8 +92,8 @@ export class LLMController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(204)
   @DeleteThreadApiDocs()
-  async deleteThread(@Param('id') id: string, @Req() req: any) {
-    const userId: string = req.user?.id ?? req.user?.userId;
+  async deleteThread(@Param('id') id: string, @Req() req: Request) {
+    const userId: number = req.user?.id ?? req.user?.id;
     await this.llmService.deleteThread({ userId, threadId: id });
   }
 }

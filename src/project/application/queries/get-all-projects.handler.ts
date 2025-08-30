@@ -1,11 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetAllProjectsQuery } from './get-all-projects.query';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Project } from '../../infrastructure/entities/project.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
+
+import { SortOrderEnum } from '../../../common/enums';
 import { generateSearchConditions } from '../../../common/utils';
 import { UserSortByEnum } from '../../../user/enums';
-import { SortOrderEnum } from '../../../common/enums';
+import { Project } from '../../infrastructure/entities/project.entity';
+import { GetAllProjectsQuery } from './get-all-projects.query';
 
 @QueryHandler(GetAllProjectsQuery)
 export class GetAllProjectsHandler

@@ -14,8 +14,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from '../services';
+
 import { ActiveUserGuard, JwtAuthGuard, RolesGuard } from '../../auth/guards';
+import { Role } from '../../common/role.decorator';
 import { JwtPayload } from '../../common/types';
 import { GetJwtPayload } from '../../common/utils/decorators';
 import {
@@ -27,6 +28,7 @@ import {
   UpdatePasswordApiDocs,
   UpdateProfileApiDocs,
 } from '../docs';
+import { DeleteUserDocs } from '../docs/delete-user.decorator';
 import {
   ChangeEmailDto,
   CheckEmailDto,
@@ -35,10 +37,10 @@ import {
   UpdatePasswordDto,
   UpdatePhoneDto,
   UpdateUserDto,
+  UserCreateDto,
 } from '../dto';
 import { UsersRoleEnum } from '../enums';
-import { Role } from '../../common/role.decorator';
-import { DeleteUserDocs } from '../docs/delete-user.decorator';
+import { UserService } from '../services';
 
 @ApiBearerAuth('access_token')
 @ApiTags('user')
@@ -64,8 +66,8 @@ export class UserController {
   }
   @Post()
   @UseGuards(JwtAuthGuard)
-  public async create(@Body() createAdminDto: any) {
-    return this.userService.createUser(createAdminDto);
+  public async create(@Body() createUserDto: UserCreateDto) {
+    return this.userService.createUser(createUserDto);
   }
 
   @CheckEmailApiDocs()

@@ -5,6 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+
 import { RegisterDto } from '../dto/register.dto';
 import { RegisterResponseDto } from '../dto/responses/register-response.dto';
 

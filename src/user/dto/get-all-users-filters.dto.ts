@@ -1,12 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
-import { SortOrderEnum } from '../../common/enums';
+
 import { PaginationFilterDto } from '../../common/dto/pagination';
+import { SortOrderEnum } from '../../common/enums';
 import { UserSortByEnum } from '../enums';
-import { Type, Transform } from 'class-transformer';
 
 // Utility function for boolean transformation
-const toBoolean = (value: any): boolean => {
+const toBoolean = (value: string | boolean): boolean => {
   if (value === 'true' || value === true) {
     return true;
   }

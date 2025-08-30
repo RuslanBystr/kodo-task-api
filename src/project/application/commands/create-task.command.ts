@@ -3,6 +3,6 @@ export class CreateTaskCommand {
     public readonly title: string,
     public readonly description?: string,
     public readonly projectId?: string,
-    public readonly assignedUserId?: string,
+    public readonly assignedUserId?: number,
   ) {}
 }

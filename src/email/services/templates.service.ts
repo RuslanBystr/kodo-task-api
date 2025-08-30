@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Templates, templateName } from '../templates';
+
 import { ADDITIONAL_PROVIDERS } from '../../common/enums';
+import { templateName, Templates } from '../templates';
 
 @Injectable()
 export class TemplatesService {

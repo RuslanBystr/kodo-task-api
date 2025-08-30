@@ -1,12 +1,13 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Chat } from '../entities/chat.entity';
-import { Repository } from 'typeorm';
-import { Message } from '../entities/message.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { CryptoService } from '../../crypto/crypto.service';
 import { FileEntity } from '../../file/entities/file.entity';
 import { User } from '../../user/entities/user.entity';
-import { CryptoService } from '../../crypto/crypto.service';
 import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
+import { Chat } from '../entities/chat.entity';
+import { Message } from '../entities/message.entity';
 
 @Injectable()
 export class MessageService {
@@ -41,7 +42,6 @@ export class MessageService {
 
     if (file) {
       fileImage = await this.fileRepo.findOne({ where: { uuid: file } });
-      console.log('file: ', fileImage);
     }
 
     let replyMessage: Message | null = null;
@@ -182,7 +182,7 @@ export class MessageService {
     page = 1,
     limit = 20,
     chatId,
-  }: GetAllMessageFilterDto): Promise<any> {
+  }: GetAllMessageFilterDto) {
     const [messageItems, total] = await this.messageRepo
       .createQueryBuilder('message')
       .select([
@@ -263,7 +263,7 @@ export class MessageService {
     };
   }
 
-  async removeMessage(id: number): Promise<any> {
+  async removeMessage(id: number) {
     const message = await this.messageRepo.findOne({
       where: { id },
       relations: ['chat'],

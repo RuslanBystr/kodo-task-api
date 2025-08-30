@@ -1,14 +1,15 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
   CreateDateColumn,
-  ManyToMany,
+  Entity,
   JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Task } from './task.entity';
+
 import { User } from '../../../user/entities/user.entity';
+import { Task } from './task.entity';
 
 @Entity()
 export class Project {

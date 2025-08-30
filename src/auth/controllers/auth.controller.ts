@@ -9,30 +9,31 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { Response, Request } from 'express';
-import { AuthService } from '../services/auth.service';
+import { ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
+
 import { LoginDto } from '../../common/dto';
-import { UserService } from '../../user/services';
-import { GetJwtPayload } from '../../common/utils/decorators';
+import { CONFIG } from '../../common/enums';
 import { JwtPayload } from '../../common/types';
-import { GoogleAuthGuard, JwtAuthGuard, JwtRefreshGuard } from '../guards';
+import { GetJwtPayload } from '../../common/utils/decorators';
+import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
+import { UsersRoleEnum } from '../../user/enums';
+import { UserService } from '../../user/services';
 import {
   ForgotPasswordApiDocs,
   LoginApiDocs,
   RegisterApiDocs,
   ResetPasswordApiDocs,
 } from '../docs';
-import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
 import { ForgotPasswordEmailDto, RegisterDto, ResetPasswordDto } from '../dto';
-import { CONFIG } from '../../common/enums';
-import { UsersRoleEnum } from '../../user/enums';
+import { GoogleAuthGuard, JwtAuthGuard, JwtRefreshGuard } from '../guards';
+import { AuthService } from '../services/auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  private baseFrontendUrl: string;
+  private readonly baseFrontendUrl: string;
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,

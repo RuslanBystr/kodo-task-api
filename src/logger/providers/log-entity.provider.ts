@@ -1,6 +1,7 @@
 import { Provider } from '@nestjs/common';
-import { Log } from '../entities/log.entity';
+
 import { ENTITIES } from '../../common/enums';
+import { Log } from '../entities/log.entity';
 
 export const logEntityProvider: Provider = {
   provide: ENTITIES.LOG,

@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailDataRequired } from '@sendgrid/mail';
-import { TemplatesService } from './templates.service';
-import { SendgridType } from '../types/sendgrid.type';
-import { templates } from '../templates';
-import { CONFIG, ADDITIONAL_PROVIDERS } from '../../common/enums';
+
+import { ADDITIONAL_PROVIDERS, CONFIG } from '../../common/enums';
 import { LoggerService } from '../../logger/services/logger.service';
+import { templates } from '../templates';
+import { SendgridType } from '../types/sendgrid.type';
+import { TemplatesService } from './templates.service';
 
 @Injectable()
 export class MailService {

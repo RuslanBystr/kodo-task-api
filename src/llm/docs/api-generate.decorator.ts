@@ -1,9 +1,9 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiBody,
-  ApiOperation,
   ApiBadRequestResponse,
+  ApiBody,
   ApiOkResponse,
+  ApiOperation,
 } from '@nestjs/swagger';
 
 export function GenerateTextApiDocs() {

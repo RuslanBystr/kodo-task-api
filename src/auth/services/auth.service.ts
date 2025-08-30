@@ -5,21 +5,22 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { HASH_ROUNDS } from '../../common/constants';
+import { LoginDto } from '../../common/dto';
+import { CONFIG, ENTITIES, LIBS } from '../../common/enums';
+import { JwtPayload } from '../../common/types';
+import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
+import { User } from '../../user/entities/user.entity';
+import { UsersRoleEnum } from '../../user/enums';
+import { UserService, UserVerificationService } from '../../user/services';
+import { UserType } from '../../user/types';
 import { RefreshTokenCookieDto, RegisterDto, ResetPasswordDto } from '../dto';
 import { LoginResponseDto, RegisterResponseDto } from '../dto/responses';
-import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
-import { CONFIG, ENTITIES, LIBS } from '../../common/enums';
-import { UserType } from 'src/user/types';
-import { LoginDto } from '../../common/dto';
-import { JwtPayload } from '../../common/types';
-import { HASH_ROUNDS } from '../../common/constants';
-import { User } from '../../user/entities/user.entity';
-import { UserService, UserVerificationService } from '../../user/services';
-import { UsersRoleEnum } from '../../user/enums';
 
 @Injectable()
 export class AuthService {

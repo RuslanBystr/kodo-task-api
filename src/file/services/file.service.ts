@@ -1,12 +1,14 @@
+import * as path from 'node:path';
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import fs from 'fs';
-import * as path from 'node:path';
 import { Repository } from 'typeorm';
-import { FileS3Service } from './file-s3.service';
-import { FileEntity } from '../entities/file.entity';
-import { RemoveFileResponseDto } from '../dto/responses';
+
 import { UPLOAD_FILE_PATH } from '../../common/constants';
+import { RemoveFileResponseDto } from '../dto/responses';
+import { FileEntity } from '../entities/file.entity';
+import { FileS3Service } from './file-s3.service';
 
 @Injectable()
 export class FileService {
@@ -18,7 +20,6 @@ export class FileService {
 
   async saveFile(file: Express.Multer.File) {
     const filePath = path.join(UPLOAD_FILE_PATH, file.filename);
-    console.log(filePath);
 
     try {
       await this.fileS3.uploadFile(file.filename, filePath);

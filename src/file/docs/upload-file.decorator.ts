@@ -8,8 +8,9 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UploadFileDto } from '../dto/upload-file.dto';
+
 import { UploadFileResponseDto } from '../dto/responses/upload-file-response.dto';
+import { UploadFileDto } from '../dto/upload-file.dto';
 
 export function UploadFileApiDocs() {
   return applyDecorators(

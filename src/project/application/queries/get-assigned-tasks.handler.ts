@@ -1,13 +1,13 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsWhere, FindOptionsOrder } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 
-import { GetAssignedTasksQuery } from './get-assigned-tasks.query';
-import { Task } from '../../infrastructure/entities/task.entity';
-import { InternalServerErrorException } from '@nestjs/common';
-import { TaskSortByEnum } from '../../domain';
 import { SortOrderEnum } from '../../../common/enums';
 import { generateSearchConditions } from '../../../common/utils';
+import { TaskSortByEnum } from '../../domain';
+import { Task } from '../../infrastructure/entities/task.entity';
+import { GetAssignedTasksQuery } from './get-assigned-tasks.query';
 
 @QueryHandler(GetAssignedTasksQuery)
 export class GetAssignedTasksHandler
@@ -57,8 +57,8 @@ export class GetAssignedTasksHandler
 
     const where: FindOptionsWhere<Task> = {
       ...baseConditions,
-      ...(projectId ? { project: { id: projectId as any } } : {}),
-      assignedUser: { id: Number(q.userId) } as any,
+      ...(projectId ? { project: { id: projectId } } : {}),
+      assignedUser: { id: Number(q.userId) },
     };
 
     const orderBy: FindOptionsOrder<Task> = {

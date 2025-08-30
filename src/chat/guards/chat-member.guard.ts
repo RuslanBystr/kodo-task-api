@@ -1,9 +1,10 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Injectable,
 } from '@nestjs/common';
+
 import { ChatService } from '../services/chat.service';
 
 @Injectable()

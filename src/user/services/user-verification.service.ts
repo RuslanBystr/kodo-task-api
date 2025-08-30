@@ -1,10 +1,11 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { randomBytes, randomUUID } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
+import { randomBytes, randomUUID } from 'crypto';
 import { Repository } from 'typeorm';
-import { UserVerification } from '../entities/user-verification.entity';
+
 import { ENTITIES } from '../../common/enums';
+import { User } from '../entities/user.entity';
+import { UserVerification } from '../entities/user-verification.entity';
 import { UserVerificationType, UserVerifyCodeType } from '../types';
 
 @Injectable()
