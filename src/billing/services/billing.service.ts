@@ -6,12 +6,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThanOrEqual } from 'typeorm';
-import { Subscription } from '../entities/subscription.entity';
+import { LessThanOrEqual, Repository } from 'typeorm';
+
+import { CONFIG } from '../../common/enums';
 import { Plan } from '../entities/plan.entity';
+import { Subscription } from '../entities/subscription.entity';
 import { SubscriptionStatus } from '../enums/subscription-status.enum';
 import { LiqPayClient } from '../liqpay.client';
-import { CONFIG } from '../../common/enums';
 
 @Injectable()
 export class BillingService {
@@ -25,7 +26,7 @@ export class BillingService {
     private readonly configService: ConfigService,
   ) {}
 
-  async createCheckout(user_id: string, plan_id: string) {
+  async createCheckout(user_id: number, plan_id: string) {
     if (!user_id) throw new UnauthorizedException('Missing user_id');
     try {
       const plan = await this.planRepo.findOneBy({ id: plan_id });
@@ -34,7 +35,7 @@ export class BillingService {
       const order_id = `sub_${user_id}_${Date.now()}`;
 
       const sub = this.subsRepo.create({
-        user_id,
+        user_id: user_id.toString(),
         plan,
         status: SubscriptionStatus.PENDING,
         liqpay_order_id: order_id,
@@ -121,9 +122,9 @@ export class BillingService {
     return { ok: true };
   }
 
-  async getStatus(user_id: string) {
+  async getStatus(user_id: number) {
     const sub = await this.subsRepo.findOne({
-      where: { user_id },
+      where: { user_id: user_id.toString() },
       order: { updated_at: 'DESC' },
     });
     return sub ?? null;
@@ -149,10 +150,6 @@ export class BillingService {
         this.logger.warn(`No card_token for sub=${sub.id}, cannot renew`);
         continue;
       }
-      // 1) Сформувати LiqPay "request" (action: pay, recurringbytoken, card_token, order_id ...).
-      // 2) За успіху — продовжити active_until на plan.period_days.
-      // 3) За фейлу — проставити FAILED та сповістити користувача.
-      // Тут залишаю як TODO, бо залежить від вашого флоу/нотифікацій.
     }
   }
 

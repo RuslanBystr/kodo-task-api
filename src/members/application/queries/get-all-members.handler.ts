@@ -1,11 +1,12 @@
+import { InternalServerErrorException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
-import { GetAllMembersQuery, UserSortColumnMap } from './get-all-members.query';
+
+import { SortOrderEnum } from '../../../common/enums';
 import { User } from '../../../user/entities/user.entity';
 import { UserSortByEnum } from '../../../user/enums';
-import { SortOrderEnum } from '../../../common/enums';
-import { InternalServerErrorException } from '@nestjs/common';
+import { GetAllMembersQuery, UserSortColumnMap } from './get-all-members.query';
 
 @QueryHandler(GetAllMembersQuery)
 export class GetAllMembersHandler implements IQueryHandler<GetAllMembersQuery> {

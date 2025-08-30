@@ -5,6 +5,7 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
+
 import { CheckEmailDto } from '../dto/check-email.dto';
 
 export function CheckEmailApiDocs() {

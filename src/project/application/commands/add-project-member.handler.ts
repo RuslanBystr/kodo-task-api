@@ -1,10 +1,11 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddProjectMemberCommand } from './add-project-member.command';
-import { Project } from '../../infrastructure/entities/project.entity';
+
 import { User } from '../../../user/entities/user.entity';
+import { Project } from '../../infrastructure/entities/project.entity';
+import { AddProjectMemberCommand } from './add-project-member.command';
 
 @CommandHandler(AddProjectMemberCommand)
 export class AddProjectMemberHandler

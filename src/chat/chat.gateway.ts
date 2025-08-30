@@ -1,16 +1,17 @@
 import {
-  WebSocketGateway,
-  SubscribeMessage,
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
+  SubscribeMessage,
+  WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
-import { MessageService } from './services/message.service';
+import { Server, Socket } from 'socket.io';
+
 import { CreateMessageDto } from './dto';
 import { ChatService } from './services/chat.service';
+import { MessageService } from './services/message.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -28,9 +29,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private chatUserMap = new Map<string, Set<string>>();
   private userChatMap = new Map<string, Set<string>>();
 
-  async handleConnection() {
-    console.log('Socket connected');
-  }
+  async handleConnection() {}
 
   @SubscribeMessage('userConnected')
   handleUserConnection(
@@ -46,7 +45,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.socketUserMap.set(client.id, userId);
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-    console.log(`User ${userId} connected with socket ${client.id}`);
   }
 
   handleDisconnect(client: Socket): void {
@@ -66,7 +64,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-    console.log(`User ${userId} disconnected`);
   }
 
   @SubscribeMessage('sendMessage')
@@ -92,7 +89,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('reaction')
-  async addReactionOnMessage(@MessageBody() message: any): Promise<void> {
+  async addReactionOnMessage(
+    @MessageBody() message: { id: number; chatId: string; reaction: string },
+  ): Promise<void> {
     const response = await this.messageService.addReactionOnMessage(
       message.id,
       message.reaction,
@@ -101,12 +100,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('typing')
-  async typingMessage(@MessageBody() message: any): Promise<void> {
+  async typingMessage(
+    @MessageBody() message: { userId: number; chatId: string },
+  ): Promise<void> {
     this.server.to(`chat-${message.chatId}`).emit('typing', message.userId);
   }
 
   @SubscribeMessage('removeMessage')
-  async removeMessage(@MessageBody() message: any): Promise<void> {
+  async removeMessage(
+    @MessageBody() message: { id: number; chatId: string },
+  ): Promise<void> {
     const deletedMessage = await this.messageService.removeMessage(message.id);
     this.server
       .to(`chat-${message.chatId}`)
@@ -153,13 +156,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     chatSet.add(chatId);
 
     client.join(`chat-${chatId}`);
-
-    console.log(`User ${userId} joined chat ${chatId}`);
   }
 
   @SubscribeMessage('webrtc_signal')
   async handleWebrtcSignal(
-    @MessageBody() data: { signal: any; toUserId: string; chatId: string },
+    @MessageBody() data: { signal: string; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
     const fromUserId = client.data.userId;
@@ -177,8 +178,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           toSocket.join(`chat-${data.chatId}`);
           toChats = new Set<string>([data.chatId]);
           this.userChatMap.set(data.toUserId, toChats);
-
-          console.log(`Auto-joined ${data.toUserId} to chat ${data.chatId}`);
         } else {
           console.warn(`Socket not found for user ${data.toUserId}`);
           return;
@@ -199,7 +198,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } else {
-      console.log('Users are not in the same chat');
+      throw new Error('User is not in the chat');
     }
   }
 }

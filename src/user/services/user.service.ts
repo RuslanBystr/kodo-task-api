@@ -6,24 +6,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LIBS, SortOrderEnum } from '../../common/enums';
-import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
-import { HASH_ROUNDS } from '../../common/constants';
-import { User } from '../entities/user.entity';
 import { FindOptionsWhere, Not, Repository } from 'typeorm';
-import { UserVerificationService } from './user-verification.service';
+
+import { HASH_ROUNDS } from '../../common/constants';
+import { LIBS, SortOrderEnum } from '../../common/enums';
+import { generateSearchConditions } from '../../common/utils';
+import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
 import { MailService } from '../../email/services/mail.service';
 import { FileEntity } from '../../file/entities/file.entity';
 import { FileService } from '../../file/services/file.service';
-import { UserSortByEnum } from '../enums';
-import { generateSearchConditions } from '../../common/utils';
-import {
-  ChangeEmailResponseDto,
-  ChangePhoneResponseDto,
-  GetUserResponseDto,
-  UpdateUserResponseDto,
-  UserGetAllResponseDto,
-} from '../dto/responses';
 import {
   GetAllUsersFilterDto,
   UpdateEmailDto,
@@ -32,6 +23,16 @@ import {
   UpdateUserDto,
   UserCreateDto,
 } from '../dto';
+import {
+  ChangeEmailResponseDto,
+  ChangePhoneResponseDto,
+  GetUserResponseDto,
+  UpdateUserResponseDto,
+  UserGetAllResponseDto,
+} from '../dto/responses';
+import { User } from '../entities/user.entity';
+import { UserSortByEnum } from '../enums';
+import { UserVerificationService } from './user-verification.service';
 
 @Injectable()
 export class UserService {
@@ -149,7 +150,7 @@ export class UserService {
     });
   }
 
-  async sendVerifyCode(id: number, email = null) {
+  async sendVerifyCode(id: number, email: string = null) {
     const user: User = await this.userRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException('User not found');

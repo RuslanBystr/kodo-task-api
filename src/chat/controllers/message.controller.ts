@@ -1,20 +1,21 @@
 import {
-  Controller,
-  Post,
+  BadRequestException,
   Body,
+  Controller,
+  Delete,
   Get,
+  Param,
+  Post,
+  Put,
   Query,
   UseGuards,
-  BadRequestException,
-  Delete,
-  Param,
-  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { MessageService } from '../services/message.service';
-import { ChatMemberGuard } from '../guards';
-import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
+
 import { JwtAuthGuard } from '../../auth/guards';
+import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
+import { ChatMemberGuard } from '../guards';
+import { MessageService } from '../services/message.service';
 
 @ApiTags('message')
 @Controller('messages')

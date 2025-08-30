@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -7,11 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
-import { UsersRoleEnum } from '../enums';
-import { Task } from '../../project/infrastructure/entities/task.entity';
+
 import { Message } from '../../chat/entities/message.entity';
 import { UserChat } from '../../chat/entities/user.chat.entity';
+import { Task } from '../../project/infrastructure/entities/task.entity';
+import { UsersRoleEnum } from '../enums';
 
 @Entity()
 export class User {

@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { UserService, UserVerificationService } from './services';
-import { UserController } from './controllers/user.controller';
+
+import { ENTITIES } from '../common/enums';
 import { EmailModule } from '../email/email.module';
-import { UserVerification } from './entities/user-verification.entity';
 import { FileEntity } from '../file/entities/file.entity';
 import { FileModule } from '../file/file.module';
-import { ENTITIES } from '../common/enums';
+import { UserController } from './controllers/user.controller';
+import { User } from './entities/user.entity';
+import { UserVerification } from './entities/user-verification.entity';
+import { UserService, UserVerificationService } from './services';
 
 @Module({
   imports: [

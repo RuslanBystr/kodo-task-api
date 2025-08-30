@@ -1,10 +1,11 @@
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { CreateProjectCommand } from './create-project.command';
-import { Project } from '../../infrastructure/entities/project.entity';
+
 import { User } from '../../../user/entities/user.entity';
+import { Project } from '../../infrastructure/entities/project.entity';
+import { CreateProjectCommand } from './create-project.command';
 
 @CommandHandler(CreateProjectCommand)
 export class CreateProjectHandler

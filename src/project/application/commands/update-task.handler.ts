@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateTaskCommand } from './update-task.command';
+
 import { Task } from '../../infrastructure/entities/task.entity';
+import { UpdateTaskCommand } from './update-task.command';
 
 @CommandHandler(UpdateTaskCommand)
 export class UpdateTaskHandler implements ICommandHandler<UpdateTaskCommand> {

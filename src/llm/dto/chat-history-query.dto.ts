@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsInt,
   IsISO8601,
@@ -6,7 +7,6 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class ChatHistoryQueryDto {
   @IsString()

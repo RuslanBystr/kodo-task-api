@@ -7,8 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Plan } from './plan.entity';
+
 import { SubscriptionStatus } from '../enums/subscription-status.enum';
+import { Plan } from './plan.entity';
 
 @Entity('subscriptions')
 export class Subscription {

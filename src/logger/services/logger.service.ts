@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+import { ENTITIES } from '../../common/enums/entities';
 import { Log } from '../entities/log.entity';
 import { LogType } from '../enums/type.enum';
 import { logParams } from '../types/log-params.type';
-import { ENTITIES } from '../../common/enums/entities';
 
 @Injectable()
 export class LoggerService {

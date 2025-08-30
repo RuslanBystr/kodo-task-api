@@ -1,18 +1,28 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Query,
+  Get,
+  Param,
+  Post,
   Put,
-  UseGuards,
+  Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
-import { ProjectMemberGuard } from '../guards';
+
+import { JwtAuthGuard } from '../../../auth/guards';
+import { AuthRequest } from '../../../common/types';
+import { AddProjectMemberCommand } from '../../application/commands/add-project-member.command';
+import { CreateProjectCommand } from '../../application/commands/create-project.command';
+import { DeleteProjectCommand } from '../../application/commands/delete-project.command';
+import { RemoveProjectMemberCommand } from '../../application/commands/remove-project-member.command';
+import { UpdateProjectCommand } from '../../application/commands/update-project.command';
+import { GetAllProjectsQuery } from '../../application/queries/get-all-projects.query';
+import { GetProjectByIdQuery } from '../../application/queries/get-project-by-id.query';
+import { GetProjectMembersQuery } from '../../application/queries/get-project-members.query';
 import {
   AddProjectMemberDto,
   CreateProjectDto,
@@ -20,16 +30,7 @@ import {
   RemoveProjectMemberDto,
   UpdateProjectDto,
 } from '../dto';
-import { GetAllProjectsQuery } from '../../application/queries/get-all-projects.query';
-import { CreateProjectCommand } from '../../application/commands/create-project.command';
-import { GetProjectByIdQuery } from '../../application/queries/get-project-by-id.query';
-import { UpdateProjectCommand } from '../../application/commands/update-project.command';
-import { DeleteProjectCommand } from '../../application/commands/delete-project.command';
-import { AddProjectMemberCommand } from '../../application/commands/add-project-member.command';
-import { GetProjectMembersQuery } from '../../application/queries/get-project-members.query';
-import { RemoveProjectMemberCommand } from '../../application/commands/remove-project-member.command';
-import { JwtAuthGuard } from '../../../auth/guards';
-import { AuthRequest } from '../../../common/types';
+import { ProjectMemberGuard } from '../guards';
 
 @ApiTags('project')
 @Controller('project')

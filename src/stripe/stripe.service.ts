@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
+
 import { CONFIG } from '../common/enums/config';
 
 @Injectable()

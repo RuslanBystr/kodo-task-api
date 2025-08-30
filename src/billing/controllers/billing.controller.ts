@@ -8,13 +8,15 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { BillingService } from '../services/billing.service';
-import { CreateCheckoutDto } from '../dto/create-checkout.dto';
-import { BillingGuard } from '../guards/billing.guard';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'express';
 import { Repository } from 'typeorm';
-import { Plan } from '../entities/plan.entity';
+
 import { JwtAuthGuard } from '../../auth/guards';
+import { CreateCheckoutDto } from '../dto/create-checkout.dto';
+import { Plan } from '../entities/plan.entity';
+import { BillingGuard } from '../guards/billing.guard';
+import { BillingService } from '../services/billing.service';
 
 @Controller('billing')
 export class BillingController {
@@ -29,8 +31,8 @@ export class BillingController {
 
   @Post('checkout')
   @UseGuards(JwtAuthGuard)
-  async createCheckout(@Req() req: any, @Body() dto: CreateCheckoutDto) {
-    const user_id: string = req.user.id;
+  async createCheckout(@Req() req: Request, @Body() dto: CreateCheckoutDto) {
+    const user_id: number = req.user.id;
 
     if (!user_id) throw new UnauthorizedException('No user in request');
 
@@ -46,15 +48,14 @@ export class BillingController {
 
   @Post('cancel')
   @UseGuards(JwtAuthGuard)
-  async cancel(@Req() req: any) {
-    const user_id: string = req.user.userId;
-    return this.billing.cancel(user_id);
+  async cancel(@Req() req: Request) {
+    return this.billing.cancel(req.user.id.toString());
   }
 
   @Get('status')
   @UseGuards(JwtAuthGuard)
-  async status(@Req() req: any) {
-    const user_id: string = req.user.userId;
+  async status(@Req() req: Request) {
+    const user_id: number = req.user.id;
     return this.billing.getStatus(user_id);
   }
 

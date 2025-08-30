@@ -9,12 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { ChatService } from '../services/chat.service';
-import { GetAllChatsFilterDto } from '../dto';
+
 import { JwtAuthGuard } from '../../auth/guards';
-import { ChatMemberGuard } from '../guards';
-import { CreateGroupDto } from '../dto/create-group.dto';
+import { GetAllChatsFilterDto } from '../dto';
 import { AddGroupMemberDto } from '../dto/add-group-member.dto';
+import { CreateGroupDto } from '../dto/create-group.dto';
+import { ChatMemberGuard } from '../guards';
+import { ChatService } from '../services/chat.service';
 
 @ApiTags('chat')
 @Controller('chats')

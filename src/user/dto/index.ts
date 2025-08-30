@@ -6,4 +6,3 @@ export * from './update-password.dto';
 export * from './update-phone.dto';
 export * from './update-user.dto';
 export * from './user-create-dto';
-export * from './user-create-dto';

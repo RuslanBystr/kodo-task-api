@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
+
+import { ADDITIONAL_PROVIDERS } from '../common/enums';
+import { LoggerModule } from '../logger/logger.module';
+import { LoggerService } from '../logger/services/logger.service';
 import { MailController } from './controllers/mail.controller';
-import { MailService } from './services/mail.service';
-import { TemplatesService } from './services/templates.service';
 import { MailingProvider } from './providers/mailing.provider';
 import { templatesProvider } from './providers/templates.provider';
-import { LoggerModule } from '../logger/logger.module';
-import { ADDITIONAL_PROVIDERS } from 'src/common/enums/additional-providers';
-import { LoggerService } from 'src/logger/services/logger.service';
+import { MailService } from './services/mail.service';
+import { TemplatesService } from './services/templates.service';
 
 @Module({
   imports: [LoggerModule],

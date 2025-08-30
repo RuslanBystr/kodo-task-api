@@ -9,8 +9,9 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UpdateEmailDto } from '../dto/update-email.dto';
+
 import { ChangeEmailResponseDto } from '../dto/responses/change-email-response.dto';
+import { UpdateEmailDto } from '../dto/update-email.dto';
 
 export function ChangeEmailApiDocs() {
   return applyDecorators(

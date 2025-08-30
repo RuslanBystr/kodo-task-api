@@ -1,4 +1,3 @@
-export * from './update-password.decorator';
 export * from './change-data-verify-code.decorator';
 export * from './change-email.decorator';
 export * from './change-phone.decorator';
@@ -6,4 +5,5 @@ export * from './check-email.api.docs';
 export * from './get-profile.decorator';
 export * from './get-refresh.decorator';
 export * from './logout.decorator';
+export * from './update-password.decorator';
 export * from './update-profile.decorator';

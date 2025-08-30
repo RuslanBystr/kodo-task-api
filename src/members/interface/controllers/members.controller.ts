@@ -1,9 +1,10 @@
 import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Request } from 'express';
+
+import { JwtAuthGuard } from '../../../auth/guards';
 import { GetAllUsersFilterDto } from '../../../user/dto';
 import { GetAllMembersQuery } from '../../application/queries/get-all-members.query';
-import { JwtAuthGuard } from '../../../auth/guards';
 
 @Controller('members')
 export class MembersController {

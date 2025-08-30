@@ -1,9 +1,10 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GetProjectMembersQuery } from './get-project-members.query';
+
 import { Project } from '../../infrastructure/entities/project.entity';
+import { GetProjectMembersQuery } from './get-project-members.query';
 
 @QueryHandler(GetProjectMembersQuery)
 export class GetProjectMembersHandler

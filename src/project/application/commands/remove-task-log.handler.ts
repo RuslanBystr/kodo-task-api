@@ -1,9 +1,10 @@
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { RemoveTaskLogCommand } from './remove-task-log.command';
-import { TaskLog } from '../../infrastructure/entities/task-log.entity';
+
 import { Task } from '../../infrastructure/entities/task.entity';
+import { TaskLog } from '../../infrastructure/entities/task-log.entity';
+import { RemoveTaskLogCommand } from './remove-task-log.command';
 
 @CommandHandler(RemoveTaskLogCommand)
 export class RemoveTaskLogHandler

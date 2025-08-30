@@ -1,17 +1,19 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Chat } from '../entities/chat.entity';
-import { User } from '../../user/entities/user.entity';
-import { UserChat } from '../entities/user.chat.entity';
 import { DataSource, In, Repository } from 'typeorm';
-import { GetAllChatsFilterDto } from '../dto';
-import { Message } from '../entities/message.entity';
+
 import { CryptoService } from '../../crypto/crypto.service';
 import { FileEntity } from '../../file/entities/file.entity';
+import { User } from '../../user/entities/user.entity';
+import { GetAllChatsFilterDto } from '../dto';
+import { Chat } from '../entities/chat.entity';
+import { Message } from '../entities/message.entity';
+import { UserChat } from '../entities/user.chat.entity';
 import { ChatType } from '../enums/chat-type.enum';
 
 @Injectable()
@@ -26,11 +28,10 @@ export class ChatService {
 
   async getChatData(chatId: number): Promise<Chat> {
     try {
-      const chat = await this.chatRepo.findOne({
+      return await this.chatRepo.findOne({
         where: { id: chatId },
         relations: ['userChats'],
       });
-      return chat;
     } catch (error) {
       console.error(error);
     }
@@ -75,11 +76,7 @@ export class ChatService {
     );
   }
 
-  async getUserChats({
-    page = 1,
-    limit = 100,
-    userId,
-  }: GetAllChatsFilterDto): Promise<any> {
+  async getUserChats({ page = 1, limit = 100, userId }: GetAllChatsFilterDto) {
     const [chatItems, total] = await this.chatRepo
       .createQueryBuilder('chat')
       .where('chat.type = :type', { type: ChatType.PRIVATE })
@@ -123,7 +120,7 @@ export class ChatService {
     };
   }
 
-  async getUserGroupChats({ page = 1, limit = 100, userId }): Promise<any> {
+  async getUserGroupChats({ page = 1, limit = 100, userId }) {
     try {
       const [chatItems, total] = await this.chatRepo
         .createQueryBuilder('chat')
@@ -162,7 +159,7 @@ export class ChatService {
         },
       };
     } catch (err) {
-      throw err;
+      throw new InternalServerErrorException('Failed to get user group chats');
     }
   }
 
@@ -223,7 +220,7 @@ export class ChatService {
 
       return chat;
     } catch (err) {
-      throw err;
+      throw new InternalServerErrorException('Failed to create group chat');
     }
   }
   async addChatMembers(

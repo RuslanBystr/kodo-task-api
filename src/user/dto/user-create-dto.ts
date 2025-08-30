@@ -1,14 +1,14 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  Length,
-  IsBoolean,
-  IsNotEmpty,
-  MinLength,
-  MaxLength,
   IsStrongPassword,
+  Length,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class UserCreateDto {

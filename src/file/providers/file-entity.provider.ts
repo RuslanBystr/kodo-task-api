@@ -1,6 +1,7 @@
 import { Provider } from '@nestjs/common';
-import { FileEntity } from '../entities/file.entity';
+
 import { ENTITIES } from '../../common/enums';
+import { FileEntity } from '../entities/file.entity';
 
 export const fileEntityProvider: Provider = {
   provide: ENTITIES.FILE_ENTITY,

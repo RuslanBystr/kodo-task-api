@@ -13,16 +13,17 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
-import { randomUUID } from 'crypto';
 import { isUUID } from 'class-validator';
+import { randomUUID } from 'crypto';
+import { Response } from 'express';
 import { diskStorage } from 'multer';
-import { FileService } from '../services/file.service';
-import { DeleteFileApiDocs, UploadFileApiDocs } from '../docs';
-import { MAX_FILE_SIZE, UPLOAD_FILE_PATH } from '../../common/constants';
-import { GetJwtPayload } from '../../common/utils/decorators';
-import { JwtPayload } from '../../common/types';
+
 import { JwtAuthGuard } from '../../auth/guards';
+import { MAX_FILE_SIZE, UPLOAD_FILE_PATH } from '../../common/constants';
+import { JwtPayload } from '../../common/types';
+import { GetJwtPayload } from '../../common/utils/decorators';
+import { DeleteFileApiDocs, UploadFileApiDocs } from '../docs';
+import { FileService } from '../services/file.service';
 
 @ApiTags('file')
 @Controller('file')

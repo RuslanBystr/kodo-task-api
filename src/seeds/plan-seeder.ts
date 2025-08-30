@@ -1,5 +1,6 @@
-import { Seeder } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
+import { Seeder } from 'typeorm-extension';
+
 import { Plan } from '../billing/entities/plan.entity';
 
 export class PlanSeeder implements Seeder {

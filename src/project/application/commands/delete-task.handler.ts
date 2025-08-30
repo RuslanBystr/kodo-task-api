@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DeleteTaskCommand } from './delete-task.command';
+
 import { Task } from '../../infrastructure/entities/task.entity';
+import { DeleteTaskCommand } from './delete-task.command';
 
 @CommandHandler(DeleteTaskCommand)
 export class DeleteTaskHandler implements ICommandHandler<DeleteTaskCommand> {

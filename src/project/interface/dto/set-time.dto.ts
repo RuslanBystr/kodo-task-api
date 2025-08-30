@@ -1,5 +1,5 @@
-import { IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsNumber } from 'class-validator';
 
 export class SetTimeDto {
   @Type(() => Number)

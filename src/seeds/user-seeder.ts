@@ -1,10 +1,11 @@
-import * as process from 'process';
 import * as bcrypt from 'bcrypt';
-import { Seeder } from 'typeorm-extension';
+import * as process from 'process';
 import { DataSource } from 'typeorm';
+import { Seeder } from 'typeorm-extension';
+
 import { CONFIG } from '../common/enums';
-import { UsersRoleEnum } from '../user/enums';
 import { User } from '../user/entities/user.entity';
+import { UsersRoleEnum } from '../user/enums';
 
 export class UserSeeder implements Seeder {
   private SAULT = 10;

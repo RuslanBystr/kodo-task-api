@@ -4,6 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import { LogType } from '../enums/type.enum';
 
 @Entity()

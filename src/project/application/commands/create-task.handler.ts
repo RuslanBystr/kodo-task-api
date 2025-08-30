@@ -2,10 +2,10 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateTaskCommand } from './create-task.command';
-import { Task } from '../../infrastructure/entities/task.entity';
-import { Project } from '../../infrastructure/entities/project.entity';
 import { User } from '../../../user/entities/user.entity';
+import { Project } from '../../infrastructure/entities/project.entity';
+import { Task } from '../../infrastructure/entities/task.entity';
+import { CreateTaskCommand } from './create-task.command';
 
 @CommandHandler(CreateTaskCommand)
 export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
@@ -20,10 +20,10 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
     const [user, project] = await Promise.all([
       cmd.assignedUserId
         ? this.userRepo.findOne({
-            where: { id: cmd.assignedUserId as any },
+            where: { id: cmd.assignedUserId },
           })
         : Promise.resolve(null),
-      this.projectRepo.findOne({ where: { id: cmd.projectId as any } }),
+      this.projectRepo.findOne({ where: { id: cmd.projectId } }),
     ]);
 
     if (!project) throw new Error('Project not found');

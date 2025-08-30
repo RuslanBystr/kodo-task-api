@@ -7,6 +7,7 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { GetUserResponseDto } from '../dto/responses/get-user-response.dto';
 
 export function GetProfileApiDocs() {

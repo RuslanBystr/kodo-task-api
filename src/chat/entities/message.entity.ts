@@ -1,17 +1,18 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
-  OneToOne,
+  Entity,
   JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+
+import { FileEntity } from '../../file/entities/file.entity';
 import { User } from '../../user/entities/user.entity';
 import { Chat } from './chat.entity';
-import { FileEntity } from '../../file/entities/file.entity';
 
 @Entity('message')
 export class Message {

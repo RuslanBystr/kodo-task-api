@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThan } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
+
 import { Subscription } from '../entities/subscription.entity';
 import { SubscriptionStatus } from '../enums/subscription-status.enum';
 
@@ -12,8 +13,8 @@ export class BillingGuard implements CanActivate {
   ) {}
 
   async canActivate(ctx: ExecutionContext) {
-    const req = ctx.switchToHttp().getRequest<any>();
-    const user_id: string = req.user?.userId;
+    const req = ctx.switchToHttp().getRequest();
+    const user_id: string = req.user?.id;
     if (!user_id) return false;
 
     const now = new Date();

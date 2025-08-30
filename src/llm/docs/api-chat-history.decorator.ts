@@ -1,10 +1,10 @@
 import { applyDecorators } from '@nestjs/common';
 import {
-  ApiOperation,
-  ApiOkResponse,
   ApiBadRequestResponse,
-  ApiUnauthorizedResponse,
+  ApiOkResponse,
+  ApiOperation,
   ApiQuery,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 export function ChatHistoryApiDocs() {

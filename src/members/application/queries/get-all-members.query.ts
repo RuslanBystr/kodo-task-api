@@ -20,4 +20,3 @@ export const UserSortColumnMap: Record<UserSortByEnum, string> = {
   [UserSortByEnum.LAST_NAME]: 'user.lastName',
   [UserSortByEnum.EMAIL]: 'user.email',
 };
-

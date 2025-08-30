@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { DeleteProjectCommand } from './delete-project.command';
+
 import { Project } from '../../infrastructure/entities/project.entity';
+import { DeleteProjectCommand } from './delete-project.command';
 
 @CommandHandler(DeleteProjectCommand)
 export class DeleteProjectHandler

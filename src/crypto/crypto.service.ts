@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { CONFIG } from '../common/enums';
-import { ConfigService } from '@nestjs/config';
 import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { CONFIG } from '../common/enums';
 
 @Injectable()
 export class CryptoService {

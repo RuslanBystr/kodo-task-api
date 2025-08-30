@@ -4,10 +4,11 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { AuthRequest } from '../../common/types';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../user/entities/user.entity';
 import { Repository } from 'typeorm';
+
+import { AuthRequest } from '../../common/types';
+import { User } from '../../user/entities/user.entity';
 
 @Injectable()
 export class ActiveUserGuard implements CanActivate {

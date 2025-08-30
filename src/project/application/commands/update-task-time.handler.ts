@@ -1,9 +1,10 @@
+import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { UpdateTaskTimeCommand } from './update-task-time.command';
+
 import { Task } from '../../infrastructure/entities/task.entity';
 import { TaskLog } from '../../infrastructure/entities/task-log.entity';
+import { UpdateTaskTimeCommand } from './update-task-time.command';
 
 @CommandHandler(UpdateTaskTimeCommand)
 export class UpdateTaskTimeHandler
@@ -17,7 +18,7 @@ export class UpdateTaskTimeHandler
       const logRepo = manager.getRepository(TaskLog);
 
       const task = await taskRepo.findOne({
-        where: { id: c.taskId, assignedUser: { id: c.userId as any } },
+        where: { id: c.taskId, assignedUser: { id: c.userId } },
         relations: ['assignedUser'],
       });
       if (!task)

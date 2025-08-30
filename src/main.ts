@@ -1,9 +1,10 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { join } from 'path';
-import { appendFileSync } from 'fs';
 import * as cookieParser from 'cookie-parser';
+import { appendFileSync } from 'fs';
+import { join } from 'path';
+
 import { AppModule } from './app.module';
 import { setupSwagger } from './swagger.config';
 
@@ -32,7 +33,7 @@ async function bootstrap() {
           process.env.API_PORT,
       ),
     )
-    .catch((err) => console.log(err.message));
+    .catch((err) => console.error(err.message));
 }
 bootstrap();
 

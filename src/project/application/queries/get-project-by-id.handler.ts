@@ -1,8 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GetProjectByIdQuery } from './get-project-by-id.query';
+
 import { Project } from '../../infrastructure/entities/project.entity';
+import { GetProjectByIdQuery } from './get-project-by-id.query';
 
 @QueryHandler(GetProjectByIdQuery)
 export class GetProjectByIdHandler
