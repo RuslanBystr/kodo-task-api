@@ -36,6 +36,9 @@ import { Threads } from './src/llm/entities/threads.entity';
 import { ThreadMessages } from './src/llm/entities/thread-messages.entity';
 import { Threads1755943711841 } from './migrations/1755943711841-threads';
 import { ThreadMessageRole1755945896932 } from './migrations/1755945896932-thread-message-role';
+import { Plan } from './src/billing/entities/plan.entity';
+import { Subscription } from './src/billing/entities/subscription.entity';
+import { BillingEntities1756064617972 } from './migrations/1756064617972-billing-entities';
 
 config();
 const configService = new ConfigService();
@@ -60,6 +63,8 @@ const options: DataSourceOptions & SeederOptions = {
     TaskLog,
     Threads,
     ThreadMessages,
+    Plan,
+    Subscription,
   ],
   migrations: [
     CreateAndVerifyUser1740301060631,
@@ -82,6 +87,7 @@ const options: DataSourceOptions & SeederOptions = {
     ProjectMembers1748633190456,
     Threads1755943711841,
     ThreadMessageRole1755945896932,
+    BillingEntities1756064617972,
   ],
   seeds: [MainSeeder],
 };

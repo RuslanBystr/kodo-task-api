@@ -5,9 +5,9 @@ import { UserService, UserVerificationService } from './services';
 import { UserController } from './controllers/user.controller';
 import { EmailModule } from '../email/email.module';
 import { UserVerification } from './entities/user-verification.entity';
-import { userVerificationEntityProvider } from './providers/user-verification-entity.provider';
 import { FileEntity } from '../file/entities/file.entity';
 import { FileModule } from '../file/file.module';
+import { ENTITIES } from '../common/enums';
 
 @Module({
   imports: [
@@ -18,13 +18,12 @@ import { FileModule } from '../file/file.module';
   providers: [
     UserService,
     UserVerificationService,
-    userVerificationEntityProvider,
+    {
+      provide: ENTITIES.USER_VERIFICATION,
+      useValue: UserVerification,
+    },
   ],
-  exports: [
-    UserService,
-    userVerificationEntityProvider,
-    UserVerificationService,
-  ],
+  exports: [UserService, ENTITIES.USER_VERIFICATION, UserVerificationService],
   controllers: [UserController],
 })
 export class UserModule {}

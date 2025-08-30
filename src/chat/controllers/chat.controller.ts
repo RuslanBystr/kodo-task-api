@@ -42,7 +42,6 @@ export class ChatController {
   @Post('group')
   @UseGuards(JwtAuthGuard)
   createGroupChat(@Body() dto: CreateGroupDto) {
-    console.log(dto);
     return this.chatService.createGroupChat(dto.userIds, dto.groupName);
   }
 
