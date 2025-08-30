@@ -18,6 +18,7 @@ import { CONFIG } from '../common/enums';
         entities: [],
         //subscribers: [],
         autoLoadEntities: true,
+        migrationsRun: true,
       }),
     }),
   ],

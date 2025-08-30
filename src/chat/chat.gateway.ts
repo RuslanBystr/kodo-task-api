@@ -9,8 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { MessageService } from './services/message.service';
-
-import { CreateMessageDto } from './dto/create-message.dto';
+import { CreateMessageDto } from './dto';
 import { ChatService } from './services/chat.service';
 
 @WebSocketGateway({ cors: { origin: '*' } })
@@ -30,7 +29,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private userChatMap = new Map<string, Set<string>>();
 
   async handleConnection() {
-    console.log('Connected');
+    console.log('Socket connected');
   }
 
   @SubscribeMessage('userConnected')

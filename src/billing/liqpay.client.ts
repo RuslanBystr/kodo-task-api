@@ -28,8 +28,7 @@ export class LiqPayClient {
 
   async createCheckout(payload: Record<string, unknown>) {
     const body = this.buildCheckoutPayload(payload);
-    // Зазвичай віддаємо data/signature на фронт, щоб вставити у форму LiqPay
-    // але можна й сервером викликати checkout (поверне HTML)
+
     const res = await axios.post(this.apiUrl, body);
     return res.data;
   }

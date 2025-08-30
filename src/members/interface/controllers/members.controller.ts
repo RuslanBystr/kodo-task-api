@@ -7,9 +7,7 @@ import { JwtAuthGuard } from '../../../auth/guards';
 
 @Controller('members')
 export class MembersController {
-  constructor(
-    private readonly query: QueryBus,
-  ) {}
+  constructor(private readonly query: QueryBus) {}
 
   @Get()
   @UseGuards(JwtAuthGuard)
