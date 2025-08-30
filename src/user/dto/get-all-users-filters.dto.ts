@@ -1,8 +1,8 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
-import { SortOrderEnum } from '../../common/enums/sort-order.enum';
-import { PaginationFilterDto } from '../../common/dto/pagination/pagination-filters.dto';
-import { UserSortByEnum } from '../enums/user-sort.enum';
+import { SortOrderEnum } from '../../common/enums';
+import { PaginationFilterDto } from '../../common/dto/pagination';
+import { UserSortByEnum } from '../enums';
 import { Type, Transform } from 'class-transformer';
 
 // Utility function for boolean transformation

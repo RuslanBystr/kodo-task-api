@@ -8,11 +8,7 @@ import {
 } from 'typeorm';
 import { Message } from './message.entity';
 import { UserChat } from './user.chat.entity';
-
-export enum ChatType {
-  PRIVATE = 'PRIVATE',
-  GROUP = 'GROUP',
-}
+import { ChatType } from '../enums/chat-type.enum';
 
 @Entity()
 export class Chat {

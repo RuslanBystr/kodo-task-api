@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CONFIG } from '../common/enums';
-import { JwtModule } from '@nestjs/jwt';
+import { CONFIG, ENTITIES } from '../common/enums';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
-import { userEntityProvider } from '../user/providers/user-entity.provider';
 import { BcryptModule } from '../common/utils/libs/bcrypt/bcrypt.module';
 import { UserModule } from '../user/user.module';
 import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy';
@@ -37,7 +36,10 @@ import { GoogleStrategy } from './strategies/google.strategy';
     JwtStrategy,
     JwtRefreshTokenStrategy,
     GoogleStrategy,
-    userEntityProvider,
+    {
+      provide: ENTITIES.USER,
+      useValue: User,
+    },
     MailService,
   ],
   controllers: [AuthController],

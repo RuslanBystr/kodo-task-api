@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Chat, ChatType } from '../entities/chat.entity';
+import { Chat } from '../entities/chat.entity';
 import { User } from '../../user/entities/user.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { DataSource, In, Repository } from 'typeorm';
@@ -12,6 +12,7 @@ import { GetAllChatsFilterDto } from '../dto';
 import { Message } from '../entities/message.entity';
 import { CryptoService } from '../../crypto/crypto.service';
 import { FileEntity } from '../../file/entities/file.entity';
+import { ChatType } from '../enums/chat-type.enum';
 
 @Injectable()
 export class ChatService {
