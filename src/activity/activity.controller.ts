@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ActivityService } from './activity.service';
 import { ApiTags } from '@nestjs/swagger';
+import { ActivityService } from './activity.service';
 
 @ApiTags('activity')
 @Controller('activity')
