@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to Hetzner (SSH pull)
 
 on:
   push:
@@ -10,26 +10,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout (for completeness; not used on server build)
         uses: actions/checkout@v4
 
       - name: Setup SSH
+        shell: bash
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_USER: ${{ secrets.HETZNER_USER }}
+          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
-          cat <<EOF > ~/.ssh/id_rsa
-          ${{ secrets.EC2_KEY }}
-          EOF
+          chmod 700 ~/.ssh
+          echo "${HETZNER_SSH_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$HETZNER_HOST" >> ~/.ssh/known_hosts
 
+      - name: Deploy on Hetzner
+        shell: bash
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_USER: ${{ secrets.HETZNER_USER }}
 
-      - name: Deploy app on EC2
+          NODE_VERSION: "20"
+          APP_DIR: "KodoTaskAPI"
+          BRANCH: "develop"
+          PM2_APP_NAME: "kodotask"
         run: |
-          ssh -t ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/ubuntu/KodoTaskAPI
-            git pull origin develop
-            npm install
+          ssh -t "${HETZNER_USER}@${HETZNER_HOST}" << 'EOF'
+            set -e
+
+            cd "$HOME/${APP_DIR}"
+
+            git fetch origin
+            git checkout "${BRANCH}"
+            git pull origin "${BRANCH}"
+          
+            npm ci
+
             npm run build
+            
             npm run typeorm:run-migrations
-            pm2 restart all
+
+            pm2 restart kodotask
+          
           EOF
