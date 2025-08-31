@@ -84,7 +84,7 @@ jobs:
 
             npm run build
             npm run typeorm:run-migrations || true
-
+            npm run seed
             pm2 restart "${PM2_APP_NAME}" || pm2 start dist/main.js --name "${PM2_APP_NAME}"
             pm2 save
           EOF

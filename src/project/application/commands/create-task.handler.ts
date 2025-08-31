@@ -33,6 +33,8 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
       title: cmd.title,
       description: cmd.description,
       project,
+      estimate: cmd.estimate,
+      priority: cmd.priority,
       assignedUser: user ?? null,
     });
 

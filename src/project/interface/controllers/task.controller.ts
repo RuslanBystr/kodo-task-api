@@ -41,6 +41,8 @@ export class TaskController {
       new CreateTaskCommand(
         dto.title,
         dto.description,
+        dto.estimate,
+        dto.priority,
         dto.projectId,
         dto.assignedUserId,
       ),

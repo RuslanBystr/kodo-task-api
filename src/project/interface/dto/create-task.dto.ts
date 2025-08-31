@@ -1,6 +1,10 @@
+import { TaskPriority } from '../../infrastructure/entities/task.entity';
+
 export class CreateTaskDto {
   title: string;
   description?: string;
-  assignedUserId: number;
+  estimate: number;
+  priority: TaskPriority;
   projectId: string;
+  assignedUserId: number;
 }
