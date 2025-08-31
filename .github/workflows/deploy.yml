@@ -20,11 +20,24 @@ jobs:
           HETZNER_USER: ${{ secrets.HETZNER_USER }}
           HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
         run: |
+          set -euo pipefail
+          set -x
+          
+          : "${HETZNER_HOST:?Missing HETZNER_HOST secret}"
+          : "${HETZNER_USER:?Missing HETZNER_USER secret}"
+          : "${HETZNER_SSH_KEY:?Missing HETZNER_SSH_KEY secret}"
+          
+          echo "HOME is: $HOME"
+          whoami
+          ls -la "$HOME"
+          
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "${HETZNER_SSH_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "$HETZNER_HOST" >> ~/.ssh/known_hosts
+          printf "%s" "$HETZNER_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          
+          ssh-keyscan -T 15 -H "$HETZNER_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Deploy on Hetzner
         shell: bash
@@ -37,7 +50,7 @@ jobs:
           BRANCH: "develop"
           PM2_APP_NAME: "kodotask"
         run: |
-          ssh -t "${HETZNER_USER}@${HETZNER_HOST}" << 'EOF'
+          ssh -t "${HETZNER_USER}@${HETZNER_HOST}" << EOF
             set -e
 
             cd "$HOME/${APP_DIR}"
