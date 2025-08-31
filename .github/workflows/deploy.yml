@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: Hetzner
+      url: https://api.api-kodotask.org/api
 
     steps:
       - name: Checkout (for completeness; not used on server build)
