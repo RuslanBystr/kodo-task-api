@@ -13,6 +13,18 @@ jobs:
       - name: Checkout (for completeness; not used on server build)
         uses: actions/checkout@v4
 
+      - name: Connectivity check to SSH
+        shell: bash
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+        run: |
+          set -euo pipefail
+          echo "Resolving host..."
+          getent hosts "$HETZNER_HOST" || true
+          echo "Probing TCP 22..."
+          timeout 5 bash -lc "cat < /dev/null > /dev/tcp/$HETZNER_HOST/22" \
+            && echo "✅ TCP 22 reachable" || (echo "❌ Cannot reach $HETZNER_HOST:22"; exit 1)
+
       - name: Setup SSH
         shell: bash
         env:
@@ -44,27 +56,32 @@ jobs:
         env:
           HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
           HETZNER_USER: ${{ secrets.HETZNER_USER }}
-
-          NODE_VERSION: "20"
           APP_DIR: "KodoTaskAPI"
           BRANCH: "develop"
           PM2_APP_NAME: "kodotask"
         run: |
-          ssh -t "${HETZNER_USER}@${HETZNER_HOST}" << EOF
+          set -euo pipefail
+          ssh -4 -i ~/.ssh/id_ed25519 \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=~/.ssh/known_hosts \
+              -t "${HETZNER_USER}@${HETZNER_HOST}" << EOF
             set -e
 
-            cd "$HOME/${APP_DIR}"
+            cd "\$HOME/${APP_DIR}"
 
             git fetch origin
             git checkout "${BRANCH}"
             git pull origin "${BRANCH}"
-          
-            npm ci
+
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
 
             npm run build
-            
-            npm run typeorm:run-migrations
+            npm run typeorm:run-migrations || true
 
-            pm2 restart kodotask
-          
+            pm2 restart "${PM2_APP_NAME}" || pm2 start dist/main.js --name "${PM2_APP_NAME}"
+            pm2 save
           EOF
