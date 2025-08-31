@@ -19,8 +19,8 @@ jobs:
           HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
         run: |
           set -euo pipefail
-          echo "Resolving host..."
-          getent hosts "$HETZNER_HOST" || true
+          echo "HETZNER_HOST='$HETZNER_HOST'"
+          echo "A records (IPv4):"; getent ahostsv4 "$HETZNER_HOST" || true
           echo "Probing TCP 22..."
           timeout 5 bash -lc "cat < /dev/null > /dev/tcp/$HETZNER_HOST/22" \
             && echo "✅ TCP 22 reachable" || (echo "❌ Cannot reach $HETZNER_HOST:22"; exit 1)
