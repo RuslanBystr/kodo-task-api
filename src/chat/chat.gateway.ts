@@ -1,11 +1,4 @@
 import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
-import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
@@ -16,18 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { WsJwtGuard } from '../auth/guards/ws-jwt.guard';
-import { CreateMessageDto } from './dto';
+import { CreateMessageDto } from './dto/create-message.dto';
 import { ChatService } from './services/chat.service';
 import { MessageService } from './services/message.service';
 
-type ChatID = string;
-
-@WebSocketGateway({
-  cors: { origin: '*' },
-  // namespace: '/chat',
-})
-@UseGuards(WsJwtGuard)
+@WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
@@ -37,13 +23,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   private onlineUsers = new Set<string>();
-  private userSocketMap = new Map<string, string>();
+  private userSocketMap = new Map<number, string>();
   private socketUserMap = new Map<string, string>();
 
   private chatUserMap = new Map<string, Set<string>>();
   private userChatMap = new Map<string, Set<string>>();
 
-  async handleConnection() {}
+  async handleConnection() {
+    console.log('Connected');
+  }
 
   @SubscribeMessage('userConnected')
   handleUserConnection(
@@ -55,10 +43,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.data.userId = userId;
     this.onlineUsers.add(userId);
 
-    this.userSocketMap.set(userId, client.id);
+    this.userSocketMap.set(Number(userId), client.id);
     this.socketUserMap.set(client.id, userId);
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
+    console.log(`User ${userId} connected with socket ${client.id}`);
   }
 
   handleDisconnect(client: Socket): void {
@@ -78,183 +67,133 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
+    console.log(`User ${userId} disconnected`);
   }
 
   @SubscribeMessage('sendMessage')
-  async handleMessage(
-    @MessageBody() data: CreateMessageDto,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const authUserId = client.data.userId!;
-    if (!authUserId) throw new UnauthorizedException();
-
-    if (Number(data.senderId) !== authUserId) {
-      throw new ForbiddenException(
-        'You cannot send messages on behalf of another user',
-      );
-    }
-
-    const isMember = await this.chatService.chatMember(
-      String(data.chatId),
-      authUserId.toString(),
-    );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
+  async handleMessage(@MessageBody() data: CreateMessageDto) {
     const message = await this.messageService.sendMessage(data);
-
     this.server
       .to(`chat-${data.chatId}`)
       .emit('newMessage', { ...message, chat: { id: data.chatId } });
 
     const chatMembers = await this.chatService.getChatMembers(data.chatId);
-    for (const member of chatMembers) {
-      if (member.id === authUserId) continue;
-      const socketId = this.userSocketMap.get(member.id.toString());
-      if (socketId) this.server.to(socketId).emit('notifyNewMessage', message);
+
+    const filterMembers = chatMembers.filter(
+      (member) => data.senderId !== member.id,
+    );
+
+    for (const member of filterMembers) {
+      const socketId = this.userSocketMap.get(member.id);
+
+      if (socketId) {
+        this.server.to(socketId).emit('notifyNewMessage', message);
+      }
     }
   }
 
   @SubscribeMessage('reaction')
-  async addReactionOnMessage(
-    @MessageBody() payload: { id: number; chatId: string; reaction: string },
-    @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    const authUserId = client.data.userId!;
-    const isMember = await this.chatService.chatMember(
-      String(payload.chatId),
-      authUserId.toString(),
+  async addReactionOnMessage(@MessageBody() message: any): Promise<void> {
+    const response = await this.messageService.addReactionOnMessage(
+      message.id,
+      1, // TODO CRITICAL TASK
+      message.reaction,
     );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
-    const updatedMsg = await this.messageService.addReactionOnMessage(
-      payload.id,
-      authUserId,
-      payload.reaction,
-    );
-    this.server.to(`chat-${payload.chatId}`).emit('updateMessage', updatedMsg);
+    this.server.to(`chat-${message.chatId}`).emit('updateMessage', response);
   }
 
   @SubscribeMessage('typing')
-  async typingMessage(
-    @MessageBody() payload: { chatId: string },
-    @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    const authUserId = client.data.userId!;
-    const isMember = await this.chatService.chatMember(
-      String(payload.chatId),
-      authUserId.toString(),
-    );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
-    this.server.to(`chat-${payload.chatId}`).emit('typing', authUserId);
+  async typingMessage(@MessageBody() message: any): Promise<void> {
+    this.server.to(`chat-${message.chatId}`).emit('typing', message.userId);
   }
 
   @SubscribeMessage('removeMessage')
-  async removeMessage(
-    @MessageBody() payload: { id: number; chatId: string },
-    @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    const authUserId = client.data.userId!;
-    const isMember = await this.chatService.chatMember(
-      String(payload.chatId),
-      authUserId.toString(),
-    );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
-    const deletedMessage = await this.messageService.removeMessage(payload.id);
+  async removeMessage(@MessageBody() message: any): Promise<void> {
+    const deletedMessage = await this.messageService.removeMessage(message.id);
     this.server
-      .to(`chat-${payload.chatId}`)
+      .to(`chat-${message.chatId}`)
       .emit('cleanMessage', deletedMessage);
   }
 
   @SubscribeMessage('markMessageAsRead')
   async handleMarkMessageAsRead(
-    @MessageBody() payload: { chatId: string; messageId: number },
-    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    {
+      chatId,
+      readByUserId,
+      userId,
+    }: {
+      chatId: string;
+      readByUserId: number;
+      userId: number;
+    },
   ) {
-    const authUserId = client.data.userId!;
-    const isMember = await this.chatService.chatMember(
-      String(payload.chatId),
-      authUserId.toString(),
-    );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
-    const message = await this.messageService.markAsRead(
-      payload.messageId,
-      authUserId,
-    );
-    this.server.to(`chat-${payload.chatId}`).emit('messageRead', message);
+    const message = await this.messageService.markAsRead(userId, readByUserId);
+    this.server.to(`chat-${chatId}`).emit('messageRead', message);
   }
 
   @SubscribeMessage('joinChat')
-  async handleJoinChat(
+  handleJoinChat(
     @MessageBody() chatId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const authUserId = client.data.userId!;
-    if (!authUserId) throw new UnauthorizedException();
+    const userId = client.data.userId;
 
-    const isMember = await this.chatService.chatMember(
-      String(chatId),
-      authUserId.toString(),
-    );
-    if (!isMember)
-      throw new ForbiddenException('You are not a member of this chat');
-
-    this.userSocketMap.set(authUserId, client.id);
-
-    let chatSet = this.userChatMap.get(authUserId);
-    if (!chatSet) {
-      chatSet = new Set<ChatID>();
-      this.userChatMap.set(authUserId, chatSet);
+    if (!userId) {
+      console.warn('Attempted to join chat without userId set on socket');
+      return;
     }
+    this.userSocketMap.set(userId, client.id);
+
+    let chatSet = this.userChatMap.get(userId);
+
+    if (!chatSet) {
+      chatSet = new Set<string>();
+      this.userChatMap.set(userId, chatSet);
+    }
+
     chatSet.add(chatId);
 
-    let usersSet = this.chatUserMap.get(chatId);
-    if (!usersSet) {
-      usersSet = new Set<string>();
-      this.chatUserMap.set(chatId, usersSet);
-    }
-    usersSet.add(authUserId);
-
     client.join(`chat-${chatId}`);
+
+    console.log(`User ${userId} joined chat ${chatId}`);
   }
 
   @SubscribeMessage('webrtc_signal')
   async handleWebrtcSignal(
-    @MessageBody() data: { signal: string; toUserId: string; chatId: string },
+    @MessageBody() data: { signal: any; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const fromUserId = client.data.userId!;
-    const chatId = String(data.chatId);
-    const toUserId = data.toUserId;
+    const fromUserId = client.data.userId;
 
-    const fromChats = this.userChatMap.get(fromUserId) ?? new Set<ChatID>();
-    let toChats = this.userChatMap.get(toUserId);
+    const fromChats = this.userChatMap.get(fromUserId) || new Set<string>();
+    let toChats = this.userChatMap.get(data.toUserId);
 
     if (!toChats) {
-      const toSocketId = this.userSocketMap.get(toUserId);
+      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
+
       if (toSocketId) {
         const toSocket = this.server.sockets.sockets.get(toSocketId);
+
         if (toSocket) {
-          toSocket.join(`chat-${chatId}`);
-          toChats = new Set<ChatID>([chatId]);
-          this.userChatMap.set(toUserId, toChats);
+          toSocket.join(`chat-${data.chatId}`);
+          toChats = new Set<string>([data.chatId]);
+          this.userChatMap.set(data.toUserId, toChats);
+
+          console.log(`Auto-joined ${data.toUserId} to chat ${data.chatId}`);
         } else {
-          throw new NotFoundException(`Socket not found for user ${toUserId}`);
+          console.warn(`Socket not found for user ${data.toUserId}`);
+          return;
         }
       } else {
-        throw new BadRequestException(`User ${toUserId} is not connected`);
+        console.warn(`User ${data.toUserId} is not connected`);
+        return;
       }
     }
 
-    if (fromChats.has(chatId) && toChats.has(chatId)) {
-      const toSocketId = this.userSocketMap.get(toUserId);
+    if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
+      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
+
       if (toSocketId) {
         this.server.to(toSocketId).emit('webrtc_signal', {
           signal: data.signal,
@@ -262,7 +201,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } else {
-      throw new ForbiddenException('Both users must be in the chat');
+      console.log('Users are not in the same chat');
     }
   }
 }
