@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -22,7 +21,6 @@ import { CreateMessageDto } from './dto';
 import { ChatService } from './services/chat.service';
 import { MessageService } from './services/message.service';
 
-type UID = number;
 type ChatID = string;
 
 @WebSocketGateway({
@@ -36,49 +34,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly messageService: MessageService,
     private readonly chatService: ChatService,
-    private readonly jwt: JwtService,
   ) {}
 
-  private onlineUsers = new Set<UID>();
-  private userSocketMap = new Map<UID, string>(); // userId -> socketId
-  private socketUserMap = new Map<string, UID>(); // socketId -> userId
+  private onlineUsers = new Set<string>();
+  private userSocketMap = new Map<string, string>();
+  private socketUserMap = new Map<string, string>();
 
-  private chatUserMap = new Map<ChatID, Set<UID>>(); // chatId -> set(userId)
-  private userChatMap = new Map<UID, Set<ChatID>>(); // userId -> set(chatId)
+  private chatUserMap = new Map<string, Set<string>>();
+  private userChatMap = new Map<string, Set<string>>();
 
-  async handleConnection(client: Socket) {
-    try {
-      const raw =
-        (client.handshake.auth?.token as string | undefined) ??
-        (client.handshake.headers?.authorization as string | undefined) ??
-        (client.handshake.query?.token as string | undefined) ??
-        null;
+  async handleConnection() {}
 
-      if (!raw) throw new UnauthorizedException('Missing auth token');
+  @SubscribeMessage('userConnected')
+  handleUserConnection(
+    @MessageBody() userId: string,
+    @ConnectedSocket() client: Socket,
+  ): void {
+    if (!userId) return;
 
-      const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+    client.data.userId = userId;
+    this.onlineUsers.add(userId);
 
-      const payload = this.jwt.verify(token);
+    this.userSocketMap.set(userId, client.id);
+    this.socketUserMap.set(client.id, userId);
 
-      const userId = payload.id;
-      if (!userId) throw new UnauthorizedException('Invalid user id in token');
-
-      client.data.userId = userId;
-      client.data.user = payload;
-      console.log('USER ID:', userId);
-
-      this.onlineUsers.add(userId);
-      this.userSocketMap.set(userId, client.id);
-      this.socketUserMap.set(client.id, userId);
-
-      this.server.emit('onlineUsers', Array.from(this.onlineUsers));
-    } catch (e) {
-      client.disconnect(true);
-    }
+    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
   }
 
   handleDisconnect(client: Socket): void {
-    const userId = client.data.userId ?? this.socketUserMap.get(client.id);
+    const userId = client.data.userId || this.socketUserMap.get(client.id);
     if (!userId) return;
 
     this.onlineUsers.delete(userId);
@@ -88,8 +72,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     for (const [chatId, users] of this.chatUserMap.entries()) {
       users.delete(userId);
-      if (users.size === 0) this.chatUserMap.delete(chatId);
+      if (users.size === 0) {
+        this.chatUserMap.delete(chatId);
+      }
     }
+
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
   }
 
@@ -123,7 +110,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const chatMembers = await this.chatService.getChatMembers(data.chatId);
     for (const member of chatMembers) {
       if (member.id === authUserId) continue;
-      const socketId = this.userSocketMap.get(member.id);
+      const socketId = this.userSocketMap.get(member.id.toString());
       if (socketId) this.server.to(socketId).emit('notifyNewMessage', message);
     }
   }
@@ -230,7 +217,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     let usersSet = this.chatUserMap.get(chatId);
     if (!usersSet) {
-      usersSet = new Set<UID>();
+      usersSet = new Set<string>();
       this.chatUserMap.set(chatId, usersSet);
     }
     usersSet.add(authUserId);
@@ -245,7 +232,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const fromUserId = client.data.userId!;
     const chatId = String(data.chatId);
-    const toUserId = Number(data.toUserId);
+    const toUserId = data.toUserId;
 
     const fromChats = this.userChatMap.get(fromUserId) ?? new Set<ChatID>();
     let toChats = this.userChatMap.get(toUserId);
