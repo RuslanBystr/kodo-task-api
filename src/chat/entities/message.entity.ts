@@ -6,6 +6,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -13,6 +14,7 @@ import {
 import { FileEntity } from '../../file/entities/file.entity';
 import { User } from '../../user/entities/user.entity';
 import { Chat } from './chat.entity';
+import { MessageReaction } from './message-reaction.entity';
 
 @Entity('message')
 export class Message {
@@ -46,8 +48,8 @@ export class Message {
   @JoinTable()
   readByUsers: User[];
 
-  @Column({ default: null, nullable: true })
-  reaction: string | null;
+  @OneToMany(() => MessageReaction, (r) => r.message, { cascade: true })
+  reactions: MessageReaction[];
 
   @ManyToOne(() => Message, { nullable: true })
   linkToMessage: Message | null;

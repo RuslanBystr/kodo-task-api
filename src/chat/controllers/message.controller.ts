@@ -8,9 +8,11 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 
 import { JwtAuthGuard } from '../../auth/guards';
 import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
@@ -45,8 +47,9 @@ export class MessageController {
   async reactionOnMessage(
     @Param('id') id: number,
     @Body('reaction') reaction: string,
+    @Req() req: Request,
   ) {
-    return this.messageService.addReactionOnMessage(id, reaction);
+    return this.messageService.addReactionOnMessage(id, req.user.id, reaction);
   }
 
   @Delete('/:chatId')

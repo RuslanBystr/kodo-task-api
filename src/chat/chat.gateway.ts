@@ -1,4 +1,12 @@
 import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
@@ -9,46 +17,68 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
+import { WsJwtGuard } from '../auth/guards/ws-jwt.guard';
 import { CreateMessageDto } from './dto';
 import { ChatService } from './services/chat.service';
 import { MessageService } from './services/message.service';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+type UID = number;
+type ChatID = string;
+
+@WebSocketGateway({
+  cors: { origin: '*' },
+  // namespace: '/chat',
+})
+@UseGuards(WsJwtGuard)
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   constructor(
     private readonly messageService: MessageService,
     private readonly chatService: ChatService,
+    private readonly jwt: JwtService,
   ) {}
 
-  private onlineUsers = new Set<string>();
-  private userSocketMap = new Map<number, string>();
-  private socketUserMap = new Map<string, string>();
+  private onlineUsers = new Set<UID>();
+  private userSocketMap = new Map<UID, string>(); // userId -> socketId
+  private socketUserMap = new Map<string, UID>(); // socketId -> userId
 
-  private chatUserMap = new Map<string, Set<string>>();
-  private userChatMap = new Map<string, Set<string>>();
+  private chatUserMap = new Map<ChatID, Set<UID>>(); // chatId -> set(userId)
+  private userChatMap = new Map<UID, Set<ChatID>>(); // userId -> set(chatId)
 
-  async handleConnection() {}
+  async handleConnection(client: Socket) {
+    try {
+      const raw =
+        (client.handshake.auth?.token as string | undefined) ??
+        (client.handshake.headers?.authorization as string | undefined) ??
+        (client.handshake.query?.token as string | undefined) ??
+        null;
 
-  @SubscribeMessage('userConnected')
-  handleUserConnection(
-    @MessageBody() userId: string,
-    @ConnectedSocket() client: Socket,
-  ): void {
-    if (!userId) return;
+      if (!raw) throw new UnauthorizedException('Missing auth token');
 
-    client.data.userId = userId;
-    this.onlineUsers.add(userId);
+      const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
 
-    this.userSocketMap.set(Number(userId), client.id);
-    this.socketUserMap.set(client.id, userId);
+      const payload = this.jwt.verify(token);
 
-    this.server.emit('onlineUsers', Array.from(this.onlineUsers));
+      const userId = payload.id;
+      if (!userId) throw new UnauthorizedException('Invalid user id in token');
+
+      client.data.userId = userId;
+      client.data.user = payload;
+      console.log('USER ID:', userId);
+
+      this.onlineUsers.add(userId);
+      this.userSocketMap.set(userId, client.id);
+      this.socketUserMap.set(client.id, userId);
+
+      this.server.emit('onlineUsers', Array.from(this.onlineUsers));
+    } catch (e) {
+      client.disconnect(true);
+    }
   }
 
   handleDisconnect(client: Socket): void {
-    const userId = client.data.userId || this.socketUserMap.get(client.id);
+    const userId = client.data.userId ?? this.socketUserMap.get(client.id);
     if (!userId) return;
 
     this.onlineUsers.delete(userId);
@@ -58,102 +88,152 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     for (const [chatId, users] of this.chatUserMap.entries()) {
       users.delete(userId);
-      if (users.size === 0) {
-        this.chatUserMap.delete(chatId);
-      }
+      if (users.size === 0) this.chatUserMap.delete(chatId);
     }
-
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
   }
 
   @SubscribeMessage('sendMessage')
-  async handleMessage(@MessageBody() data: CreateMessageDto) {
+  async handleMessage(
+    @MessageBody() data: CreateMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const authUserId = client.data.userId!;
+    if (!authUserId) throw new UnauthorizedException();
+
+    if (Number(data.senderId) !== authUserId) {
+      throw new ForbiddenException(
+        'You cannot send messages on behalf of another user',
+      );
+    }
+
+    const isMember = await this.chatService.chatMember(
+      String(data.chatId),
+      authUserId.toString(),
+    );
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
+
     const message = await this.messageService.sendMessage(data);
+
     this.server
       .to(`chat-${data.chatId}`)
       .emit('newMessage', { ...message, chat: { id: data.chatId } });
 
     const chatMembers = await this.chatService.getChatMembers(data.chatId);
-
-    const filterMembers = chatMembers.filter(
-      (member) => data.senderId !== member.id,
-    );
-
-    for (const member of filterMembers) {
+    for (const member of chatMembers) {
+      if (member.id === authUserId) continue;
       const socketId = this.userSocketMap.get(member.id);
-
-      if (socketId) {
-        this.server.to(socketId).emit('notifyNewMessage', message);
-      }
+      if (socketId) this.server.to(socketId).emit('notifyNewMessage', message);
     }
   }
 
   @SubscribeMessage('reaction')
   async addReactionOnMessage(
-    @MessageBody() message: { id: number; chatId: string; reaction: string },
+    @MessageBody() payload: { id: number; chatId: string; reaction: string },
+    @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    const response = await this.messageService.addReactionOnMessage(
-      message.id,
-      message.reaction,
+    const authUserId = client.data.userId!;
+    const isMember = await this.chatService.chatMember(
+      String(payload.chatId),
+      authUserId.toString(),
     );
-    this.server.to(`chat-${message.chatId}`).emit('updateMessage', response);
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
+
+    const updatedMsg = await this.messageService.addReactionOnMessage(
+      payload.id,
+      authUserId,
+      payload.reaction,
+    );
+    this.server.to(`chat-${payload.chatId}`).emit('updateMessage', updatedMsg);
   }
 
   @SubscribeMessage('typing')
   async typingMessage(
-    @MessageBody() message: { userId: number; chatId: string },
+    @MessageBody() payload: { chatId: string },
+    @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    this.server.to(`chat-${message.chatId}`).emit('typing', message.userId);
+    const authUserId = client.data.userId!;
+    const isMember = await this.chatService.chatMember(
+      String(payload.chatId),
+      authUserId.toString(),
+    );
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
+
+    this.server.to(`chat-${payload.chatId}`).emit('typing', authUserId);
   }
 
   @SubscribeMessage('removeMessage')
   async removeMessage(
-    @MessageBody() message: { id: number; chatId: string },
+    @MessageBody() payload: { id: number; chatId: string },
+    @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    const deletedMessage = await this.messageService.removeMessage(message.id);
+    const authUserId = client.data.userId!;
+    const isMember = await this.chatService.chatMember(
+      String(payload.chatId),
+      authUserId.toString(),
+    );
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
+
+    const deletedMessage = await this.messageService.removeMessage(payload.id);
     this.server
-      .to(`chat-${message.chatId}`)
+      .to(`chat-${payload.chatId}`)
       .emit('cleanMessage', deletedMessage);
   }
 
   @SubscribeMessage('markMessageAsRead')
   async handleMarkMessageAsRead(
-    @MessageBody()
-    {
-      chatId,
-      readByUserId,
-      userId,
-    }: {
-      chatId: string;
-      readByUserId: number;
-      userId: number;
-    },
+    @MessageBody() payload: { chatId: string; messageId: number },
+    @ConnectedSocket() client: Socket,
   ) {
-    const message = await this.messageService.markAsRead(userId, readByUserId);
-    this.server.to(`chat-${chatId}`).emit('messageRead', message);
+    const authUserId = client.data.userId!;
+    const isMember = await this.chatService.chatMember(
+      String(payload.chatId),
+      authUserId.toString(),
+    );
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
+
+    const message = await this.messageService.markAsRead(
+      payload.messageId,
+      authUserId,
+    );
+    this.server.to(`chat-${payload.chatId}`).emit('messageRead', message);
   }
 
   @SubscribeMessage('joinChat')
-  handleJoinChat(
+  async handleJoinChat(
     @MessageBody() chatId: string,
     @ConnectedSocket() client: Socket,
   ) {
-    const userId = client.data.userId;
+    const authUserId = client.data.userId!;
+    if (!authUserId) throw new UnauthorizedException();
 
-    if (!userId) {
-      console.warn('Attempted to join chat without userId set on socket');
-      return;
-    }
-    this.userSocketMap.set(userId, client.id);
+    const isMember = await this.chatService.chatMember(
+      String(chatId),
+      authUserId.toString(),
+    );
+    if (!isMember)
+      throw new ForbiddenException('You are not a member of this chat');
 
-    let chatSet = this.userChatMap.get(userId);
+    this.userSocketMap.set(authUserId, client.id);
 
+    let chatSet = this.userChatMap.get(authUserId);
     if (!chatSet) {
-      chatSet = new Set<string>();
-      this.userChatMap.set(userId, chatSet);
+      chatSet = new Set<ChatID>();
+      this.userChatMap.set(authUserId, chatSet);
     }
-
     chatSet.add(chatId);
+
+    let usersSet = this.chatUserMap.get(chatId);
+    if (!usersSet) {
+      usersSet = new Set<UID>();
+      this.chatUserMap.set(chatId, usersSet);
+    }
+    usersSet.add(authUserId);
 
     client.join(`chat-${chatId}`);
   }
@@ -163,34 +243,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { signal: string; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const fromUserId = client.data.userId;
+    const fromUserId = client.data.userId!;
+    const chatId = String(data.chatId);
+    const toUserId = Number(data.toUserId);
 
-    const fromChats = this.userChatMap.get(fromUserId) || new Set<string>();
-    let toChats = this.userChatMap.get(data.toUserId);
+    const fromChats = this.userChatMap.get(fromUserId) ?? new Set<ChatID>();
+    let toChats = this.userChatMap.get(toUserId);
 
     if (!toChats) {
-      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
-
+      const toSocketId = this.userSocketMap.get(toUserId);
       if (toSocketId) {
         const toSocket = this.server.sockets.sockets.get(toSocketId);
-
         if (toSocket) {
-          toSocket.join(`chat-${data.chatId}`);
-          toChats = new Set<string>([data.chatId]);
-          this.userChatMap.set(data.toUserId, toChats);
+          toSocket.join(`chat-${chatId}`);
+          toChats = new Set<ChatID>([chatId]);
+          this.userChatMap.set(toUserId, toChats);
         } else {
-          console.warn(`Socket not found for user ${data.toUserId}`);
-          return;
+          throw new NotFoundException(`Socket not found for user ${toUserId}`);
         }
       } else {
-        console.warn(`User ${data.toUserId} is not connected`);
-        return;
+        throw new BadRequestException(`User ${toUserId} is not connected`);
       }
     }
 
-    if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
-      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
-
+    if (fromChats.has(chatId) && toChats.has(chatId)) {
+      const toSocketId = this.userSocketMap.get(toUserId);
       if (toSocketId) {
         this.server.to(toSocketId).emit('webrtc_signal', {
           signal: data.signal,
@@ -198,7 +275,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     } else {
-      throw new Error('User is not in the chat');
+      throw new ForbiddenException('Both users must be in the chat');
     }
   }
 }

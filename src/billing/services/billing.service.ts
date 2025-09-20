@@ -56,7 +56,6 @@ export class BillingService {
         sandbox: '1', // test mode
       };
 
-      // повертаємо data/signature — фронт підставить у форму LiqPay
       return this.liqpay.buildCheckoutPayload(payload);
     } catch (err) {
       this.logger.error(err);
@@ -64,10 +63,6 @@ export class BillingService {
     }
   }
 
-  /**
-   * Обробка вебхука від LiqPay
-   * LiqPay шле { data, signature }
-   */
   async handleWebhook(data: string, signature: string) {
     if (!this.liqpay.verifySignature(data, signature)) {
       this.logger.warn('Invalid LiqPay signature');

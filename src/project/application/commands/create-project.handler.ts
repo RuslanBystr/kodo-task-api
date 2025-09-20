@@ -19,11 +19,28 @@ export class CreateProjectHandler
 
   async execute(c: CreateProjectCommand) {
     const user = await this.userRepo.findOne({ where: { id: c.userId } });
-    if (!user)
+    if (!user) {
       throw new NotFoundException(`User with ID ${c.userId} not found`);
+    }
 
-    const project = this.projectRepo.create({ ...c.dto, members: [user] });
-    await this.projectRepo.save(project);
-    return project;
+    const members: User[] = [];
+    if (c.dto.members?.length) {
+      const foundMembers = await this.userRepo.findByIds(c.dto.members);
+      members.push(...foundMembers);
+    }
+
+    if (!members.find((m) => m.id === user.id)) {
+      members.push(user);
+    }
+
+    const project = this.projectRepo.create({
+      name: c.dto.name,
+      description: c.dto.description,
+      image: c.dto.image,
+      owner: user,
+      members,
+    });
+
+    return this.projectRepo.save(project);
   }
 }

@@ -64,6 +64,7 @@ export class UserController {
   async getUserById(@Param('id') id: number) {
     return this.userService.findById(id);
   }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   public async create(@Body() createUserDto: UserCreateDto) {

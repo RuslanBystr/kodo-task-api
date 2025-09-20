@@ -17,9 +17,11 @@ import { FileModule } from './file/file.module';
 import { LlmModule } from './llm/llm.module';
 import { LoggerModule } from './logger/logger.module';
 import { MembersModule } from './members/members.module';
+import { NotificationModule } from './notification/notification.module';
 import { ProjectModule } from './project/project.module';
 import { StripeModule } from './stripe/stripe.module';
 import { UserModule } from './user/user.module';
+import { WebrtcModule } from './webrtc/webrtc.module';
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { UserModule } from './user/user.module';
     LlmModule,
     BillingModule,
     MembersModule,
+    NotificationModule,
+    WebrtcModule,
   ],
   controllers: [AppController],
   providers: [

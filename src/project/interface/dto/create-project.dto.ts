@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty()
@@ -15,4 +21,8 @@ export class CreateProjectDto {
   @IsOptional()
   @IsUUID()
   image?: string;
+
+  @IsOptional()
+  @IsArray()
+  members?: string[];
 }

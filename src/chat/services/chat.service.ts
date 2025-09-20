@@ -13,6 +13,7 @@ import { User } from '../../user/entities/user.entity';
 import { GetAllChatsFilterDto } from '../dto';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
+import { MessageReaction } from '../entities/message-reaction.entity';
 import { UserChat } from '../entities/user.chat.entity';
 import { ChatType } from '../enums/chat-type.enum';
 
@@ -38,7 +39,7 @@ export class ChatService {
   }
 
   async lastMessageDescription(chatItems: Chat[]): Promise<
-    {
+    Awaited<{
       id: number;
       type: ChatType;
       userChats: UserChat[];
@@ -52,12 +53,12 @@ export class ChatService {
         createdAt: Date;
         isRead: boolean;
         readByUsers: User[];
-        reaction: string | null;
+        reactions: MessageReaction[];
         linkToMessage: Message | null;
-      } | null;
+      };
       messages: Message[];
       groupName?: string;
-    }[]
+    }>[]
   > {
     return Promise.all(
       chatItems.map(async (chatItem: Chat) => ({

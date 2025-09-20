@@ -8,11 +8,14 @@ import { User } from '../../user/entities/user.entity';
 import { CreateMessageDto, GetAllMessageFilterDto } from '../dto';
 import { Chat } from '../entities/chat.entity';
 import { Message } from '../entities/message.entity';
+import { MessageReaction } from '../entities/message-reaction.entity';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message) private messageRepo: Repository<Message>,
+    @InjectRepository(MessageReaction)
+    private reactionRepo: Repository<MessageReaction>,
     @InjectRepository(Chat) private chatRepo: Repository<Chat>,
     @InjectRepository(FileEntity) private fileRepo: Repository<FileEntity>,
     @InjectRepository(User) private userRepo: Repository<User>,
@@ -88,15 +91,24 @@ export class MessageService {
     return await this.getMessageById(savedMessage.id);
   }
 
-  async addReactionOnMessage(id: number, reaction: string): Promise<Message> {
-    const message = await this.messageRepo.findOne({ where: { id } });
+  async addReactionOnMessage(
+    messageId: number,
+    userId: number,
+    reaction: string,
+  ): Promise<void> {
+    const [message, user] = await Promise.all([
+      this.messageRepo.findOne({ where: { id: messageId } }),
+      this.userRepo.findOne({ where: { id: userId } }),
+    ]);
 
-    if (!message) {
-      throw new NotFoundException(`Message with ID ${id} not found`);
-    }
+    if (!message)
+      throw new NotFoundException(`Message with ID ${messageId} not found`);
+    if (!user) throw new NotFoundException(`User with ID ${userId} not found`);
 
-    message.reaction = reaction;
-    return this.messageRepo.save(message);
+    await this.reactionRepo.upsert(
+      { messageId, userId, reaction },
+      { conflictPaths: ['messageId', 'userId', 'reaction'] },
+    );
   }
 
   async markAsRead(userId: number, readByUserId: number): Promise<Message> {
@@ -128,7 +140,6 @@ export class MessageService {
       .select([
         'message.id',
         'message.content',
-        'message.reaction',
         'message.isRead',
         'message.createdAt',
         'voiceMessage.uuid',
@@ -150,6 +161,15 @@ export class MessageService {
         'sender.avatar',
         'sender.firstName',
         'sender.lastName',
+      ])
+      .leftJoin('message.reactions', 'reaction')
+      .addSelect(['reaction.id', 'reaction.reaction', 'reaction.createdAt'])
+      .leftJoin('reaction.user', 'reactionUser')
+      .addSelect([
+        'reactionUser.id',
+        'reactionUser.firstName',
+        'reactionUser.lastName',
+        'reactionUser.avatar',
       ])
       .where('message.id = :id', { id })
       .getOne();
@@ -188,14 +208,12 @@ export class MessageService {
       .select([
         'message.id',
         'message.content',
-        'message.reaction',
         'message.isRead',
         'message.createdAt',
         'voiceMessage.uuid',
       ])
       .leftJoinAndSelect('message.voiceMessage', 'voiceMessage')
       .leftJoinAndSelect('message.file', 'file')
-
       .leftJoin('message.linkToMessage', 'linkToMessage')
       .addSelect(['linkToMessage.id', 'linkToMessage.content'])
 

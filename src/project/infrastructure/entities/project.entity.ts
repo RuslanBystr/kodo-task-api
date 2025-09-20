@@ -2,14 +2,28 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { User } from '../../../user/entities/user.entity';
 import { Task } from './task.entity';
+
+export enum ProjectStatusEnum {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+  COMPLETED = 'Completed',
+}
+
+export enum ProjectVisibilityEnum {
+  PRIVATE = 'Private',
+  INTERNAL = 'Internal',
+  PUBLIC = 'Public',
+}
 
 @Entity()
 export class Project {
@@ -41,6 +55,27 @@ export class Project {
     },
   })
   members: User[];
+
+  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'owner_id' })
+  owner?: User | null;
+
+  @Column({ type: 'uuid', name: 'owner_id', nullable: true })
+  ownerId?: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectStatusEnum,
+    default: ProjectStatusEnum.ACTIVE,
+  })
+  status: ProjectStatusEnum;
+
+  @Column({
+    type: 'enum',
+    enum: ProjectVisibilityEnum,
+    default: ProjectVisibilityEnum.PRIVATE,
+  })
+  visibility: ProjectVisibilityEnum;
 
   @CreateDateColumn({
     name: 'created_at',
