@@ -9,7 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-import { CreateMessageDto } from './dto/create-message.dto';
+import { CreateMessageDto } from './dto';
 import { ChatService } from './services/chat.service';
 import { MessageService } from './services/message.service';
 
@@ -198,6 +198,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.server.to(toSocketId).emit('webrtc_signal', {
           signal: data.signal,
           fromUserId,
+          chatId: data.chatId,
         });
       }
     } else {
