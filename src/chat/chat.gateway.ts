@@ -164,45 +164,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { signal: any; toUserId: string; chatId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    const fromUserId = client.data.userId;
+    const fromUserId = String(client.data.userId || '');
+    if (!fromUserId) return;
 
-    const fromChats = this.userChatMap.get(fromUserId) || new Set<string>();
-    let toChats = this.userChatMap.get(data.toUserId);
-
-    if (!toChats) {
-      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
-
-      if (toSocketId) {
-        const toSocket = this.server.sockets.sockets.get(toSocketId);
-
-        if (toSocket) {
-          toSocket.join(`chat-${data.chatId}`);
-          toChats = new Set<string>([data.chatId]);
-          this.userChatMap.set(data.toUserId, toChats);
-
-          console.log(`Auto-joined ${data.toUserId} to chat ${data.chatId}`);
-        } else {
-          console.warn(`Socket not found for user ${data.toUserId}`);
-          return;
-        }
-      } else {
-        console.warn(`User ${data.toUserId} is not connected`);
-        return;
-      }
+    const toSocketId = this.userSocketMap.get(Number(data.toUserId));
+    if (!toSocketId) {
+      console.warn(`User ${data.toUserId} is not connected`);
+      return;
     }
 
-    if (fromChats.has(data.chatId) && toChats.has(data.chatId)) {
-      const toSocketId = this.userSocketMap.get(Number(data.toUserId));
-
-      if (toSocketId) {
-        this.server.to(toSocketId).emit('webrtc_signal', {
-          signal: data.signal,
-          fromUserId,
-          chatId: data.chatId,
-        });
-      }
-    } else {
-      console.log('Users are not in the same chat');
-    }
+    this.server.to(toSocketId).emit('webrtc_signal', {
+      signal: data.signal,
+      fromUserId,
+      chatId: data.chatId,
+    });
   }
 }
