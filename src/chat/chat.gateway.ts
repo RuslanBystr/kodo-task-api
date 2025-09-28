@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleUserConnection(
     @MessageBody() userId: string,
     @ConnectedSocket() client: Socket,
-  ): void {
+  ): boolean {
     if (!userId) return;
 
     client.data.userId = userId;
@@ -48,6 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.server.emit('onlineUsers', Array.from(this.onlineUsers));
     console.log(`User ${userId} connected with socket ${client.id}`);
+    return true;
   }
 
   handleDisconnect(client: Socket): void {
