@@ -68,14 +68,18 @@ export class IceService implements OnModuleInit {
 
     const iceServers: IceConfig['iceServers'] = [];
 
-    iceServers.push({ urls: ['stun:stun.l.google.com:19302'] });
+    // iceServers.push({ urls: ['stun:stun.l.google.com:19302'] });
 
-    // TURN (udp/tcp)
+    // TURN UDP
     iceServers.push({
-      urls: [
-        `turn:${this.host}:${this.turnPort}?transport=udp`,
-        `turn:${this.host}:${this.turnPort}?transport=tcp`,
-      ],
+      urls: `turn:${this.host}:${this.turnPort}?transport=udp`,
+      username,
+      credential,
+    });
+
+    // TURN TCP
+    iceServers.push({
+      urls: `turn:${this.host}:${this.turnPort}?transport=tcp`,
       username,
       credential,
     });
