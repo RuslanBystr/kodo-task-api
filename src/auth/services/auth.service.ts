@@ -25,8 +25,6 @@ import { LoginResponseDto, RegisterResponseDto } from '../dto/responses';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(ENTITIES.USER)
-    private readonly user: UserType,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,

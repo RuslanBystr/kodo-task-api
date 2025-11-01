@@ -6,7 +6,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { CheckEmailDto } from '../dto/check-email.dto';
+import { CheckEmailDto } from '../dto';
 
 export function CheckEmailApiDocs() {
   return applyDecorators(

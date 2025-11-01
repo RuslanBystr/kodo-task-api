@@ -9,8 +9,9 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ChangePhoneResponseDto } from '../dto/responses/change-phone-response.dto';
-import { UpdatePhoneDto } from '../dto/update-phone.dto';
+import { UpdatePhoneDto } from '../dto';
+import { ChangePhoneResponseDto } from '../dto/responses';
+
 export function ChangePhoneApiDocs() {
   return applyDecorators(
     ApiBearerAuth('Access-token'),

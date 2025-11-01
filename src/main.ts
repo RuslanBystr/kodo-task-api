@@ -10,7 +10,9 @@ import { setupSwagger } from './swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
   app.enableCors({
     origin: process.env.CORS
       ? [process.env.ADMIN_PANEL_DOMAIN, process.env.PUBLIC_WEBSITE_DOMAIN]
@@ -30,7 +32,8 @@ async function bootstrap() {
     .then(() =>
       console.log(
         '\x1b[38;2;150;255;150m Server started\x1b[0m http://localhost:' +
-          process.env.API_PORT,
+          process.env.API_PORT +
+          '/api',
       ),
     )
     .catch((err) => console.error(err.message));

@@ -6,8 +6,8 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { ResetPasswordDto } from '../dto/reset-password.dto';
-import { ResetPasswordResponseDto } from '../dto/responses/reset-password-response.dto';
+import { ResetPasswordDto } from '../dto';
+import { ResetPasswordResponseDto } from '../dto/responses';
 
 export function ResetPasswordApiDocs() {
   return applyDecorators(

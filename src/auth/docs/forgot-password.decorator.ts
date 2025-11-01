@@ -6,8 +6,8 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { ForgotPasswordEmailDto } from '../dto/forgot-password-email.dto';
-import { ForgotPasswordResponseDto } from '../dto/responses/forgot-password-response.dto';
+import { ForgotPasswordEmailDto } from '../dto';
+import { ForgotPasswordResponseDto } from '../dto/responses';
 
 export function ForgotPasswordApiDocs() {
   return applyDecorators(

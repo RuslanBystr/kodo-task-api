@@ -22,7 +22,6 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "madge:check": "node scripts/madge-check.mjs",
     "madge:graph": "madge src --ts-config tsconfig.json --image graph.png --extensions ts,tsx,js --exclude \".*\\.spec\\.ts$|__tests__|e2e\"",
     "madge:orphans": "madge src --ts-config tsconfig.json --orphans --extensions ts,tsx,js --exclude \".*\\.spec\\.ts$|__tests__|e2e\"",
     "madge:circular": "madge src --ts-config tsconfig.json --circular --extensions ts,tsx,js --exclude \".*\\.spec\\.ts$|__tests__|e2e\"",

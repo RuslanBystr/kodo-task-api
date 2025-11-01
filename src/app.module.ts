@@ -4,8 +4,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ActivityModule } from './activity/activity.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BillingModule } from './billing/billing.module';
 import { ChatModule } from './chat/chat.module';
@@ -19,7 +17,6 @@ import { LoggerModule } from './logger/logger.module';
 import { MembersModule } from './members/members.module';
 import { NotificationModule } from './notification/notification.module';
 import { ProjectModule } from './project/project.module';
-import { StripeModule } from './stripe/stripe.module';
 import { UserModule } from './user/user.module';
 import { WebrtcModule } from './webrtc/webrtc.module';
 
@@ -37,7 +34,6 @@ import { WebrtcModule } from './webrtc/webrtc.module';
     FileModule,
     ProjectModule,
     ChatModule,
-    StripeModule,
     CryptoModule,
     ActivityModule,
     LlmModule,
@@ -46,13 +42,11 @@ import { WebrtcModule } from './webrtc/webrtc.module';
     NotificationModule,
     WebrtcModule,
   ],
-  controllers: [AppController],
   providers: [
     {
       provide: APP_FILTER,
       useClass: ExceptionsLoggerFilter,
     },
-    AppService,
   ],
 })
 export class AppModule {}

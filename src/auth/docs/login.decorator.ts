@@ -6,8 +6,8 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 
-import { LoginDto } from '../../common/dto/login.dto';
-import { LoginResponseDto } from '../dto/responses/login-response.dto';
+import { LoginDto } from '../../common/dto';
+import { LoginResponseDto } from '../dto/responses';
 
 export function LoginApiDocs() {
   return applyDecorators(
