@@ -8,7 +8,8 @@ import { FileModule } from '../file/file.module';
 import { UserController } from './controllers/user.controller';
 import { User } from './entities/user.entity';
 import { UserVerification } from './entities/user-verification.entity';
-import { UserService, UserVerificationService } from './services';
+import { UserService } from './services/user.service';
+import { UserVerificationService } from './services/user-verification.service';
 
 @Module({
   imports: [

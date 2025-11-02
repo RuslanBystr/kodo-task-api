@@ -25,7 +25,6 @@ export function setupSwagger(app: INestApplication) {
   SwaggerModule.setup('api', app, document, {
     customCss: `
       button { outline: none !important; }
-      #swagger-ui { background: linear-gradient(45deg, #eafffa, #cceeff); }
       .swagger-ui>.topbar { background-color: #66aabb; }
       #swagger-ui .scheme-container { background-color: #77d9d9; }
       .swagger-ui .auth-wrapper>.btn { border: 2px solid #fff; background-color: #dff; }

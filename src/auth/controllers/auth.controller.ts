@@ -19,7 +19,7 @@ import { JwtPayload } from '../../common/types';
 import { GetJwtPayload } from '../../common/utils/decorators';
 import { GetLogoutApiDocs, GetRefreshApiDocs } from '../../user/docs';
 import { UsersRoleEnum } from '../../user/enums';
-import { UserService } from '../../user/services';
+import { UserService } from '../../user/services/user.service';
 import {
   ForgotPasswordApiDocs,
   LoginApiDocs,

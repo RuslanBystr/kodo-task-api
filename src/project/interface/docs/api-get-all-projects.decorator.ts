@@ -16,7 +16,8 @@ export function ApiGetAllProjects() {
     ApiExtraModels(),
     ApiOperation({
       summary: 'Get all projects',
-      description: 'Returns paginated list of projects where the authenticated user is a member',
+      description:
+        'Returns paginated list of projects where the authenticated user is a member',
     }),
     ApiBearerAuth(),
     ApiQuery({ name: 'id', required: false, type: Number }),
@@ -57,9 +58,19 @@ export function ApiGetAllProjects() {
               properties: {
                 id: { type: 'number', example: 42 },
                 name: { type: 'string', example: 'AI Assistant Platform' },
-                description: { type: 'string', example: 'Platform for managing AI prompts and agents' },
-                image: { type: 'string', example: '550e8400-e29b-41d4-a716-446655440000' },
-                createdAt: { type: 'string', format: 'date-time', example: '2025-11-01T08:00:00.000Z' },
+                description: {
+                  type: 'string',
+                  example: 'Platform for managing AI prompts and agents',
+                },
+                image: {
+                  type: 'string',
+                  example: '550e8400-e29b-41d4-a716-446655440000',
+                },
+                createdAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  example: '2025-11-01T08:00:00.000Z',
+                },
                 // minimal owner
                 owner: {
                   type: 'object',
@@ -75,7 +86,10 @@ export function ApiGetAllProjects() {
                     type: 'object',
                     properties: {
                       id: { type: 'number', example: 9 },
-                      email: { type: 'string', example: 'teammate@example.com' },
+                      email: {
+                        type: 'string',
+                        example: 'teammate@example.com',
+                      },
                     },
                   },
                 },

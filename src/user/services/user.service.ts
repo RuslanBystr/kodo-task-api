@@ -19,13 +19,11 @@ import {
   GetAllUsersFilterDto,
   UpdateEmailDto,
   UpdatePasswordDto,
-  UpdatePhoneDto,
   UpdateUserDto,
   UserCreateDto,
 } from '../dto';
 import {
   ChangeEmailResponseDto,
-  ChangePhoneResponseDto,
   GetUserResponseDto,
   UpdateUserResponseDto,
   UserGetAllResponseDto,
@@ -196,36 +194,6 @@ export class UserService {
     await this.userVerificationService.deleteCode(verifyCode);
     return {
       email,
-    };
-  }
-
-  async changePhone(
-    { phone, code }: UpdatePhoneDto,
-    id: number,
-  ): Promise<ChangePhoneResponseDto> {
-    const user: User = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    //uncomment if need to check phone for unique
-    // const existUser = await this.userRepository.findOne({
-    //   where: {
-    //     phone: phone,
-    //     id: Not(id),
-    //   },
-    // });
-    // if (phone) {
-    //   throw new BadRequestException('User with such phone already exist');
-    // }
-    const verifyCode =
-      await this.userVerificationService.validateVerificationCode({
-        email: user.email,
-        code,
-      });
-    await this.userRepository.update({ id }, { phone });
-    await this.userVerificationService.deleteCode(verifyCode);
-    return {
-      phone,
     };
   }
 

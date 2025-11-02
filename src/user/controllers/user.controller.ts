@@ -22,7 +22,6 @@ import { GetJwtPayload } from '../../common/utils/decorators';
 import {
   ChangeDataVerifyCodeApiDocs,
   ChangeEmailApiDocs,
-  ChangePhoneApiDocs,
   CheckEmailApiDocs,
   GetProfileApiDocs,
   UpdatePasswordApiDocs,
@@ -35,12 +34,11 @@ import {
   GetAllUsersFilterDto,
   UpdateEmailDto,
   UpdatePasswordDto,
-  UpdatePhoneDto,
   UpdateUserDto,
   UserCreateDto,
 } from '../dto';
 import { UsersRoleEnum } from '../enums';
-import { UserService } from '../services';
+import { UserService } from '../services/user.service';
 
 @ApiBearerAuth('access_token')
 @ApiTags('user')
@@ -125,17 +123,6 @@ export class UserController {
     @GetJwtPayload() { id: userId }: JwtPayload,
   ) {
     return await this.userService.changeEmail(updateEmailDto, userId);
-  }
-
-  @ChangePhoneApiDocs()
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard, ActiveUserGuard)
-  @Patch('phone')
-  async changePhone(
-    @Body() updatePhoneDto: UpdatePhoneDto,
-    @GetJwtPayload() { id: userId }: JwtPayload,
-  ) {
-    return await this.userService.changePhone(updatePhoneDto, userId);
   }
 
   @UpdatePasswordApiDocs()
