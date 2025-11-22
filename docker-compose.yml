@@ -35,8 +35,23 @@ services:
       - ./coturn/turnserver.conf:/etc/coturn/turnserver.conf:ro
     command: ["-c", "/etc/coturn/turnserver.conf", "--no-cli"]
 
+  rabbitmq:
+    image: rabbitmq:3.9-management # Includes the management UI
+    container_name: kodotask-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # RabbitMQ AMQP port
+      - "15672:15672"  # RabbitMQ Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   pgdata:
     driver: local
   redisdata:
+    driver: local
+  rabbitmq_data:
     driver: local

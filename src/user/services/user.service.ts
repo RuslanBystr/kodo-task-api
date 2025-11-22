@@ -31,6 +31,7 @@ import {
 import { User } from '../entities/user.entity';
 import { UserSortByEnum } from '../enums';
 import { UserVerificationService } from './user-verification.service';
+import { RabbitMQService } from '../../rabbitmq/services/rabbitmq.service';
 
 @Injectable()
 export class UserService {
@@ -43,6 +44,7 @@ export class UserService {
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>,
     private readonly fileService: FileService,
+    private readonly rabbitmqService: RabbitMQService,
   ) {}
 
   async checkEmailAvailability({ email }: { email: string }) {
@@ -207,6 +209,9 @@ export class UserService {
       ...createDto,
       password,
     });
+    this.rabbitmqService.sendMessage(
+      `New user created ${user.email}\n${user.firstName} ${user.lastName}`,
+    );
     return this.userRepository.save(user);
   }
 

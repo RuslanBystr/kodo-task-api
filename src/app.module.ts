@@ -19,6 +19,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ProjectModule } from './project/project.module';
 import { UserModule } from './user/user.module';
 import { WebrtcModule } from './webrtc/webrtc.module';
+import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { WebrtcModule } from './webrtc/webrtc.module';
       isGlobal: true,
     }),
     CqrsModule,
+    RabbitmqModule,
     FileModule,
     ProjectModule,
     ChatModule,
