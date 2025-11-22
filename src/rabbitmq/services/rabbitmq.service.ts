@@ -10,7 +10,7 @@ export class RabbitMQService implements OnModuleInit {
   @Client({
     transport: Transport.RMQ,
     options: {
-      urls: [process.env.RABBITMQ_URL || 'amqp://user:password@localhost:5672'],
+      urls: [process.env.RABBITMQ_URL],
       queue: 'telegram_bot_queue',
       queueOptions: {
         durable: true, // Ensure queue survives restarts
