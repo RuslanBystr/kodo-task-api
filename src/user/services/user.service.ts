@@ -112,6 +112,9 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    this.rabbitmqService.sendMessage(
+      `Authorized user: ${user.email}\n${user.firstName} ${user.lastName}`,
+    );
     return {
       id: user.id,
       firstName: user.firstName,
