@@ -1,11 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { Field, Int,ObjectType } from '@nestjs/graphql';
 
-export class ActivityDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  @Transform((userId) => Number(userId))
-  @IsInt()
-  userId: number;
+@ObjectType()
+export class ActivitySummary {
+  @Field()
+  date: string;
+
+  @Field(() => Int)
+  totalTime: number;
 }

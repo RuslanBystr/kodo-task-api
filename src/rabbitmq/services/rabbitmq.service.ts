@@ -16,7 +16,11 @@ export class RabbitMQService implements OnModuleInit {
   private client: ClientProxy;
 
   async onModuleInit() {
-    await this.client.connect();
+    try {
+      await this.client.connect();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   sendMessage(message: any) {
