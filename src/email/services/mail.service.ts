@@ -9,7 +9,7 @@ import { MailDataRequired } from '@sendgrid/mail';
 import { ADDITIONAL_PROVIDERS, CONFIG } from '../../common/enums';
 import { LoggerService } from '../../logger/services/logger.service';
 import { templates } from '../templates';
-import { SendgridType } from '../types/sendgrid.type';
+import { SendgridType } from '../types';
 import { TemplatesService } from './templates.service';
 
 @Injectable()

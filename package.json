@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "node": "20.12.2"
+    "node": "22.16.0"
   },
   "scripts": {
     "build": "nest build",
@@ -58,12 +58,12 @@
     "@sendgrid/mail": "^8.1.3",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9",
-    "apollo-server-express": "^3.13.0",
     "aws-sdk": "^2.1611.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
+    "express": "^5.1.0",
     "generate-password": "1.7.1",
     "graphql": "^16.12.0",
     "nestjs-typeorm-paginate": "^4.0.4",
@@ -71,12 +71,10 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.11.5",
-    "puppeteer": "^22.8.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "sharp": "^0.34.1",
-    "stripe": "^17.7.0",
-    "typeorm": "^0.3.20",
+    "typeorm": "^0.3.26",
     "typeorm-extension": "^3.5.1"
   },
   "devDependencies": {
@@ -95,7 +93,6 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "dependency-cruiser": "^17.0.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.32.0",
