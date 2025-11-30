@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ENTITIES } from '../common/enums';
-import { EmailModule } from '../email/email.module';
+import { MailModule } from '../mail/mail.module';
 import { FileEntity } from '../file/entities/file.entity';
 import { FileModule } from '../file/file.module';
 import { RabbitmqModule } from '../rabbitmq/rabbitmq.module';
@@ -15,7 +15,7 @@ import { UserVerificationService } from './services/user-verification.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, UserVerification, FileEntity]),
-    EmailModule,
+    MailModule,
     FileModule,
     RabbitmqModule,
   ],

@@ -12,9 +12,10 @@ import { HASH_ROUNDS } from '../../common/constants';
 import { LIBS, SortOrderEnum } from '../../common/enums';
 import { generateSearchConditions } from '../../common/utils';
 import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
-import { MailService } from '../../email/services/mail.service';
 import { FileEntity } from '../../file/entities/file.entity';
 import { FileService } from '../../file/services/file.service';
+import { MailService } from '../../mail/services/mail.service';
+import { RabbitMQService } from '../../rabbitmq/services/rabbitmq.service';
 import {
   GetAllUsersFilterDto,
   UpdateEmailDto,
@@ -31,7 +32,6 @@ import {
 import { User } from '../entities/user.entity';
 import { UserSortByEnum } from '../enums';
 import { UserVerificationService } from './user-verification.service';
-import { RabbitMQService } from '../../rabbitmq/services/rabbitmq.service';
 
 @Injectable()
 export class UserService {

@@ -10,7 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { ExceptionsLoggerFilter } from './common/utils/filters/error';
 import { CryptoModule } from './crypto/crypto.module';
 import { DatabaseModule } from './database/database.module';
-import { EmailModule } from './email/email.module';
+import { MailModule } from './mail/mail.module';
 import { FileModule } from './file/file.module';
 import { LlmModule } from './llm/llm.module';
 import { LoggerModule } from './logger/logger.module';
@@ -26,7 +26,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 @Module({
   imports: [
     UserModule,
-    EmailModule,
+    MailModule,
     AuthModule,
     DatabaseModule,
     LoggerModule,

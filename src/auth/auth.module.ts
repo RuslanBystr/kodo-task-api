@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CONFIG, ENTITIES } from '../common/enums';
 import { BcryptModule } from '../common/utils/libs/bcrypt/bcrypt.module';
-import { EmailModule } from '../email/email.module';
-import { MailService } from '../email/services/mail.service';
+import { MailModule } from '../mail/mail.module';
+import { MailService } from '../mail/services/mail.service';
 import { User } from '../user/entities/user.entity';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './controllers/auth.controller';
@@ -30,7 +30,7 @@ import { JwtRefreshTokenStrategy } from './strategies/jwt-refresh-token.strategy
       }),
     }),
     BcryptModule,
-    EmailModule,
+    MailModule,
   ],
   providers: [
     AuthService,
