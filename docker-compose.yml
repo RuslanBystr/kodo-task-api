@@ -1,5 +1,3 @@
-
-
 services:
   postgres:
     image: postgres:16
@@ -10,10 +8,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
-
     ports:
       - ${POSTGRES_PORT}:5432
-
     volumes:
       - pgdata:/var/lib/postgresql/data/pgdata
 
@@ -21,8 +17,8 @@ services:
     image: redis:7
     container_name: kodotask-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redisdata:/data
 
