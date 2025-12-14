@@ -8,7 +8,7 @@ import {
 } from 'passport-google-oauth20';
 
 import { CONFIG } from '../../common/enums';
-import { UserService } from '../../user/services';
+import { UserService } from '../../user/services/user.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

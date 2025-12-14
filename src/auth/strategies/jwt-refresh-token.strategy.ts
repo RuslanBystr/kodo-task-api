@@ -6,7 +6,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { CONFIG, STRATEGIES } from '../../common/enums';
 import { JwtPayload } from '../../common/types';
-import { UserService } from '../../user/services';
+import { UserService } from '../../user/services/user.service';
 
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(

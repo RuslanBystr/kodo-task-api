@@ -94,22 +94,44 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('reaction')
-  async addReactionOnMessage(@MessageBody() message: any): Promise<void> {
+  async addReactionOnMessage(
+    @MessageBody()
+    message: {
+      id: number;
+      userId: number;
+      chatId: string;
+      reaction: string;
+    },
+  ): Promise<void> {
     const response = await this.messageService.addReactionOnMessage(
       message.id,
-      1, // TODO CRITICAL TASK
+      message.userId,
       message.reaction,
     );
     this.server.to(`chat-${message.chatId}`).emit('updateMessage', response);
   }
 
   @SubscribeMessage('typing')
-  async typingMessage(@MessageBody() message: any): Promise<void> {
+  async typingMessage(
+    @MessageBody()
+    message: {
+      id: number;
+      userId: number;
+      chatId: string;
+    },
+  ): Promise<void> {
     this.server.to(`chat-${message.chatId}`).emit('typing', message.userId);
   }
 
   @SubscribeMessage('removeMessage')
-  async removeMessage(@MessageBody() message: any): Promise<void> {
+  async removeMessage(
+    @MessageBody()
+    message: {
+      id: number;
+      userId: number;
+      chatId: string;
+    },
+  ): Promise<void> {
     const deletedMessage = await this.messageService.removeMessage(message.id);
     this.server
       .to(`chat-${message.chatId}`)

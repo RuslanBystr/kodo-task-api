@@ -23,6 +23,7 @@ import { UpdateProjectCommand } from '../../application/commands/update-project.
 import { GetAllProjectsQuery } from '../../application/queries/get-all-projects.query';
 import { GetProjectByIdQuery } from '../../application/queries/get-project-by-id.query';
 import { GetProjectMembersQuery } from '../../application/queries/get-project-members.query';
+import { ApiCreateProject, ApiGetAllProjects } from '../docs';
 import {
   AddProjectMemberDto,
   CreateProjectDto,
@@ -42,6 +43,7 @@ export class ProjectController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiGetAllProjects()
   async getProjects(
     @Query() filterDto: GetAllProjectsFilterDto,
     @Req() req: AuthRequest,
@@ -51,6 +53,7 @@ export class ProjectController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
+  @ApiCreateProject()
   create(@Body() dto: CreateProjectDto, @Req() req: AuthRequest) {
     return this.command.execute(new CreateProjectCommand(dto, req.user.id));
   }

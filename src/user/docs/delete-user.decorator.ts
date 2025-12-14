@@ -1,4 +1,3 @@
-// delete-user.docs.ts
 import { applyDecorators } from '@nestjs/common';
 import {
   ApiBearerAuth,

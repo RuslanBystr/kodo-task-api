@@ -10,8 +10,8 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ChangePasswordResponseDto } from '../dto/responses/change-password-response.dto';
-import { UpdatePasswordDto } from '../dto/update-password.dto';
+import { UpdatePasswordDto } from '../dto';
+import { ChangePasswordResponseDto } from '../dto/responses';
 
 export function UpdatePasswordApiDocs() {
   return applyDecorators(

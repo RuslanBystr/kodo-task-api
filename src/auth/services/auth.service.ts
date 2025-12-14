@@ -12,21 +12,19 @@ import { Repository } from 'typeorm';
 
 import { HASH_ROUNDS } from '../../common/constants';
 import { LoginDto } from '../../common/dto';
-import { CONFIG, ENTITIES, LIBS } from '../../common/enums';
+import { CONFIG, LIBS } from '../../common/enums';
 import { JwtPayload } from '../../common/types';
 import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
 import { User } from '../../user/entities/user.entity';
 import { UsersRoleEnum } from '../../user/enums';
-import { UserService, UserVerificationService } from '../../user/services';
-import { UserType } from '../../user/types';
+import { UserService } from '../../user/services/user.service';
+import { UserVerificationService } from '../../user/services/user-verification.service';
 import { RefreshTokenCookieDto, RegisterDto, ResetPasswordDto } from '../dto';
 import { LoginResponseDto, RegisterResponseDto } from '../dto/responses';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(ENTITIES.USER)
-    private readonly user: UserType,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,

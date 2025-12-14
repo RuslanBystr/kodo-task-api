@@ -6,7 +6,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { GetRefreshDto } from '../dto/responses/get-refresh.dto';
+import { GetRefreshDto } from '../dto/responses';
 
 export function GetRefreshApiDocs() {
   return applyDecorators(

@@ -12,20 +12,19 @@ import { HASH_ROUNDS } from '../../common/constants';
 import { LIBS, SortOrderEnum } from '../../common/enums';
 import { generateSearchConditions } from '../../common/utils';
 import { bcrypt } from '../../common/utils/libs/bcrypt/bcrypt.type';
-import { MailService } from '../../email/services/mail.service';
 import { FileEntity } from '../../file/entities/file.entity';
 import { FileService } from '../../file/services/file.service';
+import { MailService } from '../../mail/services/mail.service';
+import { RabbitMQService } from '../../rabbitmq/services/rabbitmq.service';
 import {
   GetAllUsersFilterDto,
   UpdateEmailDto,
   UpdatePasswordDto,
-  UpdatePhoneDto,
   UpdateUserDto,
   UserCreateDto,
 } from '../dto';
 import {
   ChangeEmailResponseDto,
-  ChangePhoneResponseDto,
   GetUserResponseDto,
   UpdateUserResponseDto,
   UserGetAllResponseDto,
@@ -45,6 +44,7 @@ export class UserService {
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>,
     private readonly fileService: FileService,
+    private readonly rabbitmqService: RabbitMQService,
   ) {}
 
   async checkEmailAvailability({ email }: { email: string }) {
@@ -112,6 +112,9 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    this.rabbitmqService.sendMessage(
+      `Authorized user: ${user.email}\n${user.firstName} ${user.lastName}`,
+    );
     return {
       id: user.id,
       firstName: user.firstName,
@@ -199,36 +202,6 @@ export class UserService {
     };
   }
 
-  async changePhone(
-    { phone, code }: UpdatePhoneDto,
-    id: number,
-  ): Promise<ChangePhoneResponseDto> {
-    const user: User = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    //uncomment if need to check phone for unique
-    // const existUser = await this.userRepository.findOne({
-    //   where: {
-    //     phone: phone,
-    //     id: Not(id),
-    //   },
-    // });
-    // if (phone) {
-    //   throw new BadRequestException('User with such phone already exist');
-    // }
-    const verifyCode =
-      await this.userVerificationService.validateVerificationCode({
-        email: user.email,
-        code,
-      });
-    await this.userRepository.update({ id }, { phone });
-    await this.userVerificationService.deleteCode(verifyCode);
-    return {
-      phone,
-    };
-  }
-
   async createUser(createDto: UserCreateDto): Promise<User> {
     await this.checkEmailAvailability({ email: createDto.email });
     let password = createDto.password;
@@ -239,6 +212,9 @@ export class UserService {
       ...createDto,
       password,
     });
+    this.rabbitmqService.sendMessage(
+      `New user created ${user.email}\n${user.firstName} ${user.lastName}`,
+    );
     return this.userRepository.save(user);
   }
 
