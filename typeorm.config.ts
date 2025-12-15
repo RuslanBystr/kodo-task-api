@@ -4,7 +4,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { SeederOptions } from 'typeorm-extension';
 
 import { CONFIG } from './src/common/enums';
-import { MainSeeder } from './src/seeds/main-seeder';
+import { MainSeeder } from './src/infra/seeds/main-seeder';
 
 config();
 const configService = new ConfigService();

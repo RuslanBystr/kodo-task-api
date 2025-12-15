@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-import { LoggerService } from '../../../../logger/services/logger.service';
+import { LoggerService } from '../../../../infra/logger/services/logger.service';
 
 @Catch()
 export class ExceptionsLoggerFilter implements ExceptionFilter {

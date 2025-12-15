@@ -1,4 +1,4 @@
-import { UsersRoleEnum } from '../../user/enums';
+import { UsersRoleEnum } from '../../modules/user/enums';
 
 export class JwtPayloadDto {
   id: number;

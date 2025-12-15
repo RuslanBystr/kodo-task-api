@@ -1,35 +1,29 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
-
-import { ActivityModule } from './activity/activity.module';
-import { AuthModule } from './auth/auth.module';
-import { BillingModule } from './billing/billing.module';
-import { ChatModule } from './chat/chat.module';
-import { ExceptionsLoggerFilter } from './common/utils/filters/error';
-import { CryptoModule } from './crypto/crypto.module';
-import { DatabaseModule } from './database/database.module';
-import { MailModule } from './mail/mail.module';
-import { FileModule } from './file/file.module';
-import { LlmModule } from './llm/llm.module';
-import { LoggerModule } from './logger/logger.module';
-import { MembersModule } from './members/members.module';
-import { NotificationModule } from './notification/notification.module';
-import { ProjectModule } from './project/project.module';
-import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
-import { UserModule } from './user/user.module';
-import { WebrtcModule } from './webrtc/webrtc.module';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+
+import { ExceptionsLoggerFilter } from './common/utils/filters/error';
+import { InfraModule } from './infra/infra.module';
+import { ActivityModule } from './modules/activity/activity.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { BillingModule } from './modules/billing/billing.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { FileModule } from './modules/file/file.module';
+import { LlmModule } from './modules/llm/llm.module';
+import { MembersModule } from './modules/members/members.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { ProjectModule } from './modules/project/project.module';
+import { UserModule } from './modules/user/user.module';
+import { WebrtcModule } from './modules/webrtc/webrtc.module';
 
 @Module({
   imports: [
+    InfraModule,
     UserModule,
-    MailModule,
     AuthModule,
-    DatabaseModule,
-    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -39,11 +33,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       path: '/graphql',
     }),
     CqrsModule,
-    RabbitmqModule,
     FileModule,
     ProjectModule,
     ChatModule,
-    CryptoModule,
     ActivityModule,
     LlmModule,
     BillingModule,

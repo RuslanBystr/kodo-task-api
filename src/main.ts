@@ -6,7 +6,7 @@ import { appendFileSync } from 'fs';
 import { join } from 'path';
 
 import { AppModule } from './app.module';
-import { setupSwagger } from './swagger.config';
+import { setupSwagger } from './infra/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
