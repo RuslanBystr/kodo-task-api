@@ -18,10 +18,10 @@ import { randomUUID } from 'crypto';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
 
-import { JwtAuthGuard } from '../../auth/guards';
 import { MAX_FILE_SIZE, UPLOAD_FILE_PATH } from '../../../common/constants';
 import { JwtPayload } from '../../../common/types';
 import { GetJwtPayload } from '../../../common/utils/decorators';
+import { JwtAuthGuard } from '../../auth/guards';
 import { DeleteFileApiDocs, UploadFileApiDocs } from '../docs';
 import { FileService } from '../services/file.service';
 

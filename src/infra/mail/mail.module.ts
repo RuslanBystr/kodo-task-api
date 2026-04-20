@@ -5,7 +5,7 @@ import * as SendGrid from '@sendgrid/mail';
 import { ADDITIONAL_PROVIDERS, CONFIG } from '../../common/enums';
 import { LoggerModule } from '../logger';
 import { LoggerService } from '../logger/services/logger.service';
-import { RabbitmqModule } from '../rabbitmq';
+import { RabbitmqModule } from '../messaging/rabbitmq';
 import { MailService } from './mail.service';
 import { templates } from './templates';
 

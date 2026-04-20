@@ -4,7 +4,7 @@ import { CryptoModule } from './crypto';
 import { DatabaseModule } from './database';
 import { LoggerModule } from './logger';
 import { MailModule } from './mail';
-import { RabbitmqModule } from './rabbitmq';
+import { RabbitmqModule } from './messaging/rabbitmq';
 
 @Module({
   imports: [

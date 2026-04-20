@@ -12,6 +12,7 @@ import {
 
 import { User } from '../../../user/entities/user.entity';
 import { Task } from './task.entity';
+import { Workspace } from '../../../workspaces/entities/workspace.entity';
 
 export enum ProjectStatusEnum {
   ACTIVE = 'Active',
@@ -30,8 +31,18 @@ export class Project {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'uuid', name: 'workspace_id', nullable: true })
+  workspaceId: string;
+
+  @ManyToOne(() => Workspace, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'workspace_id' })
+  workspace: Workspace;
+
   @Column({ type: 'uuid', nullable: true })
-  public image: string;
+  image: string;
 
   @Column()
   name: string;

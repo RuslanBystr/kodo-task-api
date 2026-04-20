@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { MailService } from '../../../infra/mail';
-import { RabbitMQService } from '../../../infra/rabbitmq';
+import { RabbitMQService } from '../../../infra/messaging/rabbitmq';
 
 @ApiTags('mail')
 @Controller('mail')

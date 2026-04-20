@@ -14,8 +14,8 @@ import { generateSearchConditions } from '../../../common/utils';
 import { bcrypt } from '../../../common/utils/libs/bcrypt/bcrypt.type';
 import { FileEntity } from '../../file/entities/file.entity';
 import { FileService } from '../../file/services/file.service';
-import { MailService } from '../../../infra/mail/mail.service';
-import { RabbitMQService } from '../../../infra/rabbitmq/rabbitmq.service';
+import { MailService } from '../../../infra/mail';
+import { RabbitMQService } from '../../../infra/messaging/rabbitmq';
 import {
   GetAllUsersFilterDto,
   UpdateEmailDto,

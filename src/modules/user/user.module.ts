@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ENTITIES } from '../../common/enums';
 import { MailModule } from '../../infra/mail';
-import { RabbitmqModule } from '../../infra/rabbitmq';
+import { RabbitmqModule } from '../../infra/messaging/rabbitmq';
 import { FileEntity } from '../file/entities/file.entity';
 import { FileModule } from '../file/file.module';
 import { SupportController } from './controllers/support.controller';
