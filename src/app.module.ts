@@ -7,6 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 
 import { ExceptionsLoggerFilter } from './common/utils/filters/error';
 import { InfraModule } from './infra/infra.module';
+import { AccessModule } from './modules/access/access.module';
 import { ActivityModule } from './modules/activity/activity.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BillingModule } from './modules/billing/billing.module';
@@ -18,6 +19,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { ProjectModule } from './modules/project/project.module';
 import { UserModule } from './modules/user/user.module';
 import { WebrtcModule } from './modules/webrtc/webrtc.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { WebrtcModule } from './modules/webrtc/webrtc.module';
     }),
     CqrsModule,
     FileModule,
+    AccessModule,
+    WorkspacesModule,
     ProjectModule,
     ChatModule,
     ActivityModule,

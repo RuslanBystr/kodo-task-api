@@ -34,6 +34,7 @@ export class ExceptionsLoggerFilter implements ExceptionFilter {
         ? this.configureHttpExceptionResponse(exception)
         : this.configureErrorResponse(exception as Error);
 
+    console.log(responseJson);
     response.status(responseJson.statusCode || 500).json(responseJson);
   }
 }

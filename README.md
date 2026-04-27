@@ -72,3 +72,26 @@ Run a migration
 ```bash
 $ npm run typeorm:run-migrations
 ```
+
+# Permissions
+
+## Roles Layer
+
+### User roles (system role)
+```ts
+export enum UsersRoleEnum {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+```
+### Workspace roles
+```ts
+export enum WorkspaceRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  MEMBER = 'member',
+  VIEWER = 'viewer',
+}
+```
+### Project roles
+`custom roles`, `owner`

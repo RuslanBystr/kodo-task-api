@@ -11,8 +11,8 @@ import {
 } from 'typeorm';
 
 import { User } from '../../../user/entities/user.entity';
-import { Task } from './task.entity';
 import { Workspace } from '../../../workspaces/entities/workspace.entity';
+import { Task } from './task.entity';
 
 export enum ProjectStatusEnum {
   ACTIVE = 'Active',

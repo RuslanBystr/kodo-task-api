@@ -13,6 +13,9 @@ export class Workspace {
   @Column({ unique: true, length: 255 })
   name: string;
 
+  @Column({ default: 0 })
+  totalMembers: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

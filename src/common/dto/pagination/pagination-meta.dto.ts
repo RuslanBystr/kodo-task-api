@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IPaginationMeta } from 'nestjs-typeorm-paginate/dist/interfaces';
 
-export class PaginationMetaDto {
+export class PaginationMetaDto implements IPaginationMeta {
   @ApiProperty()
   currentPage: number;
 

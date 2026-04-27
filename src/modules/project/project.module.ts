@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { User } from '../user/entities/user.entity';
+import { Workspace } from '../workspaces/entities/workspace.entity';
 import { CommandHandlers } from './application/commands';
 import { QueryHandlers } from './application/queries';
 import { Project } from './infrastructure/entities/project.entity';
@@ -14,7 +15,7 @@ import { ProjectMemberGuard } from './interface/guards';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Project, Task, TaskLog]),
+    TypeOrmModule.forFeature([User, Project, Task, TaskLog, Workspace]),
     CqrsModule,
   ],
   providers: [...CommandHandlers, ...QueryHandlers, ProjectMemberGuard],
